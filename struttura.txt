@@ -1,0 +1,36 @@
+StockTrack
+├── pom.xml
+├── src
+│   ├── main
+│   │   ├── java                           <-- IL TUO CODICE VA QUI
+│   │   │   └── com
+│   │   │       └── stocktrack
+│   │   │           ├── bean               <-- Oggetti semplici per passare dati (Boundary <-> Controller)
+│   │   │           ├── controller         <-- Logica applicativa (es. LoginController)
+│   │   │           ├── model              <-- Entità del dominio (Prodotto, Utente)
+│   │   │           ├── view               <-- Le tue due GUI
+│   │   │           │   ├── cli            <-- System.out e Scanner
+│   │   │           │   └── fx             <-- Controller grafici JavaFX
+│   │   │           ├── persistence        <-- I DAO e il File System
+│   │   │           │   ├── dao            <-- Interfacce (es. ProdottoDAO)
+│   │   │           │   ├── fs             <-- Implementazione File System (Full)
+│   │   │           │   ├── db             <-- Implementazione Database (Full)
+│   │   │           │   └── memory         <-- Implementazione In-Memory (Demo)
+│   │   │           ├── engineering        <-- Factory, Singleton, Exception
+│   │   │           │   ├── factory        <-- Factory per creare i DAO giusti (DAOFactory)
+│   │   │           │   ├── singleton      <-- Es. SessionManager (chi è l'utente loggato?)
+│   │   │           │   └── exception      <-- Le tue eccezioni personalizzate
+│   │   │           └── Main.java          <-- Il punto di ingresso
+│   │   │
+│   │   └── resources                      <-- FILE NON-JAVA VANNO QUI
+│   │       ├── com
+│   │       │   └── stocktrack
+│   │       │       └── view               <-- Qui metti i file .fxml (Login.fxml, Home.fxml)
+│   │       ├── styles.css                 <-- Se usi CSS
+│   │       └── config.properties          <-- File per settare "demo" o "full" senza ricompilare
+│   │
+│   └── test                               <-- I TEST VANNO QUI
+│       └── java
+│           └── com
+│               └── stocktrack
+│                   └── ... (test cases)

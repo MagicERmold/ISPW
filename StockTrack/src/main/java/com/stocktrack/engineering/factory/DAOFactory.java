@@ -1,7 +1,9 @@
 package com.stocktrack.engineering.factory;
 
 import com.stocktrack.persistence.dao.StockDAO;
+import com.stocktrack.persistence.dao.UserDAO;
 import com.stocktrack.persistence.memory.InMemoryStockDAO;
+import com.stocktrack.persistence.memory.InMemoryUserDAO;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,6 +28,19 @@ public class DAOFactory {
             throw new UnsupportedOperationException("Versione FULL non ancora implementata");
         }else{
             throw new IllegalArgumentException("Tipo di persistenza non valido: " +  type);
+        }
+    }
+
+    // --- NUOVO METODO AGGIUNTO ---
+    public static UserDAO getUserDAO() throws IOException {
+        String type = readPersistenceTypeFromConfig();
+
+        // Nota: Per ora usiamo InMemory anche per la FULL version finché
+        // non implementiamo il salvataggio utenti su file.
+        if ("DEMO".equalsIgnoreCase(type) || "FULL".equalsIgnoreCase(type)) {
+            return new InMemoryUserDAO();
+        } else {
+            throw new IllegalArgumentException("Tipo di persistenza non valido: " + type);
         }
     }
 

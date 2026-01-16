@@ -35,7 +35,7 @@ public class ManageStockController {
         for (Stock stock : stocks) {
             StockBean bean = new StockBean(
                     stock.getNome(),
-                    stock.getQuantita(),
+                    stock.getQuantity(),
                     stock.getSoglia()
             );
             stockBeans.add(bean);

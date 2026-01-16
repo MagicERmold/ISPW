@@ -1,12 +1,13 @@
 package com.stocktrack;
 
-import com.stocktrack.view.cli.StockCLI;
+import com.stocktrack.view.cli.LoginCLI;
+
 
 import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        StockCLI cli = new StockCLI();
-        cli.start();
+        LoginCLI loginCLI = new LoginCLI();
+        loginCLI.start();
     }
 }

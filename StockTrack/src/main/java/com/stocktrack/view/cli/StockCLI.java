@@ -3,12 +3,14 @@ package com.stocktrack.view.cli;
 import com.stocktrack.bean.StockBean;
 import com.stocktrack.controller.ManageStockController;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.Scanner;
 
 public class StockCLI {
     private final ManageStockController controller = new ManageStockController();
 
-    public void start() {
+    public void start() throws IOException {
         Scanner scanner = new Scanner(System.in);
         boolean running = true;
 
@@ -27,7 +29,7 @@ public class StockCLI {
                     break;
                 case "2":
                     // Qui dovrai implementare la visualizzazione (chiamando il controller)
-                    System.out.println("Funzionalità in arrivo...");
+                    showAllProducts();
                     break;
                 case "0":
                     running = false;
@@ -60,7 +62,35 @@ public class StockCLI {
         } catch (Exception e) {
             System.out.println("Errore durante l'aggiunta: " + e.getMessage());
         }
+    }
 
+    private void showAllProducts() {
+        try {
+            // Chiamo il controller
+            List<StockBean> list = controller.showAllProducts();
 
+            if (list.isEmpty()) {
+                System.out.println("Il magazzino è vuoto.");
+                return;
+            }
+
+            // Intestazione tabella (formattazione carina per la CLI)
+            System.out.println("\n------------------------------------------------");
+            // %-20s significa "stringa allineata a sinistra, spazio 20 char"
+            System.out.printf("%-20s | %-10s | %-10s%n", "NOME", "QUANTITÀ", "SOGLIA");
+            System.out.println("------------------------------------------------");
+
+            for (StockBean bean : list) {
+                System.out.printf("%-20s | %-10d | %-10d%n",
+                        bean.getNome(),
+                        bean.getQuantity(),
+                        bean.getSoglia()
+                );
+            }
+
+            System.out.println("------------------------------------------------\n");
+        } catch (IOException e) {
+            System.out.println("Errore nel recupero dati: " + e.getMessage());
+        }
     }
 }

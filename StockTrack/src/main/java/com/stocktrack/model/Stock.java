@@ -5,6 +5,13 @@ public class Stock {
     private int quantity;
     private int soglia;
 
+    public Stock(String nome, int quantity) {
+        this.nome = nome;
+        this.quantity = quantity;
+        this.soglia = 0;
+    }
+
+    // Costruttore completo (utile per il DAO)
     public Stock(String nome, int quantity, int soglia) {
         this.nome = nome;
         this.quantity = quantity;
@@ -13,5 +20,17 @@ public class Stock {
 
     public String getNome() {
         return nome;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public int getSoglia() {
+        return soglia;
+    }
+
+    public void setSoglia(int soglia) {
+        this.soglia = soglia;
     }
 }

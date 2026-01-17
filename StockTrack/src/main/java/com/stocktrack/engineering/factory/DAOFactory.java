@@ -2,6 +2,7 @@ package com.stocktrack.engineering.factory;
 
 import com.stocktrack.persistence.dao.StockDAO;
 import com.stocktrack.persistence.dao.UserDAO;
+import com.stocktrack.persistence.fs.FileSystemStockDAO;
 import com.stocktrack.persistence.memory.InMemoryStockDAO;
 import com.stocktrack.persistence.memory.InMemoryUserDAO;
 
@@ -13,7 +14,6 @@ import java.util.logging.Logger;
 
 public class DAOFactory {
     private static final Logger logger = Logger.getLogger(DAOFactory.class.getName());
-
     private static final String CONFIG_FILE = "config.properties";
     private static final String PERSISTENCE_TYPE_KEY = "persistence.type";
 
@@ -25,7 +25,7 @@ public class DAOFactory {
         if("DEMO".equalsIgnoreCase(type)) {
             return new InMemoryStockDAO();
         }else if("FULL".equalsIgnoreCase(type)) {
-            throw new UnsupportedOperationException("Versione FULL non ancora implementata");
+            return new FileSystemStockDAO();
         }else{
             throw new IllegalArgumentException("Tipo di persistenza non valido: " +  type);
         }

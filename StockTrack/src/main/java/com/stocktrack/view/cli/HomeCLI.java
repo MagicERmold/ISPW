@@ -4,7 +4,6 @@ import com.stocktrack.engineering.singleton.SessionManager;
 import com.stocktrack.model.Role;
 import com.stocktrack.model.User;
 
-import java.io.IOException;
 import java.util.Scanner;
 
 public class HomeCLI {

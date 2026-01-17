@@ -2,7 +2,6 @@ package com.stocktrack;
 
 import com.stocktrack.view.cli.LoginCLI;
 
-
 import java.io.IOException;
 
 public class Main {

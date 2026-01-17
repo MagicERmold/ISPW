@@ -18,6 +18,7 @@ public class LoginCLI {
 
         while (running) {
             System.out.println("\n1. Login");
+            System.out.println("2. Register");
             System.out.println("0. Esci");
             System.out.print("Scegli un'opzione: ");
             String input = scanner.nextLine();
@@ -29,6 +30,9 @@ public class LoginCLI {
                         HomeCLI home = new HomeCLI();
                         home.start();
                     }
+                    break;
+                case "2":
+                    System.out.println("Funzione non ancora implementata");
                     break;
                 case "0":
                     System.out.println("Chiusura applicazione...");

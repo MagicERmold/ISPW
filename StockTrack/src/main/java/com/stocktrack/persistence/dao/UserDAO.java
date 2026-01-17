@@ -4,4 +4,5 @@ import com.stocktrack.model.User;
 
 public interface UserDAO {
     User findUserByUsername(String username);
+    void saveUser(User user);
 }

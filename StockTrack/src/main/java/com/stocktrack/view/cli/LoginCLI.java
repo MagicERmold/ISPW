@@ -32,7 +32,7 @@ public class LoginCLI {
                     }
                     break;
                 case "2":
-                    System.out.println("Funzione non ancora implementata");
+                    performRegister(scanner);
                     break;
                 case "0":
                     System.out.println("Chiusura applicazione...");
@@ -65,6 +65,29 @@ public class LoginCLI {
         } catch (IOException e) {
             System.out.println("Errore di sistema durante il login: " + e.getMessage());
             return false;
+        }
+    }
+
+    // --- NUOVO METODO PRIVATO ---
+    private void performRegister(Scanner scanner) {
+        System.out.println("\n--- REGISTRAZIONE ---");
+        System.out.print("Scegli Username: ");
+        String username = scanner.nextLine();
+
+        System.out.print("Scegli Password: ");
+        String password = scanner.nextLine();
+
+        // Riutilizziamo UserBean per trasportare i dati
+        UserBean bean = new UserBean(username, password);
+
+        try {
+            if (loginController.register(bean)) {
+                System.out.println("Registrazione avvenuta con successo! Ora puoi effettuare il login.");
+            } else {
+                System.out.println("Errore: Username già in uso.");
+            }
+        } catch (IOException e) {
+            System.out.println("Errore di sistema: " + e.getMessage());
         }
     }
 }

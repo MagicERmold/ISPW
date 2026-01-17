@@ -27,4 +27,9 @@ public class InMemoryUserDAO implements UserDAO {
         return usersDB.get(username);
     }
 
+    @Override
+    public void saveUser(User user) {
+        usersDB.put(user.getUsername(), user);
+    }
+
 }

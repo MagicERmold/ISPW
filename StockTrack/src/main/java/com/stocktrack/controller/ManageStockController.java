@@ -43,4 +43,24 @@ public class ManageStockController {
 
         return stockBeans;
     }
+
+    public List<StockBean> getShoppingList() throws IOException {
+        StockDAO dao = DAOFactory.getStockDAO();
+        List<Stock> allStocks = dao.getAllStocks();
+
+        List<StockBean> shoppingList = new ArrayList<>();
+
+        for (Stock stock : allStocks) {
+            // Logica di Business: Se la quantità è INFERIORE alla soglia, serve comprare!
+            if (stock.getQuantity() < stock.getSoglia()) {
+                StockBean bean = new StockBean(
+                        stock.getNome(),
+                        stock.getQuantity(),
+                        stock.getSoglia()
+                );
+                shoppingList.add(bean);
+            }
+        }
+        return shoppingList;
+    }
 }

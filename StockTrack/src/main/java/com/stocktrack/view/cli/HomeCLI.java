@@ -1,9 +1,13 @@
 package com.stocktrack.view.cli;
 
+import com.stocktrack.bean.StockBean;
+import com.stocktrack.controller.ManageStockController;
 import com.stocktrack.engineering.singleton.SessionManager;
 import com.stocktrack.model.Role;
 import com.stocktrack.model.User;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.Scanner;
 
 public class HomeCLI {
@@ -45,7 +49,7 @@ public class HomeCLI {
                     if (currentUser.getRole() == Role.ADMIN) {
                         System.out.println("Funzionalità 'Gestione Utenti' non ancora implementata.");
                     } else {
-                        System.out.println("Funzionalità 'Lista della Spesa' non ancora implementata.");
+                        generateShoppingList();
                     }
                     break;
 
@@ -75,5 +79,38 @@ public class HomeCLI {
         System.out.println("2. Genera Lista Spesa (Sottoscorta)");
         System.out.println("0. Logout");
         System.out.print("> ");
+    }
+
+    private void generateShoppingList() {
+        ManageStockController controller = new ManageStockController();
+        System.out.println("\n*** GENERAZIONE LISTA SPESA (Prodotti Sottoscorta) ***");
+
+        try {
+            List<StockBean> list = controller.getShoppingList();
+
+            if (list.isEmpty()) {
+                System.out.println("Tutto ok! Nessun prodotto è sotto la soglia minima.");
+                return;
+            }
+
+            System.out.println("ATTENZIONE: I seguenti prodotti sono in esaurimento:");
+            System.out.println("----------------------------------------------------------");
+            System.out.printf("%-20s | %-10s | %-10s | %-10s%n", "NOME", "QUANTITÀ", "SOGLIA", "DA ORDINARE");
+            System.out.println("----------------------------------------------------------");
+
+            for (StockBean bean : list) {
+                int daOrdinare = bean.getSoglia() - bean.getQuantity();
+                System.out.printf("%-20s | %-10d | %-10d | %-10d%n",
+                        bean.getNome(),
+                        bean.getQuantity(),
+                        bean.getSoglia(),
+                        daOrdinare // Suggeriamo quanti comprarne per tornare almeno a pari
+                );
+            }
+            System.out.println("----------------------------------------------------------\n");
+
+        } catch (IOException e) {
+            System.out.println("Errore nel recupero dati: " + e.getMessage());
+        }
     }
 }

@@ -10,7 +10,7 @@ import java.util.Scanner;
 public class StockCLI {
     private final ManageStockController controller = new ManageStockController();
 
-    public void start() throws IOException {
+    public void start() {
         Scanner scanner = new Scanner(System.in);
         boolean running = true;
 

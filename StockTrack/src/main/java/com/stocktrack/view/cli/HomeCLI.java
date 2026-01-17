@@ -39,11 +39,7 @@ public class HomeCLI {
                     // Sia Admin che User possono gestire il magazzino
                     // Lanciamo la vecchia StockCLI che gestisce i prodotti
                     StockCLI stockCLI = new StockCLI();
-                    try {
-                        stockCLI.start(); // Nota: dovrai modificare StockCLI per non avere il loop infinito se vuoi tornare qui
-                    } catch (IOException e) {
-                        System.out.println("Errore: " + e.getMessage());
-                    }
+                    stockCLI.start(); // Nota: dovrai modificare StockCLI per non avere il loop infinito se vuoi tornare qui
                     break;
 
                 case "2":

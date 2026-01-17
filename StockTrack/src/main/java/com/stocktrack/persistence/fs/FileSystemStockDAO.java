@@ -2,7 +2,6 @@ package com.stocktrack.persistence.fs;
 
 import com.stocktrack.model.Stock;
 import com.stocktrack.persistence.dao.StockDAO;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,72 +11,72 @@ import java.util.logging.Logger;
 public class FileSystemStockDAO implements StockDAO {
     private static final String CSV_FILE_NAME = "stock_database.csv";
     private static final Logger logger = Logger.getLogger(FileSystemStockDAO.class.getName());
-    private final File file;
+    private final File file = new File(CSV_FILE_NAME);
 
     public FileSystemStockDAO() {
-        this.file = new File(CSV_FILE_NAME);
-        // Se il file non esiste, proviamo a crearlo
         if (!file.exists()) {
-            try {
-                if (file.createNewFile()) {
-                    logger.info("File database stock creato: " + CSV_FILE_NAME);
-                }
-            } catch (IOException e) {
-                logger.log(Level.SEVERE, "Impossibile creare il file database stock", e);
-            }
+            try { file.createNewFile(); } catch (IOException e) { e.printStackTrace(); }
         }
     }
 
     @Override
     public void saveStock(Stock stock) {
-        // 'true' abilita la modalità append (scrive in coda senza sovrascrivere)
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
-
-            // Scriviamo: Nome,Quantità,Soglia
-            // Assumiamo che la tua classe Stock abbia i metodi getNome(), getQuantity(), getSoglia()
-            // Se getQuantity() si chiama getQuantita(), correggi qui sotto.
-            String line = String.format("%s,%d,%d",
-                    stock.getNome(),
-                    stock.getQuantity(),
-                    stock.getSoglia());
-
+            String line = String.format("%s,%d,%d,%s",
+                    stock.getNome(), stock.getQuantity(), stock.getThreshold(), stock.getGroupUid());
             writer.write(line);
-            writer.newLine(); // A capo
-
-            logger.info(() -> "Prodotto salvato su file: " + stock.getNome());
-
-        } catch (IOException e) {
-            logger.log(Level.SEVERE, "Errore durante il salvataggio su file", e);
-        }
+            writer.newLine();
+        } catch (IOException e) { logger.log(Level.SEVERE, "Errore save", e); }
     }
 
     @Override
-    public List<Stock> getAllStocks() {
-        List<Stock> stockList = new ArrayList<>();
-
-        if (!file.exists()) return stockList;
+    public List<Stock> getAllStocks(String groupUid) {
+        List<Stock> list = new ArrayList<>();
+        if (groupUid == null || groupUid.equals("null")) return list;
 
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                if (line.trim().isEmpty()) continue;
-
+                if(line.trim().isEmpty()) continue;
                 String[] parts = line.split(",");
-                // Ci aspettiamo 3 campi: Nome, Quantità, Soglia
-                if (parts.length >= 3) {
-                    String name = parts[0];
-                    int quantity = Integer.parseInt(parts[1]);
-                    int threshold = Integer.parseInt(parts[2]);
-
-                    // Creiamo l'oggetto usando il costruttore completo
-                    Stock s = new Stock(name, quantity, threshold);
-                    stockList.add(s);
+                if (parts.length >= 4) {
+                    // Filtra per gruppo
+                    if (parts[3].equals(groupUid)) {
+                        list.add(new Stock(parts[0], Integer.parseInt(parts[1]), Integer.parseInt(parts[2]), parts[3]));
+                    }
                 }
             }
-        } catch (IOException | NumberFormatException e) {
-            logger.log(Level.SEVERE, "Errore durante la lettura del database stock", e);
-        }
+        } catch (Exception e) { logger.log(Level.SEVERE, "Errore read", e); }
+        return list;
+    }
 
-        return stockList;
+    @Override
+    public void updateStockQuantity(String stockName, int newQuantity, String groupUid) {
+        List<String> lines = new ArrayList<>();
+        boolean found = false;
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",");
+                if (parts.length >= 4 && parts[0].equals(stockName) && parts[3].equals(groupUid)) {
+                    // Trovato! Aggiorno la quantità (indice 1)
+                    String newLine = String.format("%s,%d,%s,%s", parts[0], newQuantity, parts[2], parts[3]);
+                    lines.add(newLine);
+                    found = true;
+                } else {
+                    lines.add(line);
+                }
+            }
+        } catch (IOException e) { return; }
+
+        if (found) {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, false))) {
+                for (String s : lines) {
+                    writer.write(s);
+                    writer.newLine();
+                }
+            } catch (IOException e) { logger.log(Level.SEVERE, "Errore update stock", e); }
+        }
     }
 }

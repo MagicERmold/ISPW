@@ -4,33 +4,29 @@ public class Stock {
     private String nome;
     private int quantity;
     private int soglia;
+    private String groupUid; // CAMPO MANCANTE AGGIUNTO
 
-    public Stock(String nome, int quantity) {
-        this.nome = nome;
-        this.quantity = quantity;
-        this.soglia = 0;
-    }
-
-    // Costruttore completo (utile per il DAO)
     public Stock(String nome, int quantity, int soglia) {
+        this(nome, quantity, soglia, null);
+    }
+
+    public Stock(String nome, int quantity, int soglia, String groupUid) {
         this.nome = nome;
         this.quantity = quantity;
         this.soglia = soglia;
+        this.groupUid = groupUid;
     }
 
-    public String getNome() {
-        return nome;
-    }
+    // Rinominiamo/Aliasi per compatibilità col Controller
+    public String getNome() { return nome; }
 
-    public int getQuantity() {
-        return quantity;
-    }
+    public int getQuantity() { return quantity; }
+    public int getSoglia() { return soglia; }
+    // Nota: Il controller potrebbe chiamarlo getThreshold, aggiungiamolo per sicurezza
+    public int getThreshold() { return soglia; }
 
-    public int getSoglia() {
-        return soglia;
-    }
+    public String getGroupUid() { return groupUid; }
 
-    public void setSoglia(int soglia) {
-        this.soglia = soglia;
-    }
+    public void setQuantity(int quantity) { this.quantity = quantity; }
+    public void setSoglia(int soglia) { this.soglia = soglia; }
 }

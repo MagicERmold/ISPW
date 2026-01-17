@@ -5,6 +5,8 @@ import com.stocktrack.model.User;
 import com.stocktrack.persistence.dao.UserDAO;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -15,60 +17,79 @@ public class FileSystemUserDAO implements UserDAO {
 
     public FileSystemUserDAO() {
         this.file = new File(CSV_FILE_NAME);
-        // Se il file non esiste, lo creiamo
         if (!file.exists()) {
-            try {
-                if (file.createNewFile()) {
-                    logger.info("File utenti creato: " + CSV_FILE_NAME);
-                }
-            } catch (IOException e) {
-                logger.log(Level.SEVERE, "Impossibile creare il file utenti", e);
-            }
+            try { file.createNewFile(); } catch (IOException e) { e.printStackTrace(); }
         }
     }
 
     @Override
     public User findUserByUsername(String username) {
         if (!file.exists()) return null;
-
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 if (line.trim().isEmpty()) continue;
-
                 String[] parts = line.split(",");
-                // Formato atteso: username,password,ROLE
                 if (parts.length >= 3) {
-                    String fileUser = parts[0];
-                    if (fileUser.equals(username)) {
-                        String password = parts[1];
-                        // Convertiamo la stringa "ADMIN" o "USER" nell'Enum Role
-                        Role role = Role.valueOf(parts[2]);
-
-                        return new User(fileUser, password, role);
+                    if (parts[0].equals(username)) {
+                        String group = (parts.length > 3) ? parts[3] : null; // Leggi il gruppo se c'è
+                        return new User(parts[0], parts[1], Role.valueOf(parts[2]), group);
                     }
                 }
             }
-        } catch (IOException | IllegalArgumentException e) {
-            logger.log(Level.SEVERE, "Errore lettura utenti da file", e);
-        }
-        return null; // Utente non trovato
+        } catch (IOException e) { logger.log(Level.SEVERE, "Errore lettura", e); }
+        return null;
     }
 
     @Override
     public void saveUser(User user) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
-            // Scriviamo: username,password,RUOLO
-            String line = String.format("%s,%s,%s",
-                    user.getUsername(),
-                    user.getPassword(),
-                    user.getRole().name()); // .name() converte l'Enum in Stringa
+        writeToFile(user, true); // true = append
+    }
 
+    @Override
+    public void updateUser(User user) {
+        // Per aggiornare, dobbiamo riscrivere il file.
+        // 1. Leggi tutti gli utenti
+        List<User> users = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",");
+                if (parts.length >= 3) {
+                    String group = (parts.length > 3) ? parts[3] : null;
+                    users.add(new User(parts[0], parts[1], Role.valueOf(parts[2]), group));
+                }
+            }
+        } catch (IOException e) { return; }
+
+        // 2. Sostituisci quello modificato
+        boolean found = false;
+        for (int i = 0; i < users.size(); i++) {
+            if (users.get(i).getUsername().equals(user.getUsername())) {
+                users.set(i, user);
+                found = true;
+                break;
+            }
+        }
+
+        // 3. Riscrivi tutto se trovato
+        if (found) {
+            try {
+                // Svuota il file e riscrivi
+                new FileWriter(file, false).close();
+                for (User u : users) {
+                    writeToFile(u, true);
+                }
+            } catch (IOException e) { logger.log(Level.SEVERE, "Errore update", e); }
+        }
+    }
+
+    private void writeToFile(User user, boolean append) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, append))) {
+            String line = String.format("%s,%s,%s,%s",
+                    user.getUsername(), user.getPassword(), user.getRole(), user.getGroupUid());
             writer.write(line);
             writer.newLine();
-
-        } catch (IOException e) {
-            logger.log(Level.SEVERE, "Errore salvataggio utente su file", e);
-        }
+        } catch (IOException e) { logger.log(Level.SEVERE, "Errore scrittura", e); }
     }
 }

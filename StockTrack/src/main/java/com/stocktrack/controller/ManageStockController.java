@@ -2,8 +2,10 @@ package com.stocktrack.controller;
 
 import com.stocktrack.bean.StockBean;
 import com.stocktrack.engineering.factory.DAOFactory;
+import com.stocktrack.engineering.singleton.SessionManager;
 import com.stocktrack.exception.InvalidProductDataException;
 import com.stocktrack.model.Stock;
+import com.stocktrack.model.User;
 import com.stocktrack.persistence.dao.StockDAO;
 
 import java.io.IOException;
@@ -12,23 +14,36 @@ import java.util.List;
 
 public class ManageStockController {
 
-    // --- METODO AGGIORNATO ---
-    public void addStock(StockBean bean) throws IOException, InvalidProductDataException {
-        // Validazione dei dati (Business Logic)
-        if (bean.getQuantity() < 0) {
-            throw new InvalidProductDataException("La quantità non può essere negativa.");
-        }
-        if (bean.getSoglia() < 0) {
-            throw new InvalidProductDataException("La soglia minima non può essere negativa.");
-        }
-        if (bean.getNome() == null || bean.getNome().trim().isEmpty()) {
-            throw new InvalidProductDataException("Il nome del prodotto non può essere vuoto.");
+    // ADMIN: Aggiunge nuovo prodotto
+    public void addStock(StockBean bean) throws Exception {
+        User user = SessionManager.getInstance().getCurrentUser();
+        if (user.getGroupUid() == null) throw new Exception("Devi prima creare o unirti a un gruppo!");
+
+        // Passa il GroupUID al nuovo stock
+        Stock stock = new Stock(bean.getNome(), bean.getQuantity(), bean.getSoglia(), user.getGroupUid());
+        DAOFactory.getStockDAO().saveStock(stock);
+    }
+
+    // USER: Consuma (diminuisce) o Acquista (aumenta)
+    public void modifyQuantity(String productName, int amountChange) throws Exception {
+        User user = SessionManager.getInstance().getCurrentUser();
+        StockDAO dao = DAOFactory.getStockDAO();
+
+        // Cerco il prodotto attuale per sapere la quantità corrente
+        List<Stock> stocks = dao.getAllStocks(user.getGroupUid());
+        Stock target = null;
+        for(Stock s : stocks) {
+            if(s.getNome().equals(productName)) {
+                target = s; break;
+            }
         }
 
-        // Se i controlli passano, procediamo
-        Stock stock = new Stock(bean.getNome(), bean.getQuantity(), bean.getSoglia());
-        StockDAO dao = DAOFactory.getStockDAO();
-        dao.saveStock(stock);
+        if(target == null) throw new Exception("Prodotto non trovato!");
+
+        int newQty = target.getQuantity() + amountChange;
+        if (newQty < 0) throw new Exception("Non puoi avere quantità negativa!");
+
+        dao.updateStockQuantity(productName, newQty, user.getGroupUid());
     }
 
     public List<StockBean> showAllProducts() throws IOException {

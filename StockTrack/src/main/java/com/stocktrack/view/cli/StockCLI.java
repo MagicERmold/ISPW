@@ -2,7 +2,10 @@ package com.stocktrack.view.cli;
 
 import com.stocktrack.bean.StockBean;
 import com.stocktrack.controller.ManageStockController;
+import com.stocktrack.engineering.singleton.SessionManager;
 import com.stocktrack.exception.InvalidProductDataException;
+import com.stocktrack.model.Role;
+import com.stocktrack.model.User;
 
 import java.io.IOException;
 import java.util.List;
@@ -14,6 +17,15 @@ public class StockCLI {
     public void start() {
         Scanner scanner = new Scanner(System.in);
         boolean running = true;
+
+        User user = SessionManager.getInstance().getCurrentUser();
+
+        if (user.getRole() == Role.ADMIN) {
+            System.out.println("1. Aggiungi nuovo prodotto");
+        } else {
+            System.out.println("1. Registra Consumo (-)");
+            System.out.println("2. Registra Acquisto (+)");
+        }
 
         while (running) {
             System.out.println("\n--- HOME MENU ---"); // Qui System.out è OK (è la View!)

@@ -2,6 +2,7 @@ package com.stocktrack.controller;
 
 import com.stocktrack.bean.StockBean;
 import com.stocktrack.engineering.factory.DAOFactory;
+import com.stocktrack.exception.InvalidProductDataException;
 import com.stocktrack.model.Stock;
 import com.stocktrack.persistence.dao.StockDAO;
 
@@ -11,14 +12,22 @@ import java.util.List;
 
 public class ManageStockController {
 
-    public void addStock(StockBean bean) throws IOException {
-        // 1. Converti Bean in Entity
-        Stock stock = new Stock(bean.getNome(), bean.getQuantity(), bean.getSoglia()); // Andrò ad inserire i metodi bean come parametri
+    // --- METODO AGGIORNATO ---
+    public void addStock(StockBean bean) throws IOException, InvalidProductDataException {
+        // Validazione dei dati (Business Logic)
+        if (bean.getQuantity() < 0) {
+            throw new InvalidProductDataException("La quantità non può essere negativa.");
+        }
+        if (bean.getSoglia() < 0) {
+            throw new InvalidProductDataException("La soglia minima non può essere negativa.");
+        }
+        if (bean.getNome() == null || bean.getNome().trim().isEmpty()) {
+            throw new InvalidProductDataException("Il nome del prodotto non può essere vuoto.");
+        }
 
-        // 2. Ottieni il DAO (non sa se è Demo o Full!)
+        // Se i controlli passano, procediamo
+        Stock stock = new Stock(bean.getNome(), bean.getQuantity(), bean.getSoglia());
         StockDAO dao = DAOFactory.getStockDAO();
-
-        // 3. Salva
         dao.saveStock(stock);
     }
 

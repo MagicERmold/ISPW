@@ -3,6 +3,7 @@ package com.stocktrack.controller;
 import com.stocktrack.bean.UserBean;
 import com.stocktrack.engineering.factory.DAOFactory;
 import com.stocktrack.engineering.singleton.SessionManager;
+import com.stocktrack.exception.DuplicateUserException;
 import com.stocktrack.model.Role;
 import com.stocktrack.model.User;
 import com.stocktrack.persistence.dao.UserDAO;
@@ -30,22 +31,19 @@ public class LoginController {
         return false;
     }
 
-    // --- NUOVO METODO PER LA REGISTRAZIONE ---
-    public boolean register(UserBean userBean) throws IOException {
+    // --- METODO AGGIORNATO ---
+    // Non ritorna più boolean, ma void. Se qualcosa va storto, lancia eccezione.
+    public void register(UserBean userBean) throws IOException, DuplicateUserException {
         UserDAO userDAO = DAOFactory.getUserDAO();
 
-        // 1. Controllo se esiste già
+        // 1. Controllo duplicati
         if (userDAO.findUserByUsername(userBean.getUsername()) != null) {
-            return false; // Utente già esistente
+            // Invece di return false, lanciamo l'eccezione specifica
+            throw new DuplicateUserException("L'utente '" + userBean.getUsername() + "' è già registrato nel sistema.");
         }
 
-        // 2. Creo la nuova Entity
-        // Nota: Di default assegniamo il ruolo USER ai nuovi registrati
+        // 2. Creazione e salvataggio
         User newUser = new User(userBean.getUsername(), userBean.getPassword(), Role.USER);
-
-        // 3. Salvo
         userDAO.saveUser(newUser);
-
-        return true;
     }
 }

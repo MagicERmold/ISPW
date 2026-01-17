@@ -2,6 +2,7 @@ package com.stocktrack.view.cli;
 
 import com.stocktrack.bean.StockBean;
 import com.stocktrack.controller.ManageStockController;
+import com.stocktrack.exception.InvalidProductDataException;
 
 import java.io.IOException;
 import java.util.List;
@@ -29,7 +30,7 @@ public class StockCLI {
                     break;
                 case "2":
                     // Qui dovrai implementare la visualizzazione (chiamando il controller)
-                    showAllProducts();
+                    showAllStocks();
                     break;
                 case "0":
                     running = false;
@@ -56,15 +57,18 @@ public class StockCLI {
         StockBean bean = new StockBean(name, quantity, threshold);
 
         try {
-            // Passo il bean al controller
             controller.addStock(bean);
             System.out.println("Prodotto aggiunto con successo!");
-        } catch (Exception e) {
+
+        } catch (InvalidProductDataException e) {
+            // Gestione specifica: Dati non validi
+            System.out.println("Errore nei dati: " + e.getMessage());
+        } catch (Exception e) { // Catch generico per IOException o altro
             System.out.println("Errore durante l'aggiunta: " + e.getMessage());
         }
     }
 
-    private void showAllProducts() {
+    private void showAllStocks() {
         try {
             // Chiamo il controller
             List<StockBean> list = controller.showAllProducts();

@@ -2,6 +2,7 @@ package com.stocktrack.view.cli;
 
 import com.stocktrack.bean.UserBean;
 import com.stocktrack.controller.LoginController;
+import com.stocktrack.exception.DuplicateUserException;
 
 import java.io.IOException;
 import java.util.Scanner;
@@ -81,11 +82,13 @@ public class LoginCLI {
         UserBean bean = new UserBean(username, password);
 
         try {
-            if (loginController.register(bean)) {
-                System.out.println("Registrazione avvenuta con successo! Ora puoi effettuare il login.");
-            } else {
-                System.out.println("Errore: Username già in uso.");
-            }
+            // Ora register è void e lancia eccezione
+            loginController.register(bean);
+            System.out.println("Registrazione avvenuta con successo! Ora puoi effettuare il login.");
+
+        } catch (DuplicateUserException e) {
+            // Gestione specifica per l'errore di duplicato
+            System.out.println("Errore di Registrazione: " + e.getMessage());
         } catch (IOException e) {
             System.out.println("Errore di sistema: " + e.getMessage());
         }

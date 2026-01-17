@@ -35,10 +35,11 @@ public class DAOFactory {
     public static UserDAO getUserDAO() throws IOException {
         String type = readPersistenceTypeFromConfig();
 
-        // Nota: Per ora usiamo InMemory anche per la FULL version finché
-        // non implementiamo il salvataggio utenti su file.
-        if ("DEMO".equalsIgnoreCase(type) || "FULL".equalsIgnoreCase(type)) {
+        if ("DEMO".equalsIgnoreCase(type)) {
             return new InMemoryUserDAO();
+        } else if ("FULL".equalsIgnoreCase(type)) {
+            // ORA LO COLLEGHIAMO ALLA CLASSE VERA CHE SCRIVE SU FILE
+            return new com.stocktrack.persistence.fs.FileSystemUserDAO();
         } else {
             throw new IllegalArgumentException("Tipo di persistenza non valido: " + type);
         }

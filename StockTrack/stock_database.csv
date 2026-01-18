@@ -1,3 +1,4 @@
-Acqua,2,10
-Pasta,50,10
-Acqua,9,0
+Acqua,1,2,GROUP_admin
+Pane,5,5,GROUP_admin
+Pesce,0,5,GROUP_admin
+Acqua,5,10,GROUP_paolo

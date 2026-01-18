@@ -3,7 +3,6 @@ package com.stocktrack.controller;
 import com.stocktrack.bean.StockBean;
 import com.stocktrack.engineering.factory.DAOFactory;
 import com.stocktrack.engineering.singleton.SessionManager;
-import com.stocktrack.exception.InvalidProductDataException;
 import com.stocktrack.model.Stock;
 import com.stocktrack.model.User;
 import com.stocktrack.persistence.dao.StockDAO;
@@ -14,17 +13,28 @@ import java.util.List;
 
 public class ManageStockController {
 
-    // ADMIN: Aggiunge nuovo prodotto
+    // ADMIN: Aggiunge nuovo prodotto (MODIFICATO PER EVITARE DUPLICATI)
     public void addStock(StockBean bean) throws Exception {
         User user = SessionManager.getInstance().getCurrentUser();
         if (user.getGroupUid() == null) throw new Exception("Devi prima creare o unirti a un gruppo!");
 
-        // Passa il GroupUID al nuovo stock
+        StockDAO dao = DAOFactory.getStockDAO();
+
+        // 1. Controlliamo se il prodotto esiste già
+        List<Stock> existingStocks = dao.getAllStocks(user.getGroupUid());
+        for (Stock s : existingStocks) {
+            // Confronto Case-Insensitive (Acqua == acqua)
+            if (s.getNome().equalsIgnoreCase(bean.getNome())) {
+                throw new Exception("Il prodotto '" + bean.getNome() + "' esiste già! Usa 'Registra Acquisto' per aggiornare la quantità.");
+            }
+        }
+
+        // 2. Se non esiste, lo salviamo
         Stock stock = new Stock(bean.getNome(), bean.getQuantity(), bean.getSoglia(), user.getGroupUid());
-        DAOFactory.getStockDAO().saveStock(stock);
+        dao.saveStock(stock);
     }
 
-    // USER: Consuma (diminuisce) o Acquista (aumenta)
+    // USER & ADMIN: Consuma (diminuisce) o Acquista (aumenta)
     public void modifyQuantity(String productName, int amountChange) throws Exception {
         User user = SessionManager.getInstance().getCurrentUser();
         StockDAO dao = DAOFactory.getStockDAO();
@@ -33,7 +43,7 @@ public class ManageStockController {
         List<Stock> stocks = dao.getAllStocks(user.getGroupUid());
         Stock target = null;
         for(Stock s : stocks) {
-            if(s.getNome().equals(productName)) {
+            if(s.getNome().equalsIgnoreCase(productName)) { // Meglio usare equalsIgnoreCase anche qui
                 target = s; break;
             }
         }
@@ -43,46 +53,32 @@ public class ManageStockController {
         int newQty = target.getQuantity() + amountChange;
         if (newQty < 0) throw new Exception("Non puoi avere quantità negativa!");
 
-        dao.updateStockQuantity(productName, newQty, user.getGroupUid());
+        dao.updateStockQuantity(target.getNome(), newQty, user.getGroupUid());
     }
 
     public List<StockBean> showAllProducts() throws IOException {
-        // Recupero il DAO
         StockDAO dao = DAOFactory.getStockDAO();
+        User user = SessionManager.getInstance().getCurrentUser();
 
-        // Recupero le entity
-        List<Stock> stocks = dao.getAllStocks();
+        List<Stock> stocks = dao.getAllStocks(user.getGroupUid());
 
-        // Converto entity in bean
         List <StockBean> stockBeans = new ArrayList<>();
-
         for (Stock stock : stocks) {
-            StockBean bean = new StockBean(
-                    stock.getNome(),
-                    stock.getQuantity(),
-                    stock.getSoglia()
-            );
-            stockBeans.add(bean);
+            stockBeans.add(new StockBean(stock.getNome(), stock.getQuantity(), stock.getSoglia()));
         }
-
         return stockBeans;
     }
 
     public List<StockBean> getShoppingList() throws IOException {
         StockDAO dao = DAOFactory.getStockDAO();
-        List<Stock> allStocks = dao.getAllStocks();
+        User user = SessionManager.getInstance().getCurrentUser();
+
+        List<Stock> allStocks = dao.getAllStocks(user.getGroupUid());
 
         List<StockBean> shoppingList = new ArrayList<>();
-
         for (Stock stock : allStocks) {
-            // Logica di Business: Se la quantità è INFERIORE alla soglia, serve comprare!
             if (stock.getQuantity() < stock.getSoglia()) {
-                StockBean bean = new StockBean(
-                        stock.getNome(),
-                        stock.getQuantity(),
-                        stock.getSoglia()
-                );
-                shoppingList.add(bean);
+                shoppingList.add(new StockBean(stock.getNome(), stock.getQuantity(), stock.getSoglia()));
             }
         }
         return shoppingList;

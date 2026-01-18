@@ -4,16 +4,12 @@ public class User {
     private String username;
     private String password;
     private Role role;
-    private String groupUid; // CAMPO MANCANTE AGGIUNTO
+    private String groupUid;
 
     public User(String username, String password, Role role) {
-        this.username = username;
-        this.password = password;
-        this.role = role;
-        this.groupUid = null;
+        this(username, password, role, null);
     }
 
-    // Costruttore completo per il DAO
     public User(String username, String password, Role role, String groupUid) {
         this.username = username;
         this.password = password;
@@ -25,7 +21,9 @@ public class User {
     public String getPassword() { return password; }
     public Role getRole() { return role; }
 
-    // METODI MANCANTI AGGIUNTI
+    // --- NUOVO METODO AGGIUNTO ---
+    public void setRole(Role role) { this.role = role; }
+
     public String getGroupUid() { return groupUid; }
     public void setGroupUid(String groupUid) { this.groupUid = groupUid; }
 }

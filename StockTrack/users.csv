@@ -1,4 +1,4 @@
-Paolo,paolo,USER
-user,user,USER
-admin,admin,ADMIN
-Marco,Polo,USER,null
+user,user,USER,GROUP_admin
+admin,admin,ADMIN,GROUP_admin
+andrea,andrea,USER,GROUP_admin
+paolo,paolo,ADMIN,GROUP_paolo

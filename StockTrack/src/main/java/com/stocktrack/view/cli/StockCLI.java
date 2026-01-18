@@ -3,9 +3,7 @@ package com.stocktrack.view.cli;
 import com.stocktrack.bean.StockBean;
 import com.stocktrack.controller.ManageStockController;
 import com.stocktrack.engineering.singleton.SessionManager;
-import com.stocktrack.exception.InvalidProductDataException;
-import com.stocktrack.model.Role;
-import com.stocktrack.model.User;
+import com.stocktrack.engineering.exception.InvalidProductDataException;
 
 import java.io.IOException;
 import java.util.List;
@@ -17,21 +15,18 @@ public class StockCLI {
     public void start() {
         Scanner scanner = new Scanner(System.in);
         boolean running = true;
-
-        User user = SessionManager.getInstance().getCurrentUser();
-
-        if (user.getRole() == Role.ADMIN) {
-            System.out.println("1. Aggiungi nuovo prodotto");
-        } else {
-            System.out.println("1. Registra Consumo (-)");
-            System.out.println("2. Registra Acquisto (+)");
-        }
+        // Non serve più recuperare l'utente qui per differenziare il menu,
+        // perché ora le opzioni sono uguali per tutti.
 
         while (running) {
-            System.out.println("\n--- HOME MENU ---"); // Qui System.out è OK (è la View!)
-            System.out.println("1. Add product");
-            System.out.println("2. Show all products");
-            System.out.println("0. Exit");
+            System.out.println("\n--- GESTIONE MAGAZZINO ---");
+
+            // Menu Unificato per Admin e User
+            System.out.println("1. Aggiungi nuovo prodotto (Nuova Scheda)");
+            System.out.println("2. Mostra tutti i prodotti");
+            System.out.println("3. Registra Consumo (-)");
+            System.out.println("4. Registra Acquisto (+)");
+            System.out.println("0. Torna al menu principale");
             System.out.print("Scegli un'opzione: ");
 
             String input = scanner.nextLine();
@@ -41,48 +36,67 @@ public class StockCLI {
                     addStock(scanner);
                     break;
                 case "2":
-                    // Qui dovrai implementare la visualizzazione (chiamando il controller)
                     showAllStocks();
                     break;
+                case "3":
+                    modifyStockQuantity(scanner, -1); // Consumo
+                    break;
+                case "4":
+                    modifyStockQuantity(scanner, 1);  // Acquisto
+                    break;
                 case "0":
+                    System.out.println("Torno al menu principale...");
                     running = false;
-                    System.out.println("Arrivederci!");
                     break;
                 default:
                     System.out.println("Opzione non valida.");
             }
         }
+    }
 
+    private void modifyStockQuantity(Scanner scanner, int sign) {
+        System.out.print("Nome prodotto: ");
+        String name = scanner.nextLine();
+        System.out.print("Quantità da " + (sign > 0 ? "aggiungere" : "rimuovere") + ": ");
+        try {
+            String qtyStr = scanner.nextLine();
+            int qty = Integer.parseInt(qtyStr);
+            // Moltiplichiamo per il segno (se consumo, qty diventa negativa)
+            controller.modifyQuantity(name, qty * (sign > 0 ? 1 : -1));
+            System.out.println("Operazione completata!");
+        } catch (NumberFormatException e) {
+            System.out.println("Errore: Inserisci un numero valido.");
+        } catch (Exception e) {
+            System.out.println("Errore: " + e.getMessage());
+        }
     }
 
     private void addStock(Scanner scanner) {
         System.out.print("Inserisci nome prodotto: ");
         String name = scanner.nextLine();
 
-        System.out.print("Inserisci quantità: ");
-        int quantity = Integer.parseInt(scanner.nextLine()); // Gestire eccezioni NumberFormat sarebbe meglio
-
-        System.out.print("Inserisci soglia minima: ");
-        int threshold = Integer.parseInt(scanner.nextLine());
-
-        // Creo il Bean (trasporto dati)
-        StockBean bean = new StockBean(name, quantity, threshold);
-
         try {
+            System.out.print("Inserisci quantità iniziale: ");
+            int quantity = Integer.parseInt(scanner.nextLine());
+
+            System.out.print("Inserisci soglia minima: ");
+            int threshold = Integer.parseInt(scanner.nextLine());
+
+            StockBean bean = new StockBean(name, quantity, threshold);
             controller.addStock(bean);
             System.out.println("Prodotto aggiunto con successo!");
 
+        } catch (NumberFormatException e) {
+            System.out.println("Errore: Devi inserire dei numeri per quantità e soglia.");
         } catch (InvalidProductDataException e) {
-            // Gestione specifica: Dati non validi
             System.out.println("Errore nei dati: " + e.getMessage());
-        } catch (Exception e) { // Catch generico per IOException o altro
+        } catch (Exception e) {
             System.out.println("Errore durante l'aggiunta: " + e.getMessage());
         }
     }
 
     private void showAllStocks() {
         try {
-            // Chiamo il controller
             List<StockBean> list = controller.showAllProducts();
 
             if (list.isEmpty()) {
@@ -90,9 +104,7 @@ public class StockCLI {
                 return;
             }
 
-            // Intestazione tabella (formattazione carina per la CLI)
             System.out.println("\n------------------------------------------------");
-            // %-20s significa "stringa allineata a sinistra, spazio 20 char"
             System.out.printf("%-20s | %-10s | %-10s%n", "NOME", "QUANTITÀ", "SOGLIA");
             System.out.println("------------------------------------------------");
 
@@ -103,7 +115,6 @@ public class StockCLI {
                         bean.getSoglia()
                 );
             }
-
             System.out.println("------------------------------------------------\n");
         } catch (IOException e) {
             System.out.println("Errore nel recupero dati: " + e.getMessage());

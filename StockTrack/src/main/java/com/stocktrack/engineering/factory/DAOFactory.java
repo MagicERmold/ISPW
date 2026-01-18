@@ -39,6 +39,7 @@ public class DAOFactory {
             return new InMemoryUserDAO();
         } else if ("FULL".equalsIgnoreCase(type)) {
             // ORA LO COLLEGHIAMO ALLA CLASSE VERA CHE SCRIVE SU FILE
+            // DA AGGIUSTARE ****
             return new com.stocktrack.persistence.fs.FileSystemUserDAO();
         } else {
             throw new IllegalArgumentException("Tipo di persistenza non valido: " + type);

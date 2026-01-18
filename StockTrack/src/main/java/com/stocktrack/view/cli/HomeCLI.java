@@ -12,6 +12,8 @@ import java.util.Scanner;
 
 public class HomeCLI {
 
+    private final com.stocktrack.controller.GroupController groupController = new com.stocktrack.controller.GroupController();
+
     public void start() {
         Scanner scanner = new Scanner(System.in);
         User currentUser = SessionManager.getInstance().getCurrentUser();
@@ -24,6 +26,11 @@ public class HomeCLI {
         System.out.println("\n--- HOME PAGE ---");
         System.out.println("Benvenuto, " + currentUser.getUsername() + " [" + currentUser.getRole() + "]");
 
+        // SE L'UTENTE NON HA UN GRUPPO, LO FORZIAMO A SCEGLIERNE UNO
+        if (currentUser.getGroupUid() == null) {
+            handleGroupAssignment(scanner, currentUser);
+        }
+
         boolean loggedIn = true;
         while (loggedIn) {
             // Mostriamo opzioni diverse in base al ruolo
@@ -35,33 +42,68 @@ public class HomeCLI {
 
             String input = scanner.nextLine();
 
-            // Gestione input unificata o specifica
-            // Per semplicità qui gestiamo le azioni comuni e deleghiamo
-            switch (input) {
-                case "1":
-                    // Sia Admin che User possono gestire il magazzino
-                    // Lanciamo la vecchia StockCLI che gestisce i prodotti
-                    StockCLI stockCLI = new StockCLI();
-                    stockCLI.start(); // Nota: dovrai modificare StockCLI per non avere il loop infinito se vuoi tornare qui
-                    break;
-
-                case "2":
-                    if (currentUser.getRole() == Role.ADMIN) {
-                        System.out.println("Funzionalità 'Gestione Utenti' non ancora implementata.");
-                    } else {
+            // Gestione input
+            if (currentUser.getRole() == Role.ADMIN) {
+                // LOGICA ADMIN
+                switch (input) {
+                    case "1":
+                        new StockCLI().start();
+                        break;
+                    case "2":
+                        manageUsers();
+                        break;
+                    case "3":
+                        generateShoppingList(); // ORA ANCHE L'ADMIN PUÒ FARLO
+                        break;
+                    case "0":
+                        System.out.println("Logout effettuato.");
+                        SessionManager.getInstance().logout();
+                        loggedIn = false;
+                        break;
+                    default:
+                        System.out.println("Opzione non valida.");
+                }
+            } else {
+                // LOGICA USER STANDARD
+                switch (input) {
+                    case "1":
+                        new StockCLI().start();
+                        break;
+                    case "2":
                         generateShoppingList();
-                    }
-                    break;
-
-                case "0":
-                    System.out.println("Logout effettuato.");
-                    SessionManager.getInstance().logout();
-                    loggedIn = false;
-                    break;
-
-                default:
-                    System.out.println("Opzione non valida.");
+                        break;
+                    case "0":
+                        System.out.println("Logout effettuato.");
+                        SessionManager.getInstance().logout();
+                        loggedIn = false;
+                        break;
+                    default:
+                        System.out.println("Opzione non valida.");
+                }
             }
+        }
+    }
+
+    private void handleGroupAssignment(Scanner scanner, User user) {
+        System.out.println("\nATTENZIONE: Non appartieni a nessun gruppo.");
+        System.out.println("1. Crea un nuovo gruppo famigliare/personale");
+        System.out.println("2. Unisciti a un gruppo esistente (serve ID)");
+        System.out.print("> ");
+        String choice = scanner.nextLine();
+
+        try {
+            if ("1".equals(choice)) {
+                String newId = groupController.createGroup();
+                System.out.println("Gruppo creato! Il tuo ID Gruppo è: " + newId);
+                System.out.println("Condividilo con chi vuoi far accedere al tuo magazzino.");
+            } else if ("2".equals(choice)) {
+                System.out.print("Inserisci ID Gruppo: ");
+                String groupId = scanner.nextLine();
+                groupController.joinGroup(groupId);
+                System.out.println("Ti sei unito al gruppo " + groupId);
+            }
+        } catch (IOException e) {
+            System.out.println("Errore salvataggio gruppo: " + e.getMessage());
         }
     }
 
@@ -69,13 +111,14 @@ public class HomeCLI {
         System.out.println("\nCosa vuoi fare?");
         System.out.println("1. Gestisci Magazzino (Stock)");
         System.out.println("2. Gestisci Utenti (Aggiungi/Rimuovi)");
+        System.out.println("3. Genera Lista Spesa (Sottoscorta)"); // NUOVO
         System.out.println("0. Logout");
         System.out.print("> ");
     }
 
     private void showUserMenu() {
         System.out.println("\nCosa vuoi fare?");
-        System.out.println("1. Visualizza/Modifica Magazzino");
+        System.out.println("1. Gestisci Magazzino (Stock)");
         System.out.println("2. Genera Lista Spesa (Sottoscorta)");
         System.out.println("0. Logout");
         System.out.print("> ");
@@ -104,13 +147,40 @@ public class HomeCLI {
                         bean.getNome(),
                         bean.getQuantity(),
                         bean.getSoglia(),
-                        daOrdinare // Suggeriamo quanti comprarne per tornare almeno a pari
+                        daOrdinare
                 );
             }
             System.out.println("----------------------------------------------------------\n");
 
         } catch (IOException e) {
             System.out.println("Errore nel recupero dati: " + e.getMessage());
+        }
+    }
+
+    private void manageUsers() {
+        com.stocktrack.controller.ManageUsersController userController = new com.stocktrack.controller.ManageUsersController();
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("\n--- GESTIONE UTENTI ---");
+        try {
+            List<User> users = userController.getAllUsers();
+            System.out.printf("%-15s | %-10s | %-15s%n", "USERNAME", "RUOLO", "GRUPPO");
+            System.out.println("------------------------------------------------");
+            for (User u : users) {
+                System.out.printf("%-15s | %-10s | %-15s%n",
+                        u.getUsername(), u.getRole(), (u.getGroupUid() == null ? "N/A" : u.getGroupUid()));
+            }
+
+            System.out.println("\nVuoi eliminare un utente? (scrivi username o PREMI INVIO per uscire)");
+            System.out.print("> ");
+            String input = scanner.nextLine();
+
+            if (!input.isEmpty()) {
+                userController.removeUser(input);
+                System.out.println("Utente " + input + " rimosso.");
+            }
+        } catch (Exception e) {
+            System.out.println("Errore: " + e.getMessage());
         }
     }
 }

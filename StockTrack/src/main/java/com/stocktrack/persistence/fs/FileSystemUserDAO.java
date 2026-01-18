@@ -92,4 +92,51 @@ public class FileSystemUserDAO implements UserDAO {
             writer.newLine();
         } catch (IOException e) { logger.log(Level.SEVERE, "Errore scrittura", e); }
     }
+
+    @Override
+    public List<User> getAllUsers() {
+        List<User> users = new ArrayList<>();
+        // Copia logica simile a findUserByUsername ma senza il filtro equals
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.trim().isEmpty()) continue;
+                String[] parts = line.split(",");
+                if (parts.length >= 3) {
+                    String group = (parts.length > 3) ? parts[3] : null;
+                    users.add(new User(parts[0], parts[1], Role.valueOf(parts[2]), group));
+                }
+            }
+        } catch (IOException e) { logger.log(Level.SEVERE, "Errore lettura lista utenti", e); }
+        return users;
+    }
+
+    @Override
+    public void deleteUser(String usernameToDelete) {
+        List<String> linesToKeep = new ArrayList<>();
+        boolean found = false;
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.trim().isEmpty()) continue;
+                String[] parts = line.split(",");
+                // Se lo username NON corrisponde, teniamo la riga
+                if (parts.length > 0 && !parts[0].equals(usernameToDelete)) {
+                    linesToKeep.add(line);
+                } else {
+                    found = true;
+                }
+            }
+        } catch (IOException e) { logger.log(Level.SEVERE, "Errore lettura per delete", e); return; }
+
+        if (found) {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, false))) {
+                for (String s : linesToKeep) {
+                    writer.write(s);
+                    writer.newLine();
+                }
+            } catch (IOException e) { logger.log(Level.SEVERE, "Errore riscrittura file delete", e); }
+        }
+    }
 }

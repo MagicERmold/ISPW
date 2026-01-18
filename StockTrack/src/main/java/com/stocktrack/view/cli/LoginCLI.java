@@ -2,7 +2,7 @@ package com.stocktrack.view.cli;
 
 import com.stocktrack.bean.UserBean;
 import com.stocktrack.controller.LoginController;
-import com.stocktrack.exception.DuplicateUserException;
+import com.stocktrack.engineering.exception.DuplicateUserException;
 
 import java.io.IOException;
 import java.util.Scanner;
@@ -69,25 +69,22 @@ public class LoginCLI {
         }
     }
 
-    // --- NUOVO METODO PRIVATO ---
     private void performRegister(Scanner scanner) {
         System.out.println("\n--- REGISTRAZIONE ---");
         System.out.print("Scegli Username: ");
         String username = scanner.nextLine();
-
         System.out.print("Scegli Password: ");
         String password = scanner.nextLine();
 
-        // Riutilizziamo UserBean per trasportare i dati
+        // RIMOSSA LA SELEZIONE DEL RUOLO
+        // Creiamo il bean solo con username e password
         UserBean bean = new UserBean(username, password);
 
         try {
-            // Ora register è void e lancia eccezione
+            // Chiamiamo register senza passare il ruolo (verrà gestito dal controller)
             loginController.register(bean);
             System.out.println("Registrazione avvenuta con successo! Ora puoi effettuare il login.");
-
         } catch (DuplicateUserException e) {
-            // Gestione specifica per l'errore di duplicato
             System.out.println("Errore di Registrazione: " + e.getMessage());
         } catch (IOException e) {
             System.out.println("Errore di sistema: " + e.getMessage());

@@ -1,8 +1,8 @@
 package com.stocktrack.controller;
 
 import com.stocktrack.engineering.singleton.SessionManager;
+import com.stocktrack.model.Role; // Importante
 import com.stocktrack.model.User;
-import com.stocktrack.persistence.dao.UserDAO; // Assumi che questo metodo update esista
 import com.stocktrack.engineering.factory.DAOFactory;
 import java.io.IOException;
 
@@ -10,13 +10,15 @@ public class GroupController {
 
     public String createGroup() throws IOException {
         User currentUser = SessionManager.getInstance().getCurrentUser();
-        // Genera un ID semplice basato sul nome utente (es. "GROUP_admin")
-        String newGroupUid = "GROUP_" + currentUser.getUsername();
 
+        // 1. Logica Gruppo
+        String newGroupUid = "GROUP_" + currentUser.getUsername();
         currentUser.setGroupUid(newGroupUid);
 
-        // Aggiorna il DB (dovrai implementare updateUser nel DAO, o simulare riscrivendo il file)
-        // Per semplicità d'esame, assumiamo che updateUser funzioni
+        // 2. Logica Ruolo: Chi crea il gruppo diventa ADMIN
+        currentUser.setRole(Role.ADMIN);
+
+        // 3. Aggiornamento Persistenza
         DAOFactory.getUserDAO().updateUser(currentUser);
 
         return newGroupUid;
@@ -24,7 +26,14 @@ public class GroupController {
 
     public void joinGroup(String groupUid) throws IOException {
         User currentUser = SessionManager.getInstance().getCurrentUser();
+
+        // 1. Logica Gruppo
         currentUser.setGroupUid(groupUid);
+
+        // 2. Logica Ruolo: Chi si unisce diventa USER
+        currentUser.setRole(Role.USER);
+
+        // 3. Aggiornamento Persistenza
         DAOFactory.getUserDAO().updateUser(currentUser);
     }
 }

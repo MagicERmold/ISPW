@@ -1,4 +1,4 @@
-package com.stocktrack.exception;
+package com.stocktrack.engineering.exception;
 
 public class DuplicateUserException extends Exception {
     public DuplicateUserException(String message) {

@@ -8,6 +8,6 @@ public interface UserDAO {
     User findUserByUsername(String username);
     void saveUser(User user);
     void updateUser(User user);
-    List<User> getAllUsers(); // NUOVO
-    void deleteUser(String username); // NUOVO
+    List<User> getAllUsers();
+    void deleteUser(String username);
 }

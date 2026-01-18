@@ -23,7 +23,7 @@ public class FileSystemStockDAO implements StockDAO {
     public void saveStock(Stock stock) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
             String line = String.format("%s,%d,%d,%s",
-                    stock.getNome(), stock.getQuantity(), stock.getThreshold(), stock.getGroupUid());
+                    stock.getNome(), stock.getQuantity(), stock.getSoglia(), stock.getGroupUid());
             writer.write(line);
             writer.newLine();
         } catch (IOException e) { logger.log(Level.SEVERE, "Errore save", e); }
@@ -77,6 +77,34 @@ public class FileSystemStockDAO implements StockDAO {
                     writer.newLine();
                 }
             } catch (IOException e) { logger.log(Level.SEVERE, "Errore update stock", e); }
+        }
+    }
+
+    @Override
+    public void deleteStock(String stockName, String groupUid) {
+        List<String> linesToKeep = new ArrayList<>();
+        boolean found = false;
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",");
+                // Se la riga corrisponde al prodotto E al gruppo, NON la aggiungiamo (la cancelliamo)
+                if (parts.length >= 4 && parts[0].equals(stockName) && parts[3].equals(groupUid)) {
+                    found = true;
+                } else {
+                    linesToKeep.add(line);
+                }
+            }
+        } catch (IOException e) { logger.log(Level.SEVERE, "Errore lettura delete", e); return; }
+
+        if (found) {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, false))) {
+                for (String s : linesToKeep) {
+                    writer.write(s);
+                    writer.newLine();
+                }
+            } catch (IOException e) { logger.log(Level.SEVERE, "Errore scrittura delete", e); }
         }
     }
 }

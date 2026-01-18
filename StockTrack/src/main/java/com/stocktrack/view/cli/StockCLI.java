@@ -26,6 +26,7 @@ public class StockCLI {
             System.out.println("2. Mostra tutti i prodotti");
             System.out.println("3. Registra Consumo (-)");
             System.out.println("4. Registra Acquisto (+)");
+            System.out.println("5. Elimina Prodotto (Rimuovi scheda)");
             System.out.println("0. Torna al menu principale");
             System.out.print("Scegli un'opzione: ");
 
@@ -43,6 +44,9 @@ public class StockCLI {
                     break;
                 case "4":
                     modifyStockQuantity(scanner, 1);  // Acquisto
+                    break;
+                case "5":
+                    deleteStock(scanner);
                     break;
                 case "0":
                     System.out.println("Torno al menu principale...");
@@ -118,6 +122,26 @@ public class StockCLI {
             System.out.println("------------------------------------------------\n");
         } catch (IOException e) {
             System.out.println("Errore nel recupero dati: " + e.getMessage());
+        }
+    }
+
+    private void deleteStock(Scanner scanner) {
+        System.out.println("\n--- ELIMINAZIONE PRODOTTO ---");
+        System.out.print("Nome del prodotto da eliminare definitivamente: ");
+        String name = scanner.nextLine();
+
+        System.out.print("Sei sicuro? (s/n): ");
+        String confirm = scanner.nextLine();
+
+        if ("s".equalsIgnoreCase(confirm)) {
+            try {
+                controller.deleteProduct(name);
+                System.out.println("Prodotto '" + name + "' eliminato con successo.");
+            } catch (Exception e) {
+                System.out.println("Errore: " + e.getMessage());
+            }
+        } else {
+            System.out.println("Operazione annullata.");
         }
     }
 }

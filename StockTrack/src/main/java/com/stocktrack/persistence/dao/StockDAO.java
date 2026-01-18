@@ -5,9 +5,10 @@ import java.util.List;
 
 public interface StockDAO {
     void saveStock(Stock stock);
-    List<Stock> getAllStocks(String groupUid); // ORA RICHIEDE IL GRUPPO
-    void updateStockQuantity(String stockName, int newQuantity, String groupUid); // NUOVO
+    List<Stock> getAllStocks(String groupUid);
+    void updateStockQuantity(String stockName, int newQuantity, String groupUid);
 
-    // Mantieni questo per retrocompatibilità se serve, ma fallo ritornare lista vuota o null
+    void deleteStock(String stockName, String groupUid);
+
     default List<Stock> getAllStocks() { return getAllStocks(null); }
 }

@@ -83,4 +83,25 @@ public class ManageStockController {
         }
         return shoppingList;
     }
+
+    public void deleteProduct(String productName) throws Exception {
+        User user = SessionManager.getInstance().getCurrentUser();
+        StockDAO dao = DAOFactory.getStockDAO();
+
+        // Verifica che il prodotto esista prima di cancellarlo
+        List<Stock> stocks = dao.getAllStocks(user.getGroupUid());
+        boolean exists = false;
+        for (Stock s : stocks) {
+            if (s.getNome().equalsIgnoreCase(productName)) {
+                exists = true;
+                break;
+            }
+        }
+
+        if (!exists) {
+            throw new Exception("Prodotto non trovato nel tuo magazzino.");
+        }
+
+        dao.deleteStock(productName, user.getGroupUid());
+    }
 }

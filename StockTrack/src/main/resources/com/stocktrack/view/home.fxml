@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.layout.BorderPane?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.stocktrack.view.fx.controller.HomeGraphicalController">
+    <top>
+        <ToolBar>
+            <Label fx:id="welcomeLabel" text="StockTrack"/>
+            <Button text="Aggiorna Dati" onAction="#refreshAll"/>
+            <Button text="Logout" onAction="#handleLogout"/>
+        </ToolBar>
+    </top>
+    <center>
+        <TabPane tabClosingPolicy="UNAVAILABLE">
+            <Tab text="Magazzino">
+                <fx:include fx:id="stockView" source="stock_view.fxml"/>
+            </Tab>
+            <Tab text="Lista Spesa (Sottoscorta)">
+                <Label text="Funzionalità Lista Spesa da implementare qui..." alignment="CENTER"/>
+            </Tab>
+            <Tab text="Gestione Utenti" fx:id="usersTab">
+                <Label text="Funzionalità Gestione Utenti da implementare qui..." alignment="CENTER"/>
+            </Tab>
+        </TabPane>
+    </center>
+</BorderPane>

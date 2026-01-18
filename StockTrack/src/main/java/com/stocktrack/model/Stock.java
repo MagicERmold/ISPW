@@ -22,11 +22,9 @@ public class Stock {
 
     public int getQuantity() { return quantity; }
     public int getSoglia() { return soglia; }
-    // Nota: Il controller potrebbe chiamarlo getThreshold, aggiungiamolo per sicurezza
-    public int getThreshold() { return soglia; }
 
     public String getGroupUid() { return groupUid; }
 
     public void setQuantity(int quantity) { this.quantity = quantity; }
-    public void setSoglia(int soglia) { this.soglia = soglia; }
+
 }

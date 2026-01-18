@@ -1,8 +1,8 @@
 package com.stocktrack;
 
 import com.stocktrack.view.cli.LoginCLI;
-// import com.stocktrack.view.gui.JavaFXApp; // Decommenta quando hai la classe GUI
-// import javafx.application.Application;     // Decommenta quando usi JavaFX
+import com.stocktrack.view.fx.JavaFXApp;
+import javafx.application.Application;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,9 +14,7 @@ public class Main {
 
         if ("GUI".equalsIgnoreCase(viewType)) {
             System.out.println("Avvio interfaccia grafica (GUI)...");
-            // Qui devi lanciare la tua classe JavaFX Application.
-            // Esempio:
-            // Application.launch(JavaFXApp.class, args);
+            Application.launch(JavaFXApp.class, args);
 
             System.out.println("NOTA: Collega qui la tua classe JavaFX (es. Application.launch(...))");
 

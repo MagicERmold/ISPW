@@ -50,10 +50,10 @@ public class HomeCLI {
                         new StockCLI().start();
                         break;
                     case "2":
-                        manageUsers();
+                        manageUsers(); // Chiama il metodo aggiornato sotto
                         break;
                     case "3":
-                        generateShoppingList(); // ORA ANCHE L'ADMIN PUÒ FARLO
+                        generateShoppingList();
                         break;
                     case "0":
                         System.out.println("Logout effettuato.");
@@ -110,8 +110,8 @@ public class HomeCLI {
     private void showAdminMenu() {
         System.out.println("\nCosa vuoi fare?");
         System.out.println("1. Gestisci Magazzino (Stock)");
-        System.out.println("2. Gestisci Utenti (Aggiungi/Rimuovi)");
-        System.out.println("3. Genera Lista Spesa (Sottoscorta)"); // NUOVO
+        System.out.println("2. Gestisci Utenti del Gruppo (Visualizza/Rimuovi)");
+        System.out.println("3. Genera Lista Spesa (Sottoscorta)");
         System.out.println("0. Logout");
         System.out.print("> ");
     }
@@ -161,23 +161,30 @@ public class HomeCLI {
         com.stocktrack.controller.ManageUsersController userController = new com.stocktrack.controller.ManageUsersController();
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println("\n--- GESTIONE UTENTI ---");
+        System.out.println("\n--- GESTIONE UTENTI (TUO GRUPPO) ---");
         try {
-            List<User> users = userController.getAllUsers();
-            System.out.printf("%-15s | %-10s | %-15s%n", "USERNAME", "RUOLO", "GRUPPO");
-            System.out.println("------------------------------------------------");
-            for (User u : users) {
-                System.out.printf("%-15s | %-10s | %-15s%n",
-                        u.getUsername(), u.getRole(), (u.getGroupUid() == null ? "N/A" : u.getGroupUid()));
+            // USIAMO IL NUOVO METODO: getMyGroupUsers
+            List<User> users = userController.getMyGroupUsers();
+
+            if (users.isEmpty()) {
+                System.out.println("Nessun altro utente trovato nel tuo gruppo.");
+            } else {
+                System.out.printf("%-15s | %-10s | %-15s%n", "USERNAME", "RUOLO", "GRUPPO");
+                System.out.println("------------------------------------------------");
+                for (User u : users) {
+                    System.out.printf("%-15s | %-10s | %-15s%n",
+                            u.getUsername(), u.getRole(), (u.getGroupUid() == null ? "N/A" : u.getGroupUid()));
+                }
             }
 
-            System.out.println("\nVuoi eliminare un utente? (scrivi username o PREMI INVIO per uscire)");
+            System.out.println("\nVuoi eliminare un utente del tuo gruppo? (scrivi username o PREMI INVIO per uscire)");
             System.out.print("> ");
             String input = scanner.nextLine();
 
             if (!input.isEmpty()) {
-                userController.removeUser(input);
-                System.out.println("Utente " + input + " rimosso.");
+                // USIAMO IL NUOVO METODO: removeUserFromMyGroup
+                userController.removeUserFromMyGroup(input);
+                System.out.println("Utente " + input + " rimosso dal tuo gruppo.");
             }
         } catch (Exception e) {
             System.out.println("Errore: " + e.getMessage());

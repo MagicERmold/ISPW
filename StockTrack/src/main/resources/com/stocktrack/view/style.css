@@ -1,0 +1,107 @@
+/* Impostazioni Generali */
+.root {
+    -fx-font-family: 'Segoe UI', sans-serif;
+    -fx-font-size: 14px;
+    -fx-background-color: #f4f4f9; /* Grigio chiarissimo per lo sfondo */
+}
+
+/* Etichette e Testi */
+.label {
+    -fx-text-fill: #333333;
+}
+
+/* Titoli Grandi (es. Login/Home) */
+.title-label {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+}
+
+/* Campi di Testo */
+.text-field, .password-field {
+    -fx-background-color: white;
+    -fx-background-radius: 5;
+    -fx-border-color: #bdc3c7;
+    -fx-border-radius: 5;
+    -fx-padding: 8;
+}
+
+.text-field:focused, .password-field:focused {
+    -fx-border-color: #3498db; /* Blu quando selezionato */
+    -fx-effect: dropshadow(three-pass-box, rgba(52,152,219,0.3), 5, 0, 0, 0);
+}
+
+/* Pulsanti Standard */
+.button {
+    -fx-background-color: #3498db;
+    -fx-text-fill: white;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+    -fx-padding: 8 15;
+    -fx-font-weight: bold;
+}
+
+.button:hover {
+    -fx-background-color: #2980b9; /* Blu più scuro al passaggio del mouse */
+}
+
+.button:pressed {
+    -fx-background-color: #1abc9c;
+}
+
+/* Pulsante "Action" (es. Aggiungi/Registra) - Verde */
+.action-button {
+    -fx-background-color: #27ae60;
+}
+.action-button:hover { -fx-background-color: #2ecc71; }
+
+/* Pulsante "Danger" (es. Elimina/Logout) - Rosso */
+.danger-button {
+    -fx-background-color: #e74c3c;
+}
+.danger-button:hover { -fx-background-color: #c0392b; }
+
+/* Link (es. "Torna al login") */
+.link-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #3498db;
+    -fx-underline: true;
+}
+.link-button:hover { -fx-text-fill: #2980b9; }
+
+/* Tabella */
+.table-view {
+    -fx-base: #ecf0f1;
+    -fx-control-inner-background: white;
+    -fx-background-color: white;
+    -fx-table-cell-border-color: transparent;
+    -fx-table-header-border-color: transparent;
+    -fx-padding: 5;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #2c3e50;
+    -fx-background-radius: 5 5 0 0;
+}
+
+.table-view .column-header, .table-view .filler {
+    -fx-background-color: transparent;
+    -fx-size: 35;
+    -fx-border-width: 0 1 0 0;
+    -fx-border-color: rgba(255,255,255,0.1);
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.table-row-cell:odd {
+    -fx-background-color: #ecf0f1; /* Righe alternate */
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #3498db;
+    -fx-text-fill: white;
+}

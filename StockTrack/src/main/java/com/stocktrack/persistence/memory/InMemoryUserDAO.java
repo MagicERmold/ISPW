@@ -14,13 +14,18 @@ public class InMemoryUserDAO implements UserDAO {
     private static final Map<String, User> usersDB = new HashMap<>();
 
     static {
-        // Utenti di default per testare senza dover sempre registrarsi
-        // Nota: group è null all'inizio
+        // Solamente per test
+        // Utente Admin del gruppo "GROUP_admin"
         User admin = new User("admin", "admin", Role.ADMIN, "GROUP_admin");
         usersDB.put(admin.getUsername(), admin);
 
-        User user = new User("user", "user", Role.USER, null);
+        // Utente User che appartiene allo STESSO GRUPPO (così possiamo testare la gestione)
+        User user = new User("user", "user", Role.USER, "GROUP_admin");
         usersDB.put(user.getUsername(), user);
+
+        // Utente esterno (per verificare che NON venga visto dall'admin)
+        User outsider = new User("straniero", "123", Role.ADMIN, "GROUP_altro");
+        usersDB.put(outsider.getUsername(), outsider);
     }
 
     @Override

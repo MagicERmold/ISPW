@@ -36,4 +36,11 @@ public class InMemoryStockDAO implements StockDAO {
             }
         }
     }
+
+    @Override
+    public void deleteStock(String stockName, String groupUid) {
+        // Rimuove l'elemento dalla lista se nome e gruppo corrispondono
+        warehouse.removeIf(s -> s.getNome().equals(stockName) &&
+                (groupUid == null ? s.getGroupUid() == null : groupUid.equals(s.getGroupUid())));
+    }
 }

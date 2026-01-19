@@ -17,7 +17,7 @@ public class JavaFXApp extends Application {
     public void start(Stage stage) throws IOException {
         primaryStage = stage;
         scene = new Scene(loadFXML("login"), 800, 600); // Ho aumentato un po' la dimensione
-        
+
         String css = this.getClass().getResource("/com/stocktrack/view/style.css").toExternalForm();
         scene.getStylesheets().add(css);
 

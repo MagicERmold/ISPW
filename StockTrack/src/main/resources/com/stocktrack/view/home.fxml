@@ -10,20 +10,21 @@
     <top>
         <ToolBar>
             <Label fx:id="welcomeLabel" text="StockTrack"/>
-            <Button text="Aggiorna Dati" onAction="#refreshAll"/>
             <Button text="Logout" onAction="#handleLogout"/>
         </ToolBar>
     </top>
     <center>
-        <TabPane tabClosingPolicy="UNAVAILABLE">
-            <Tab text="Magazzino">
+        <TabPane fx:id="mainTabPane" tabClosingPolicy="UNAVAILABLE">
+            <Tab text="Magazzino" onSelectionChanged="#refreshTabs">
                 <fx:include fx:id="stockView" source="stock_view.fxml"/>
             </Tab>
-            <Tab text="Lista Spesa (Sottoscorta)">
-                <Label text="Funzionalità Lista Spesa da implementare qui..." alignment="CENTER"/>
+
+            <Tab text="Lista Spesa (Sottoscorta)" onSelectionChanged="#refreshTabs">
+                <fx:include fx:id="shoppingView" source="shopping_list.fxml"/>
             </Tab>
-            <Tab text="Gestione Utenti" fx:id="usersTab">
-                <Label text="Funzionalità Gestione Utenti da implementare qui..." alignment="CENTER"/>
+
+            <Tab text="Gestione Utenti" fx:id="usersTab" onSelectionChanged="#refreshTabs">
+                <fx:include fx:id="usersView" source="users_view.fxml"/>
             </Tab>
         </TabPane>
     </center>

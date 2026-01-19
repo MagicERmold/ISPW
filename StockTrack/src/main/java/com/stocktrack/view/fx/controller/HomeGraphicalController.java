@@ -14,8 +14,12 @@ public class HomeGraphicalController {
 
     @FXML private Label welcomeLabel;
     @FXML private Tab usersTab;
-    // Iniettiamo il controller della vista inclusa per poterlo aggiornare
+
+    // INIEZIONE AUTOMATICA DEI SOTTO-CONTROLLER
+    // Il nome deve essere: fx:id dell'include + "Controller"
     @FXML private StockGraphicalController stockViewController;
+    @FXML private ShoppingListGraphicalController shoppingViewController;
+    @FXML private UsersGraphicalController usersViewController;
 
     @FXML
     public void initialize() {
@@ -26,15 +30,23 @@ public class HomeGraphicalController {
             // Nascondi tab utenti se non è admin
             if (user.getRole() != Role.ADMIN) {
                 usersTab.setDisable(true);
+                // Opzionale: Rimuovi proprio la tab se preferisci
+                // mainTabPane.getTabs().remove(usersTab);
             }
         }
     }
 
     @FXML
+    private void refreshTabs() {
+        // Ricarica i dati di TUTTE le viste quando cambi tab
+        if (stockViewController != null) stockViewController.loadData();
+        if (shoppingViewController != null) shoppingViewController.loadData();
+        if (usersViewController != null) usersViewController.loadData();
+    }
+
+    @FXML
     private void refreshAll() {
-        if (stockViewController != null) {
-            stockViewController.loadData();
-        }
+        refreshTabs(); // Il pulsante manuale fa la stessa cosa
     }
 
     @FXML

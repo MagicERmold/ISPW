@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox spacing="10" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.stocktrack.view.fx.controller.ShoppingListGraphicalController">
+    <padding> <Insets top="10" right="10" bottom="10" left="10"/> </padding>
+
+    <Label text="Prodotti in Esaurimento" styleClass="title-label"/>
+    <Label text="Questi prodotti sono scesi sotto la soglia minima." textFill="GREY"/>
+
+    <TableView fx:id="shoppingTable" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="nameCol" text="Prodotto" prefWidth="200"/>
+            <TableColumn fx:id="qtyCol" text="Quantità Attuale" prefWidth="120"/>
+            <TableColumn fx:id="thresholdCol" text="Soglia Minima" prefWidth="120"/>
+            <TableColumn fx:id="missingCol" text="Da Ordinare" prefWidth="120" style="-fx-text-fill: red; -fx-font-weight: bold;"/>
+        </columns>
+        <placeholder>
+            <Label text="Tutto ok! Nessun prodotto in esaurimento."/>
+        </placeholder>
+    </TableView>
+</VBox>

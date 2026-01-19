@@ -1,3 +1,8 @@
 user,user,USER,GROUP_admin
 admin,admin,ADMIN,GROUP_admin
-andrea,andrea,USER,GROUP_admin
+andrea,andrea,USER,null
+marco,marco,USER,null
+paolo,paolo,USER,GROUP_paolo
+pene,marco,USER,null
+ludo,ludo,ADMIN,GROUP_ludo
+user2,user2,USER,null

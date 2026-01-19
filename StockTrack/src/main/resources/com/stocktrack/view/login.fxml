@@ -23,7 +23,7 @@
 
     <Label fx:id="errorLabel" textFill="RED" />
 
-    <Button text="Accedi" onAction="#handleLogin" prefWidth="150" style="-fx-background-color: #2196F3; -fx-text-fill: white;"/>
+    <Button text="Accedi" onAction="#handleLogin" defaultButton="true" prefWidth="150" style="-fx-background-color: #2196F3; -fx-text-fill: white;"/>
 
     <Button text="Non hai un account? Registrati" onAction="#switchToRegister" style="-fx-background-color: transparent; -fx-text-fill: blue; -fx-underline: true;"/>
 </VBox>

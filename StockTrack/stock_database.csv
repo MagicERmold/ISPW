@@ -1,4 +1,9 @@
-Acqua,1,2,GROUP_admin
-Pane,5,5,GROUP_admin
-Pesce,0,5,GROUP_admin
-Acqua,5,10,GROUP_paolo
+Acqua,4,2,GROUP_admin
+Pane,15,5,GROUP_admin
+Pesce,5,5,GROUP_admin
+Pasta,10,40,GROUP_admin
+Pomodori,10,10,GROUP_admin
+Carote,6,0,GROUP_paolo
+mamma,3,0,GROUP_paolo
+Acqua,0,10,GROUP_ludo
+Ludo,10,10,GROUP_ludo

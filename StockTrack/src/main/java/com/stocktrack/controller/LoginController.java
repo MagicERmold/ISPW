@@ -13,11 +13,11 @@ import java.io.IOException;
 public class LoginController {
 
     public boolean login(UserBean userBean) throws IOException {
-        UserDAO userDAO = DAOFactory.getUserDAO(); // Metodo da aggiungere alla Factory
+        UserDAO userDAO = DAOFactory.getUserDAO();
         User user = userDAO.findUserByUsername(userBean.getUsername());
 
         if (user == null) {
-            // Utente non trovato (in un progetto reale lanceremmo eccezione custom)
+            // Utente non trovato
             return false;
         }
 

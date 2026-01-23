@@ -1,21 +1,21 @@
 package com.stocktrack.view.cli;
 
 import com.stocktrack.bean.StockBean;
+import com.stocktrack.controller.GroupController;
 import com.stocktrack.controller.ManageStockController;
+import com.stocktrack.controller.ManageUsersController;
 import com.stocktrack.engineering.singleton.SessionManager;
 import com.stocktrack.model.Role;
 import com.stocktrack.model.User;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Scanner;
 
 public class HomeCLI {
 
-    private final com.stocktrack.controller.GroupController groupController = new com.stocktrack.controller.GroupController();
+    private final GroupController groupController = new GroupController();
 
     public void start() {
-        Scanner scanner = new Scanner(System.in);
         User currentUser = SessionManager.getInstance().getCurrentUser();
 
         if (currentUser == null) {
@@ -26,9 +26,9 @@ public class HomeCLI {
         System.out.println("\n--- HOME PAGE ---");
         System.out.println("Benvenuto, " + currentUser.getUsername() + " [" + currentUser.getRole() + "]");
 
-        // SE L'UTENTE NON HA UN GRUPPO, LO FORZIAMO A SCEGLIERNE UNO
+        // Gestione Gruppo
         if (currentUser.getGroupUid() == null) {
-            handleGroupAssignment(scanner, currentUser);
+            handleGroupAssignment(currentUser);
         }
 
         boolean loggedIn = true;
@@ -40,56 +40,44 @@ public class HomeCLI {
                 showUserMenu();
             }
 
-            String input = scanner.nextLine();
+            String input = InputHelper.readString("> ");
 
-            // Gestione input
-            if (currentUser.getRole() == Role.ADMIN) {
-                // LOGICA ADMIN
-                switch (input) {
-                    case "1":
-                        new StockCLI().start();
-                        break;
-                    case "2":
-                        manageUsers(); // Chiama il metodo aggiornato sotto
-                        break;
-                    case "3":
+            // Switch unificato dove possibile o specifico
+            switch (input) {
+                case "1":
+                    new StockCLI().start();
+                    break;
+                case "2":
+                    if (currentUser.getRole() == Role.ADMIN) {
+                        manageUsers();
+                    } else {
                         generateShoppingList();
-                        break;
-                    case "0":
-                        System.out.println("Logout effettuato.");
-                        SessionManager.getInstance().logout();
-                        loggedIn = false;
-                        break;
-                    default:
-                        System.out.println("Opzione non valida.");
-                }
-            } else {
-                // LOGICA USER STANDARD
-                switch (input) {
-                    case "1":
-                        new StockCLI().start();
-                        break;
-                    case "2":
+                    }
+                    break;
+                case "3":
+                    if (currentUser.getRole() == Role.ADMIN) {
                         generateShoppingList();
-                        break;
-                    case "0":
-                        System.out.println("Logout effettuato.");
-                        SessionManager.getInstance().logout();
-                        loggedIn = false;
-                        break;
-                    default:
+                    } else {
                         System.out.println("Opzione non valida.");
-                }
+                    }
+                    break;
+                case "0":
+                    System.out.println("Logout effettuato.");
+                    SessionManager.getInstance().logout();
+                    loggedIn = false;
+                    break;
+                default:
+                    System.out.println("Opzione non valida.");
             }
         }
     }
 
-    private void handleGroupAssignment(Scanner scanner, User user) {
+    private void handleGroupAssignment(User user) {
         System.out.println("\nATTENZIONE: Non appartieni a nessun gruppo.");
         System.out.println("1. Crea un nuovo gruppo famigliare/personale");
         System.out.println("2. Unisciti a un gruppo esistente (serve ID)");
-        System.out.print("> ");
-        String choice = scanner.nextLine();
+
+        String choice = InputHelper.readString("> ");
 
         try {
             if ("1".equals(choice)) {
@@ -97,8 +85,7 @@ public class HomeCLI {
                 System.out.println("Gruppo creato! Il tuo ID Gruppo è: " + newId);
                 System.out.println("Condividilo con chi vuoi far accedere al tuo magazzino.");
             } else if ("2".equals(choice)) {
-                System.out.print("Inserisci ID Gruppo: ");
-                String groupId = scanner.nextLine();
+                String groupId = InputHelper.readString("Inserisci ID Gruppo: ");
                 groupController.joinGroup(groupId);
                 System.out.println("Ti sei unito al gruppo " + groupId);
             }
@@ -143,12 +130,7 @@ public class HomeCLI {
 
             for (StockBean bean : list) {
                 int daOrdinare = bean.getSoglia() - bean.getQuantity();
-                System.out.printf("%-20s | %-10d | %-10d | %-10d%n",
-                        bean.getNome(),
-                        bean.getQuantity(),
-                        bean.getSoglia(),
-                        daOrdinare
-                );
+                System.out.printf("%-20s | %-10d | %-10d | %-10d%n", bean.getNome(), bean.getQuantity(), bean.getSoglia(), daOrdinare);
             }
             System.out.println("----------------------------------------------------------\n");
 
@@ -158,12 +140,9 @@ public class HomeCLI {
     }
 
     private void manageUsers() {
-        com.stocktrack.controller.ManageUsersController userController = new com.stocktrack.controller.ManageUsersController();
-        Scanner scanner = new Scanner(System.in);
-
+        ManageUsersController userController = new ManageUsersController();
         System.out.println("\n--- GESTIONE UTENTI (TUO GRUPPO) ---");
         try {
-            // USIAMO IL NUOVO METODO: getMyGroupUsers
             List<User> users = userController.getMyGroupUsers();
 
             if (users.isEmpty()) {
@@ -172,19 +151,24 @@ public class HomeCLI {
                 System.out.printf("%-15s | %-10s | %-15s%n", "USERNAME", "RUOLO", "GRUPPO");
                 System.out.println("------------------------------------------------");
                 for (User u : users) {
-                    System.out.printf("%-15s | %-10s | %-15s%n",
-                            u.getUsername(), u.getRole(), (u.getGroupUid() == null ? "N/A" : u.getGroupUid()));
+                    System.out.printf("%-15s | %-10s | %-15s%n", u.getUsername(), u.getRole(), (u.getGroupUid() == null ? "N/A" : u.getGroupUid()));
                 }
             }
 
-            System.out.println("\nVuoi eliminare un utente del tuo gruppo? (scrivi username o PREMI INVIO per uscire)");
-            System.out.print("> ");
-            String input = scanner.nextLine();
+            System.out.println("\nVuoi eliminare un utente? (Scrivi username o premi INVIO per uscire)");
+            // Qui usiamo scanner.nextLine() diretto SOLO se vogliamo accettare stringa vuota
+            // Ma InputHelper.readString non accetta vuoti.
+            // Soluzione: facciamo un metodo ad hoc o usiamo un trucco.
+            // Per semplicità qui chiediamo esplicitamente:
 
-            if (!input.isEmpty()) {
-                // USIAMO IL NUOVO METODO: removeUserFromMyGroup
+            System.out.print("> ");
+            // Accediamo allo scanner statico solo se necessario o creiamo metodo in InputHelper allowEmpty
+            // Per ora usiamo InputHelper forzando l'utente a scrivere 'esci' o il nome
+            String input = InputHelper.readString("Username (o scrivi 'esci'): ");
+
+            if (!input.equalsIgnoreCase("esci")) {
                 userController.removeUserFromMyGroup(input);
-                System.out.println("Utente " + input + " rimosso dal tuo gruppo.");
+                System.out.println("Utente rimosso (se esisteva nel gruppo).");
             }
         } catch (Exception e) {
             System.out.println("Errore: " + e.getMessage());

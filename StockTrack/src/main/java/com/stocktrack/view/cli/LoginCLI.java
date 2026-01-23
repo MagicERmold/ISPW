@@ -5,37 +5,32 @@ import com.stocktrack.controller.LoginController;
 import com.stocktrack.engineering.exception.DuplicateUserException;
 
 import java.io.IOException;
-import java.util.Scanner;
 
 public class LoginCLI {
 
     private final LoginController loginController = new LoginController();
 
     public void start() {
-        Scanner scanner = new Scanner(System.in);
         boolean running = true;
-
         System.out.println("=== BENVENUTO IN STOCKTRACK ===");
 
         while (running) {
             System.out.println("\n1. Login");
             System.out.println("2. Register");
             System.out.println("0. Esci");
-            System.out.print("Scegli un'opzione: ");
-            String input = scanner.nextLine();
+
+            int input = InputHelper.readInt("Scegli un'opzione: ");
 
             switch (input) {
-                case "1":
-                    if (performLogin(scanner)) {
-                        // Se il login va a buon fine, passiamo alla Home
-                        HomeCLI home = new HomeCLI();
-                        home.start();
+                case 1:
+                    if (performLogin()) {
+                        new HomeCLI().start();
                     }
                     break;
-                case "2":
-                    performRegister(scanner);
+                case 2:
+                    performRegister();
                     break;
-                case "0":
+                case 0:
                     System.out.println("Chiusura applicazione...");
                     running = false;
                     break;
@@ -45,12 +40,9 @@ public class LoginCLI {
         }
     }
 
-    private boolean performLogin(Scanner scanner) {
-        System.out.print("Username: ");
-        String username = scanner.nextLine();
-
-        System.out.print("Password: ");
-        String password = scanner.nextLine();
+    private boolean performLogin() {
+        String username = InputHelper.readUsername("Username: ");
+        String password = InputHelper.readPassword("Password: ");
 
         UserBean userBean = new UserBean(username, password);
 
@@ -69,19 +61,14 @@ public class LoginCLI {
         }
     }
 
-    private void performRegister(Scanner scanner) {
+    private void performRegister( ) {
         System.out.println("\n--- REGISTRAZIONE ---");
-        System.out.print("Scegli Username: ");
-        String username = scanner.nextLine();
-        System.out.print("Scegli Password: ");
-        String password = scanner.nextLine();
+        String username = InputHelper.readUsername("Username: ");
+        String password = InputHelper.readPassword("Password: ");
 
-        // RIMOSSA LA SELEZIONE DEL RUOLO
-        // Creiamo il bean solo con username e password
         UserBean bean = new UserBean(username, password);
 
         try {
-            // Chiamiamo register senza passare il ruolo (verrà gestito dal controller)
             loginController.register(bean);
             System.out.println("Registrazione avvenuta con successo! Ora puoi effettuare il login.");
         } catch (DuplicateUserException e) {

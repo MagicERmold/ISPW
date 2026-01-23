@@ -1,5 +1,6 @@
 package com.stocktrack.persistence.fs;
 
+import com.stocktrack.engineering.exception.StorageException;
 import com.stocktrack.model.Role;
 import com.stocktrack.model.User;
 import com.stocktrack.persistence.dao.UserDAO;
@@ -23,7 +24,7 @@ public class FileSystemUserDAO implements UserDAO {
     }
 
     @Override
-    public User findUserByUsername(String username) {
+    public User findUserByUsername(String username) throws StorageException {
         if (!file.exists()) return null;
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
@@ -32,38 +33,31 @@ public class FileSystemUserDAO implements UserDAO {
                 String[] parts = line.split(",");
                 if (parts.length >= 3) {
                     if (parts[0].equals(username)) {
-                        String group = (parts.length > 3) ? parts[3] : null; // Leggi il gruppo se c'è
+                        String group = (parts.length > 3) ? parts[3] : null;
                         return new User(parts[0], parts[1], Role.valueOf(parts[2]), group);
                     }
                 }
             }
-        } catch (IOException e) { logger.log(Level.SEVERE, "Errore lettura", e); }
+        } catch (IOException e) {
+            throw new StorageException("Errore ricerca utente", e);
+        }
         return null;
     }
 
     @Override
-    public void saveUser(User user) {
-        writeToFile(user, true); // true = append
+    public void saveUser(User user) throws StorageException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
+            writeUserLine(writer, user);
+        } catch (IOException e) {
+            throw new StorageException("Errore salvataggio utente", e);
+        }
     }
 
     @Override
-    public void updateUser(User user) {
-        // Per aggiornare, dobbiamo riscrivere il file.
-        // 1. Leggi tutti gli utenti
-        List<User> users = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (parts.length >= 3) {
-                    String group = (parts.length > 3) ? parts[3] : null;
-                    users.add(new User(parts[0], parts[1], Role.valueOf(parts[2]), group));
-                }
-            }
-        } catch (IOException e) { return; }
-
-        // 2. Sostituisci quello modificato
+    public void updateUser(User user) throws StorageException {
+        List<User> users = getAllUsers(); // Riusiamo il metodo che lancia già StorageException
         boolean found = false;
+
         for (int i = 0; i < users.size(); i++) {
             if (users.get(i).getUsername().equals(user.getUsername())) {
                 users.set(i, user);
@@ -72,31 +66,16 @@ public class FileSystemUserDAO implements UserDAO {
             }
         }
 
-        // 3. Riscrivi tutto se trovato
         if (found) {
-            try {
-                // Svuota il file e riscrivi
-                new FileWriter(file, false).close();
-                for (User u : users) {
-                    writeToFile(u, true);
-                }
-            } catch (IOException e) { logger.log(Level.SEVERE, "Errore update", e); }
+            rewriteFile(users);
         }
     }
 
-    private void writeToFile(User user, boolean append) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, append))) {
-            String line = String.format("%s,%s,%s,%s",
-                    user.getUsername(), user.getPassword(), user.getRole(), user.getGroupUid());
-            writer.write(line);
-            writer.newLine();
-        } catch (IOException e) { logger.log(Level.SEVERE, "Errore scrittura", e); }
-    }
-
     @Override
-    public List<User> getAllUsers() {
+    public List<User> getAllUsers() throws StorageException {
         List<User> users = new ArrayList<>();
-        // Copia logica simile a findUserByUsername ma senza il filtro equals
+        if (!file.exists()) return users;
+
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = reader.readLine()) != null) {
@@ -107,36 +86,36 @@ public class FileSystemUserDAO implements UserDAO {
                     users.add(new User(parts[0], parts[1], Role.valueOf(parts[2]), group));
                 }
             }
-        } catch (IOException e) { logger.log(Level.SEVERE, "Errore lettura lista utenti", e); }
+        } catch (IOException e) {
+            throw new StorageException("Errore lettura utenti", e);
+        }
         return users;
     }
 
     @Override
-    public void deleteUser(String usernameToDelete) {
-        List<String> linesToKeep = new ArrayList<>();
-        boolean found = false;
+    public void deleteUser(String username) throws StorageException {
+        List<User> users = getAllUsers();
+        boolean removed = users.removeIf(u -> u.getUsername().equals(username));
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                if (line.trim().isEmpty()) continue;
-                String[] parts = line.split(",");
-                // Se lo username NON corrisponde, teniamo la riga
-                if (parts.length > 0 && !parts[0].equals(usernameToDelete)) {
-                    linesToKeep.add(line);
-                } else {
-                    found = true;
-                }
-            }
-        } catch (IOException e) { logger.log(Level.SEVERE, "Errore lettura per delete", e); return; }
-
-        if (found) {
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, false))) {
-                for (String s : linesToKeep) {
-                    writer.write(s);
-                    writer.newLine();
-                }
-            } catch (IOException e) { logger.log(Level.SEVERE, "Errore riscrittura file delete", e); }
+        if (removed) {
+            rewriteFile(users);
         }
+    }
+
+    private void rewriteFile(List<User> users) throws StorageException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, false))) {
+            for (User u : users) {
+                writeUserLine(writer, u);
+            }
+        } catch (IOException e) {
+            throw new StorageException("Errore riscrittura utenti", e);
+        }
+    }
+
+    private void writeUserLine(BufferedWriter writer, User user) throws IOException {
+        String line = String.format("%s,%s,%s,%s",
+                user.getUsername(), user.getPassword(), user.getRole(), user.getGroupUid());
+        writer.write(line);
+        writer.newLine();
     }
 }

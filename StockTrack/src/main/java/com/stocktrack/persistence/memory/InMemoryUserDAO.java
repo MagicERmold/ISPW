@@ -1,5 +1,6 @@
 package com.stocktrack.persistence.memory;
 
+import com.stocktrack.engineering.exception.StorageException;
 import com.stocktrack.model.Role;
 import com.stocktrack.model.User;
 import com.stocktrack.persistence.dao.UserDAO;
@@ -29,31 +30,31 @@ public class InMemoryUserDAO implements UserDAO {
     }
 
     @Override
-    public User findUserByUsername(String username) {
+    public User findUserByUsername(String username) throws StorageException {
         return usersDB.get(username);
     }
 
     @Override
-    public void saveUser(User user) {
+    public void saveUser(User user) throws StorageException {
+
         usersDB.put(user.getUsername(), user);
+
     }
 
     @Override
-    public void updateUser(User user) {
+    public void updateUser(User user) throws StorageException {
         // In una mappa, put sovrascrive se la chiave esiste già, quindi funge anche da update
         usersDB.put(user.getUsername(), user);
     }
 
-    // --- NUOVI METODI IMPLEMENTATI PER RISOLVERE L'ERRORE ---
-
     @Override
-    public List<User> getAllUsers() {
+    public List<User> getAllUsers() throws StorageException {
         // Restituisce tutti i valori della mappa come una lista
         return new ArrayList<>(usersDB.values());
     }
 
     @Override
-    public void deleteUser(String username) {
+    public void deleteUser(String username) throws StorageException {
         // Rimuove l'elemento dalla mappa usando la chiave (username)
         usersDB.remove(username);
     }

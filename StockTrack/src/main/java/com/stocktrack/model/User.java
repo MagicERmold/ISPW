@@ -1,12 +1,13 @@
 package com.stocktrack.model;
 
 public class User {
-    private String username;
-    private String password;
+    private final String username;
+    private final String password;
     private Role role;
     private String groupUid;
 
     public User(String username, String password, Role role) {
+
         this(username, password, role, null);
     }
 
@@ -21,7 +22,6 @@ public class User {
     public String getPassword() { return password; }
     public Role getRole() { return role; }
 
-    // --- NUOVO METODO AGGIUNTO ---
     public void setRole(Role role) { this.role = role; }
 
     public String getGroupUid() { return groupUid; }

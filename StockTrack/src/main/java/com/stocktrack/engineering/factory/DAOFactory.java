@@ -3,6 +3,7 @@ package com.stocktrack.engineering.factory;
 import com.stocktrack.persistence.dao.StockDAO;
 import com.stocktrack.persistence.dao.UserDAO;
 import com.stocktrack.persistence.fs.FileSystemStockDAO;
+import com.stocktrack.persistence.fs.FileSystemUserDAO;
 import com.stocktrack.persistence.memory.InMemoryStockDAO;
 import com.stocktrack.persistence.memory.InMemoryUserDAO;
 
@@ -31,16 +32,13 @@ public class DAOFactory {
         }
     }
 
-    // --- NUOVO METODO AGGIUNTO ---
     public static UserDAO getUserDAO() throws IOException {
         String type = readPersistenceTypeFromConfig();
 
         if ("DEMO".equalsIgnoreCase(type)) {
             return new InMemoryUserDAO();
         } else if ("FULL".equalsIgnoreCase(type)) {
-            // ORA LO COLLEGHIAMO ALLA CLASSE VERA CHE SCRIVE SU FILE
-            // DA AGGIUSTARE ****
-            return new com.stocktrack.persistence.fs.FileSystemUserDAO();
+            return new FileSystemUserDAO();
         } else {
             throw new IllegalArgumentException("Tipo di persistenza non valido: " + type);
         }
@@ -55,7 +53,7 @@ public class DAOFactory {
                 return "DEMO";
             }
             prop.load(inputStream);
-            return prop.getProperty(PERSISTENCE_TYPE_KEY,  "DEMO");
+            return prop.getProperty(PERSISTENCE_TYPE_KEY);
         } catch(IOException e) {
             logger.log(Level.SEVERE, "Errore durante la lettura del file di configurazione", e);
             return "DEMO";

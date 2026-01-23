@@ -1,0 +1,67 @@
+package com.stocktrack.view.cli;
+
+import java.util.Scanner;
+
+public class InputHelper {
+
+    // Unica istanza di Scanner per tutta l'app (evita problemi di chiusura stream)
+    private static final Scanner scanner = new Scanner(System.in);
+
+    /**
+     * Legge una stringa non vuota.
+     */
+    public static String readString(String prompt) {
+        while (true) {
+            System.out.print(prompt);
+            String input = scanner.nextLine().trim();
+            if (!input.isEmpty()) {
+                return input;
+            }
+            System.out.println("Errore: L'input non può essere vuoto. Riprova.");
+        }
+    }
+
+    /**
+     * Legge un intero in modo robusto.
+     * Evita il crash se l'utente inserisce testo e pulisce il buffer correttamente.
+     */
+    public static int readInt(String prompt) {
+        while (true) {
+            System.out.print(prompt);
+            String input = scanner.nextLine().trim();
+            try {
+                return Integer.parseInt(input);
+            } catch (NumberFormatException e) {
+                System.out.println("Errore: Devi inserire un numero intero valido. Riprova.");
+            }
+        }
+    }
+
+    public static String readUsername(String prompt) {
+        while (true) {
+            String input = readString(prompt);
+            if (input.length() > 3) {
+                return input;
+            }
+            System.out.println("ERRORE: Username troppo corto.");
+        }
+    }
+
+    public static String readPassword(String prompt) {
+        while (true) {
+            String input = readString(prompt);
+            if (input.length() > 7) {
+                return input;
+            }
+            System.out.println("ERRORE: Password troppo corta.");
+        }
+    }
+
+    /**
+     * Metodo opzionale per leggere 'invio' per continuare
+     */
+    public static void pressEnterToContinue() {
+        System.out.println("Premi INVIO per continuare...");
+        scanner.nextLine();
+    }
+}

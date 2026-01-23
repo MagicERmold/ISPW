@@ -15,9 +15,6 @@ public class Main {
         if ("GUI".equalsIgnoreCase(viewType)) {
             System.out.println("Avvio interfaccia grafica (GUI)...");
             Application.launch(JavaFXApp.class, args);
-
-            System.out.println("NOTA: Collega qui la tua classe JavaFX (es. Application.launch(...))");
-
         } else {
             System.out.println("Avvio interfaccia testuale (CLI)...");
             LoginCLI loginCLI = new LoginCLI();
@@ -33,7 +30,7 @@ public class Main {
                 return "CLI";
             }
             prop.load(input);
-            return prop.getProperty("view.type", "CLI");
+            return prop.getProperty("view.type");
         } catch (IOException ex) {
             System.err.println("Errore lettura config: " + ex.getMessage());
             return "CLI";

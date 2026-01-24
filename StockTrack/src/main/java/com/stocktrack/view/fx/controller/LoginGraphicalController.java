@@ -2,6 +2,7 @@ package com.stocktrack.view.fx.controller;
 
 import com.stocktrack.bean.UserBean;
 import com.stocktrack.controller.LoginController;
+import com.stocktrack.engineering.exception.StorageException;
 import com.stocktrack.engineering.singleton.SessionManager;
 import com.stocktrack.model.User;
 import com.stocktrack.view.fx.JavaFXApp;
@@ -51,8 +52,10 @@ public class LoginGraphicalController {
                 errorLabel.setTextFill(Color.RED);
             }
         } catch (IOException e) {
-            errorLabel.setText("Errore di sistema: " + e.getMessage());
+            errorLabel.setText("Errore I/O: " + e.getMessage());
             errorLabel.setTextFill(Color.RED);
+        } catch (StorageException e) {
+            System.out.println("Errore nel recupero dati: " + e.getMessage());
         }
     }
 

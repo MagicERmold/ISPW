@@ -4,6 +4,7 @@ import com.stocktrack.bean.StockBean;
 import com.stocktrack.controller.GroupController;
 import com.stocktrack.controller.ManageStockController;
 import com.stocktrack.controller.ManageUsersController;
+import com.stocktrack.engineering.exception.StorageException;
 import com.stocktrack.engineering.singleton.SessionManager;
 import com.stocktrack.model.Role;
 import com.stocktrack.model.User;
@@ -89,7 +90,7 @@ public class HomeCLI {
                 groupController.joinGroup(groupId);
                 System.out.println("Ti sei unito al gruppo " + groupId);
             }
-        } catch (IOException e) {
+        } catch (IOException | StorageException e) {
             System.out.println("Errore salvataggio gruppo: " + e.getMessage());
         }
     }
@@ -134,7 +135,7 @@ public class HomeCLI {
             }
             System.out.println("----------------------------------------------------------\n");
 
-        } catch (IOException e) {
+        } catch (IOException | StorageException e) {
             System.out.println("Errore nel recupero dati: " + e.getMessage());
         }
     }

@@ -63,7 +63,12 @@ public class RegisterGraphicalController {
     }
 
     @FXML
-    private void backToLogin() throws IOException {
-        JavaFXApp.setRoot("login");
+    private void backToLogin() {
+        try {
+            JavaFXApp.setRoot("login");
+        } catch (IOException e) {
+            infoLabel.setText("Errore caricamento pagina login: " + e.getMessage());
+            infoLabel.setTextFill(Color.RED);
+        }
     }
 }

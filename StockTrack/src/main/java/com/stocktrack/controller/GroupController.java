@@ -1,5 +1,6 @@
 package com.stocktrack.controller;
 
+import com.stocktrack.engineering.exception.StorageException;
 import com.stocktrack.engineering.singleton.SessionManager;
 import com.stocktrack.model.Role; // Importante
 import com.stocktrack.model.User;
@@ -8,7 +9,7 @@ import java.io.IOException;
 
 public class GroupController {
 
-    public String createGroup() throws IOException {
+    public String createGroup() throws IOException, StorageException {
         User currentUser = SessionManager.getInstance().getCurrentUser();
 
         // 1. Logica Gruppo
@@ -24,7 +25,7 @@ public class GroupController {
         return newGroupUid;
     }
 
-    public void joinGroup(String groupUid) throws IOException {
+    public void joinGroup(String groupUid) throws IOException, StorageException {
         User currentUser = SessionManager.getInstance().getCurrentUser();
 
         // 1. Logica Gruppo

@@ -1,6 +1,7 @@
 package com.stocktrack.controller;
 
 import com.stocktrack.bean.UserBean;
+import com.stocktrack.engineering.exception.StorageException;
 import com.stocktrack.engineering.factory.DAOFactory;
 import com.stocktrack.engineering.singleton.SessionManager;
 import com.stocktrack.engineering.exception.DuplicateUserException;
@@ -12,7 +13,7 @@ import java.io.IOException;
 
 public class LoginController {
 
-    public boolean login(UserBean userBean) throws IOException {
+    public boolean login(UserBean userBean) throws IOException, StorageException {
         UserDAO userDAO = DAOFactory.getUserDAO();
         User user = userDAO.findUserByUsername(userBean.getUsername());
 
@@ -31,7 +32,7 @@ public class LoginController {
         return false;
     }
 
-    public void register(UserBean userBean) throws IOException, DuplicateUserException {
+    public void register(UserBean userBean) throws IOException, DuplicateUserException, StorageException {
         UserDAO userDAO = DAOFactory.getUserDAO();
 
         if (userDAO.findUserByUsername(userBean.getUsername()) != null) {

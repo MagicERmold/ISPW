@@ -36,7 +36,7 @@ public class UsersGraphicalController {
         try {
             usersTable.setItems(FXCollections.observableArrayList(controller.getMyGroupUsers()));
         } catch (Exception e) {
-            e.printStackTrace();
+            showAlert("Errore caricamento utenti", e.getMessage());
         }
     }
 

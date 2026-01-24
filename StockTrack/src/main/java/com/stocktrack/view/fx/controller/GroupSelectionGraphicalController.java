@@ -1,6 +1,7 @@
 package com.stocktrack.view.fx.controller;
 
 import com.stocktrack.controller.GroupController;
+import com.stocktrack.engineering.exception.StorageException;
 import com.stocktrack.view.fx.JavaFXApp;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -41,7 +42,9 @@ public class GroupSelectionGraphicalController {
             // Vai alla Home
             JavaFXApp.setRoot("home");
         } catch (IOException e) {
-            errorLabel.setText("Errore: " + e.getMessage());
+            errorLabel.setText("Errore I/O: " + e.getMessage());
+        } catch (StorageException e) {
+            System.out.println("Errore nel recupero dati: " + e.getMessage());
         }
     }
 }

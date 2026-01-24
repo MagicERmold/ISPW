@@ -1,6 +1,7 @@
 package com.stocktrack.controller;
 
 import com.stocktrack.bean.StockBean;
+import com.stocktrack.engineering.exception.StorageException;
 import com.stocktrack.engineering.factory.DAOFactory;
 import com.stocktrack.engineering.singleton.SessionManager;
 import com.stocktrack.model.Stock;
@@ -56,7 +57,7 @@ public class ManageStockController {
         dao.updateStockQuantity(target.getNome(), newQty, user.getGroupUid());
     }
 
-    public List<StockBean> showAllProducts() throws IOException {
+    public List<StockBean> showAllProducts() throws StorageException, IOException {
         StockDAO dao = DAOFactory.getStockDAO();
         User user = SessionManager.getInstance().getCurrentUser();
 
@@ -69,7 +70,7 @@ public class ManageStockController {
         return stockBeans;
     }
 
-    public List<StockBean> getShoppingList() throws IOException {
+    public List<StockBean> getShoppingList() throws IOException, StorageException {
         StockDAO dao = DAOFactory.getStockDAO();
         User user = SessionManager.getInstance().getCurrentUser();
 

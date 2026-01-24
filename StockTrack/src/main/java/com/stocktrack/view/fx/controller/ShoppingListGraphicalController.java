@@ -5,6 +5,7 @@ import com.stocktrack.controller.ManageStockController;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -38,7 +39,15 @@ public class ShoppingListGraphicalController {
             // Usa il metodo che avevamo già creato per filtrare i sottoscorta
             shoppingTable.setItems(FXCollections.observableArrayList(controller.getShoppingList()));
         } catch (Exception e) {
-            e.printStackTrace();
+            showAlert("Impossibile calcolare la lista della spesa:\n" + e.getMessage());
         }
+    }
+
+    private void showAlert(String content) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Errore Lista Spesa");
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 }

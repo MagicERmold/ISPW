@@ -3,6 +3,7 @@ package com.stocktrack.view.cli;
 import com.stocktrack.bean.UserBean;
 import com.stocktrack.controller.LoginController;
 import com.stocktrack.engineering.exception.DuplicateUserException;
+import com.stocktrack.engineering.exception.StorageException;
 
 import java.io.IOException;
 
@@ -55,7 +56,7 @@ public class LoginCLI {
                 System.out.println("Errore: Credenziali non valide.");
                 return false;
             }
-        } catch (IOException e) {
+        } catch (IOException | StorageException e) {
             System.out.println("Errore di sistema durante il login: " + e.getMessage());
             return false;
         }
@@ -75,6 +76,8 @@ public class LoginCLI {
             System.out.println("Errore di Registrazione: " + e.getMessage());
         } catch (IOException e) {
             System.out.println("Errore di sistema: " + e.getMessage());
+        } catch (StorageException e) {
+            throw new RuntimeException(e);
         }
     }
 }

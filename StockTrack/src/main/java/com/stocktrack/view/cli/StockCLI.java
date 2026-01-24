@@ -3,10 +3,10 @@ package com.stocktrack.view.cli;
 import com.stocktrack.bean.StockBean;
 import com.stocktrack.controller.ManageStockController;
 import com.stocktrack.engineering.exception.InvalidProductDataException;
+import com.stocktrack.engineering.exception.StorageException;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Scanner;
 
 public class StockCLI {
     private final ManageStockController controller = new ManageStockController();
@@ -95,6 +95,8 @@ public class StockCLI {
             }
             System.out.println("------------------------------------------------\n");
         } catch (IOException e) {
+            System.out.println("Errore I/O: " + e.getMessage());
+        } catch (StorageException e) {
             System.out.println("Errore nel recupero dati: " + e.getMessage());
         }
     }

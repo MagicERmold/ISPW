@@ -56,12 +56,4 @@ public class InputHelper {
             System.out.println("ERRORE: Password troppo corta.");
         }
     }
-
-    /**
-     * Metodo opzionale per leggere 'invio' per continuare
-     */
-    public static void pressEnterToContinue() {
-        System.out.println("Premi INVIO per continuare...");
-        scanner.nextLine();
-    }
 }

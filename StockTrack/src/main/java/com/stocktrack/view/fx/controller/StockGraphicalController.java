@@ -10,7 +10,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 
 public class StockGraphicalController {
 
@@ -49,7 +48,7 @@ public class StockGraphicalController {
         try {
             stockTable.setItems(FXCollections.observableArrayList(controller.showAllProducts()));
         } catch (Exception e) {
-            e.printStackTrace();
+            showAlert("Errore", "Fai qualcosa"); ////**********
         }
     }
 

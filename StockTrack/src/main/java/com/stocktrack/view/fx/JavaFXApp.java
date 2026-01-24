@@ -7,18 +7,17 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class JavaFXApp extends Application {
 
     private static Scene scene;
-    private static Stage primaryStage;
 
     @Override
     public void start(Stage stage) throws IOException {
-        primaryStage = stage;
         scene = new Scene(loadFXML("login"), 800, 600); // Ho aumentato un po' la dimensione
 
-        String css = this.getClass().getResource("/com/stocktrack/view/style.css").toExternalForm();
+        String css = Objects.requireNonNull(this.getClass().getResource("/com/stocktrack/view/style.css")).toExternalForm();
         scene.getStylesheets().add(css);
 
         stage.setScene(scene);

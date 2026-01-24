@@ -29,7 +29,7 @@ public class HomeCLI {
 
         // Gestione Gruppo
         if (currentUser.getGroupUid() == null) {
-            handleGroupAssignment(currentUser);
+            handleGroupAssignment();
         }
 
         boolean loggedIn = true;
@@ -73,7 +73,7 @@ public class HomeCLI {
         }
     }
 
-    private void handleGroupAssignment(User user) {
+    private void handleGroupAssignment() {
         System.out.println("\nATTENZIONE: Non appartieni a nessun gruppo.");
         System.out.println("1. Crea un nuovo gruppo famigliare/personale");
         System.out.println("2. Unisciti a un gruppo esistente (serve ID)");

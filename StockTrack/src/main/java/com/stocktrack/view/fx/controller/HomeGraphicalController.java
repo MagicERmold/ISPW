@@ -45,11 +45,6 @@ public class HomeGraphicalController {
     }
 
     @FXML
-    private void refreshAll() {
-        refreshTabs(); // Il pulsante manuale fa la stessa cosa
-    }
-
-    @FXML
     private void handleLogout() throws IOException {
         SessionManager.getInstance().logout();
         JavaFXApp.setRoot("login");

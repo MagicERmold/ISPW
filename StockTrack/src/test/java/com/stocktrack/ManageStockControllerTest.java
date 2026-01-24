@@ -99,6 +99,6 @@ class ManageStockControllerTest {
 
         // Verifica
         assertEquals(1, shoppingList.size(), "La lista della spesa dovrebbe contenere solo 1 elemento (quello sottoscorta).");
-        assertEquals("Acqua", shoppingList.get(0).getNome(), "...");
+        assertEquals("Acqua", shoppingList.getFirst().getNome(), "...");
     }
 }

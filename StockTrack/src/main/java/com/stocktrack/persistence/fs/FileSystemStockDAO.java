@@ -6,7 +6,6 @@ import com.stocktrack.persistence.dao.StockDAO;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class FileSystemStockDAO implements StockDAO {
@@ -15,12 +14,17 @@ public class FileSystemStockDAO implements StockDAO {
     private final File file = new File(CSV_FILE_NAME);
 
     public FileSystemStockDAO() {
-        if (!file.exists()) {
-            try {
-                file.createNewFile();
-            } catch (IOException e) {
-                logger.log(Level.SEVERE, "Impossibile creare il database", e);
+        try {
+            boolean isCreated = file.createNewFile();
+
+            if (isCreated) {
+                logger.info("Nuovo file database creato: " + CSV_FILE_NAME);
+            } else {
+                logger.info("File database già esistente: " + CSV_FILE_NAME);
             }
+
+        } catch (IOException e) {
+            throw new IllegalStateException("Errore critico: Impossibile creare o accedere al file " + CSV_FILE_NAME, e);
         }
     }
 

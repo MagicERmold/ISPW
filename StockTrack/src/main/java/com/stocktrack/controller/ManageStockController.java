@@ -16,12 +16,16 @@ public class ManageStockController {
 
     // ADMIN: Aggiunge nuovo prodotto (MODIFICATO PER EVITARE DUPLICATI)
     public void addStock(StockBean bean) throws Exception {
+        // Recupero l'utente e controllo se appartiene a un gruppo per sicurezza
         User user = SessionManager.getInstance().getCurrentUser();
-        if (user.getGroupUid() == null) throw new Exception("Devi prima creare o unirti a un gruppo!");
+        if (user.getGroupUid() == null) {
+            throw new Exception("Devi prima creare o unirti a un gruppo!");
+        }
 
+        // Recupero la persistenza
         StockDAO dao = DAOFactory.getStockDAO();
 
-        // 1. Controlliamo se il prodotto esiste già
+        // Controllo se il prodotto esiste già
         List<Stock> existingStocks = dao.getAllStocks(user.getGroupUid());
         for (Stock s : existingStocks) {
             // Confronto Case-Insensitive (Acqua == acqua)
@@ -30,13 +34,14 @@ public class ManageStockController {
             }
         }
 
-        // 2. Se non esiste, lo salviamo
+        // Se non esiste, creo la STOCK e la salvo nel database
         Stock stock = new Stock(bean.getNome(), bean.getQuantity(), bean.getSoglia(), user.getGroupUid());
         dao.saveStock(stock);
     }
 
     // USER & ADMIN: Consuma (diminuisce) o Acquista (aumenta)
     public void modifyQuantity(String productName, int amountChange) throws Exception {
+        // Recupero l'utente e il metodo di persistenza
         User user = SessionManager.getInstance().getCurrentUser();
         StockDAO dao = DAOFactory.getStockDAO();
 
@@ -45,24 +50,32 @@ public class ManageStockController {
         Stock target = null;
         for(Stock s : stocks) {
             if(s.getNome().equalsIgnoreCase(productName)) { // Meglio usare equalsIgnoreCase anche qui
-                target = s; break;
+                target = s;
+                break;
             }
         }
 
+        // Il prodotto non è stato trovato
         if(target == null) throw new Exception("Prodotto non trovato!");
 
+        // Il prodotto è stato trovato
         int newQty = target.getQuantity() + amountChange;
         if (newQty < 0) throw new Exception("Non puoi avere quantità negativa!");
 
+        // Aggiorno la quantità in memoria
         dao.updateStockQuantity(target.getNome(), newQty, user.getGroupUid());
     }
 
+    // ADMIN & USER: recupero la lista dei prodotti
     public List<StockBean> showAllProducts() throws StorageException, IOException {
+        // Recupero utente e il metodo di persistenza
         StockDAO dao = DAOFactory.getStockDAO();
         User user = SessionManager.getInstance().getCurrentUser();
 
+        // Recupero tutte le STOCKS
         List<Stock> stocks = dao.getAllStocks(user.getGroupUid());
 
+        // Creo una lista di STOCKBEAN da restituire alla boundary per creare la tabella
         List <StockBean> stockBeans = new ArrayList<>();
         for (Stock stock : stocks) {
             stockBeans.add(new StockBean(stock.getNome(), stock.getQuantity(), stock.getSoglia()));
@@ -70,12 +83,16 @@ public class ManageStockController {
         return stockBeans;
     }
 
+    // ADMIN & USER: genero la lista di prodotti sottoscorta
     public List<StockBean> getShoppingList() throws IOException, StorageException {
+        // Recupero utente e il metodo di persistenza
         StockDAO dao = DAOFactory.getStockDAO();
         User user = SessionManager.getInstance().getCurrentUser();
 
+        // Recupero tutte le STOCKS
         List<Stock> allStocks = dao.getAllStocks(user.getGroupUid());
 
+        // Creo la lista e controllo quali STOCK hanno la quantity < soglia
         List<StockBean> shoppingList = new ArrayList<>();
         for (Stock stock : allStocks) {
             if (stock.getQuantity() < stock.getSoglia()) {
@@ -85,7 +102,9 @@ public class ManageStockController {
         return shoppingList;
     }
 
+    // ADMIN: cancella STOCK dalla memoria
     public void deleteProduct(String productName) throws Exception {
+        // Recupero utente e il metodo di persistenza
         User user = SessionManager.getInstance().getCurrentUser();
         StockDAO dao = DAOFactory.getStockDAO();
 
@@ -99,10 +118,12 @@ public class ManageStockController {
             }
         }
 
+        // Il prodotto non esiste
         if (!exists) {
             throw new Exception("Prodotto non trovato nel tuo magazzino.");
         }
 
+        // La dao si occuperà di cancellare la STOCK
         dao.deleteStock(productName, user.getGroupUid());
     }
 }

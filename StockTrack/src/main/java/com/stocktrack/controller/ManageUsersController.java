@@ -1,6 +1,7 @@
 package com.stocktrack.controller;
 
 import com.stocktrack.engineering.exception.StorageException;
+import com.stocktrack.engineering.exception.UserNotFoundException;
 import com.stocktrack.engineering.factory.DAOFactory;
 import com.stocktrack.engineering.singleton.SessionManager;
 import com.stocktrack.model.Role;
@@ -11,12 +12,13 @@ import java.util.List;
 
 public class ManageUsersController {
 
-    // Aggiunto 'StorageException' alla clausola throws
+    // ADMIN: recupera la lista di utenti che si trovano nello stesso gruppo dell'ADMIN
     public List<User> getMyGroupUsers() throws IOException, StorageException {
+        // Recupero l'ADMIN e il suo gruppo associato
         User currentUser = SessionManager.getInstance().getCurrentUser();
         String myGroup = currentUser.getGroupUid();
 
-        // Questa chiamata ora può lanciare StorageException
+        // Recupero tutti gli utenti associati al mio gruppo
         List<User> allUsers = DAOFactory.getUserDAO().getAllUsers();
         List<User> groupUsers = new ArrayList<>();
 
@@ -28,31 +30,32 @@ public class ManageUsersController {
         return groupUsers;
     }
 
-    // Aggiunto 'StorageException' alla clausola throws
+    // ADMIN: elimina gli utenti dal gruppo dell'ADMIN
     public void removeUserFromMyGroup(String usernameToRemove) throws IOException, StorageException, StorageException {
+        // Recupero l'ADMIN
         User currentUser = SessionManager.getInstance().getCurrentUser();
 
-        // Questa chiamata può lanciare StorageException
+        // Recupero l'utente da rimuovere
         User userToRemove = DAOFactory.getUserDAO().findUserByUsername(usernameToRemove);
 
+        // Utente non trovato, gestione eccezioni
         if (userToRemove == null) {
-            // Possiamo usare IOException o una custom come 'UserNotFoundException'
-            throw new IOException("Utente non trovato.");
+            throw new UserNotFoundException(usernameToRemove + " non trovato!");
         }
 
         if (currentUser.getGroupUid() == null || !currentUser.getGroupUid().equals(userToRemove.getGroupUid())) {
-            throw new IOException("Non hai i permessi per gestire questo utente (Gruppo diverso).");
+            throw new UserNotFoundException("Non hai i permessi per gestire questo utente (Gruppo diverso).");
         }
 
         if (currentUser.getUsername().equals(usernameToRemove)) {
-            throw new IOException("Non puoi rimuovere te stesso!");
+            throw new UserNotFoundException("Non puoi rimuovere te stesso!");
         }
 
-        // Sganciamo l'utente dal gruppo
+        // Rimuovo l'utente dal gruppo
         userToRemove.setGroupUid(null);
         userToRemove.setRole(Role.USER);
 
-        // Questa chiamata può lanciare StorageException
+        // Aggiorno l'utente rimosso nel database
         DAOFactory.getUserDAO().updateUser(userToRemove);
     }
 }

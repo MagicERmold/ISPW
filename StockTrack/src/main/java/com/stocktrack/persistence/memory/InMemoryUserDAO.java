@@ -1,7 +1,5 @@
 package com.stocktrack.persistence.memory;
 
-import com.stocktrack.engineering.exception.StorageException;
-import com.stocktrack.model.Role;
 import com.stocktrack.model.User;
 import com.stocktrack.persistence.dao.UserDAO;
 
@@ -14,6 +12,7 @@ public class InMemoryUserDAO implements UserDAO {
     // Simuliamo il database con una Mappa in memoria (RAM)
     private static final Map<String, User> usersDB = new HashMap<>();
 
+    /*
     static {
         // Solamente per test
         // Utente Admin del gruppo "GROUP_admin"
@@ -28,33 +27,34 @@ public class InMemoryUserDAO implements UserDAO {
         User outsider = new User("straniero", "123", Role.ADMIN, "GROUP_altro");
         usersDB.put(outsider.getUsername(), outsider);
     }
+    */
 
     @Override
-    public User findUserByUsername(String username) throws StorageException {
+    public User findUserByUsername(String username) {
+        // Recupero l'utente dalla memoria
         return usersDB.get(username);
     }
 
     @Override
-    public void saveUser(User user) throws StorageException {
-
+    public void saveUser(User user) {
+        // Inserisco l'utente in memoria
         usersDB.put(user.getUsername(), user);
-
     }
 
     @Override
-    public void updateUser(User user) throws StorageException {
+    public void updateUser(User user) {
         // In una mappa, put sovrascrive se la chiave esiste già, quindi funge anche da update
         usersDB.put(user.getUsername(), user);
     }
 
     @Override
-    public List<User> getAllUsers() throws StorageException {
+    public List<User> getAllUsers() {
         // Restituisce tutti i valori della mappa come una lista
         return new ArrayList<>(usersDB.values());
     }
 
     @Override
-    public void deleteUser(String username) throws StorageException {
+    public void deleteUser(String username) {
         // Rimuove l'elemento dalla mappa usando la chiave (username)
         usersDB.remove(username);
     }

@@ -1,8 +1,8 @@
 package com.stocktrack.bean;
 
 public class UserBean {
-    private String username;
-    private String password;
+    private final String username;
+    private final String password;
 
     public UserBean(String username, String password) {
         this.username = username;

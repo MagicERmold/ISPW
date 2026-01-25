@@ -78,7 +78,7 @@
                     <execution>
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>com.stocktrack.view.fx/JavaFXApp</mainClass>
+                            <mainClass>com.stocktrack.Main</mainClass>
                             <launcher>app</launcher>
                             <jlinkZipName>app</jlinkZipName>
                             <jlinkImageName>app</jlinkImageName>

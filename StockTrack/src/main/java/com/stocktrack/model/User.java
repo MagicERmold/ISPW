@@ -18,12 +18,25 @@ public class User {
         this.groupUid = "null".equals(groupUid) ? null : groupUid;
     }
 
-    public String getUsername() { return username; }
-    public String getPassword() { return password; }
-    public Role getRole() { return role; }
+    // GETTER e SETTER necessari
+    public String getUsername() {
+        return username;
+    }
+    public String getPassword() {
+        return password;
+    }
+    public Role getRole() {
+        return role;
+    }
 
-    public void setRole(Role role) { this.role = role; }
+    public void setRole(Role role) {
+        this.role = role;
+    }
 
-    public String getGroupUid() { return groupUid; }
-    public void setGroupUid(String groupUid) { this.groupUid = groupUid; }
+    public String getGroupUid() {
+        return groupUid;
+    }
+    public void setGroupUid(String groupUid) {
+        this.groupUid = groupUid;
+    }
 }

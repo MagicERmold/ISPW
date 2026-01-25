@@ -17,18 +17,31 @@ public class FileSystemUserDAO implements UserDAO {
 
     public FileSystemUserDAO() {
         this.file = new File(CSV_FILE_NAME);
-        if (!file.exists()) {
-            try { file.createNewFile(); } catch (IOException e) { e.printStackTrace(); }
+        try {
+            boolean isCreated = file.createNewFile();
+
+            if (isCreated) {
+                logger.info("Nuovo file database creato: " + CSV_FILE_NAME);
+            } else {
+                logger.info("File database già esistente: " + CSV_FILE_NAME);
+            }
+
+        } catch (IOException e) {
+            throw new IllegalStateException("Errore critico: Impossibile creare o accedere al file " + CSV_FILE_NAME, e);
         }
     }
 
     @Override
     public User findUserByUsername(String username) throws StorageException {
-        if (!file.exists()) return null;
+        if (!file.exists()) {
+            return null;
+        }
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                if (line.trim().isEmpty()) continue;
+                if (line.trim().isEmpty()) {
+                    continue;
+                }
                 String[] parts = line.split(",");
                 if (parts.length >= 3) {
                     if (parts[0].equals(username)) {

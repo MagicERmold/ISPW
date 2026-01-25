@@ -20,7 +20,7 @@ public class DAOFactory {
 
     private DAOFactory() {}
 
-    public static StockDAO getStockDAO() throws IOException {
+    public static StockDAO getStockDAO() {
         String type = readPersistenceTypeFromConfig();
 
         if("DEMO".equalsIgnoreCase(type)) {
@@ -44,7 +44,7 @@ public class DAOFactory {
         }
     }
 
-    private static String readPersistenceTypeFromConfig() throws IOException {
+    private static String readPersistenceTypeFromConfig()  {
         Properties prop = new Properties();
 
         try(InputStream inputStream = DAOFactory.class.getClassLoader().getResourceAsStream(CONFIG_FILE)) {

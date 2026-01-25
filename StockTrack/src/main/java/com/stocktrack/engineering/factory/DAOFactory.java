@@ -1,11 +1,14 @@
 package com.stocktrack.engineering.factory;
 
+import com.stocktrack.engineering.exception.StorageException;
 import com.stocktrack.persistence.dao.StockDAO;
 import com.stocktrack.persistence.dao.UserDAO;
 import com.stocktrack.persistence.fs.FileSystemStockDAO;
 import com.stocktrack.persistence.fs.FileSystemUserDAO;
 import com.stocktrack.persistence.memory.InMemoryStockDAO;
 import com.stocktrack.persistence.memory.InMemoryUserDAO;
+import com.stocktrack.persistence.serial.SerializableStockDAO;
+import com.stocktrack.persistence.serial.SerializableUserDAO;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,27 +23,33 @@ public class DAOFactory {
 
     private DAOFactory() {}
 
-    public static StockDAO getStockDAO() {
+    public static StockDAO getStockDAO() throws StorageException {
         String type = readPersistenceTypeFromConfig();
 
-        if("DEMO".equalsIgnoreCase(type)) {
-            return new InMemoryStockDAO();
-        }else if("FULL".equalsIgnoreCase(type)) {
-            return new FileSystemStockDAO();
-        }else{
-            throw new IllegalArgumentException("Tipo di persistenza non valido: " +  type);
+        switch (type.toUpperCase()) {
+            case "DEMO":
+                return new InMemoryStockDAO();
+            case "FULL-FS":
+                return new FileSystemStockDAO();
+            case "FULL-SR":
+                return new SerializableStockDAO();
+            default:
+                throw new IllegalArgumentException("Tipo di persistenza non valido: " + type);
         }
     }
 
     public static UserDAO getUserDAO() throws IOException {
         String type = readPersistenceTypeFromConfig();
 
-        if ("DEMO".equalsIgnoreCase(type)) {
-            return new InMemoryUserDAO();
-        } else if ("FULL".equalsIgnoreCase(type)) {
-            return new FileSystemUserDAO();
-        } else {
-            throw new IllegalArgumentException("Tipo di persistenza non valido: " + type);
+        switch (type.toUpperCase()) {
+            case "DEMO":
+                return new InMemoryUserDAO();
+            case "FULL-FS":
+                return new FileSystemUserDAO();
+            case "FULL-SR":
+                return new SerializableUserDAO();
+            default:
+                throw new IllegalArgumentException("Tipo di persistenza non valido: " + type);
         }
     }
 
@@ -53,7 +62,7 @@ public class DAOFactory {
                 return "DEMO";
             }
             prop.load(inputStream);
-            return prop.getProperty(PERSISTENCE_TYPE_KEY);
+            return prop.getProperty(PERSISTENCE_TYPE_KEY, "DEMO");
         } catch(IOException e) {
             logger.log(Level.SEVERE, "Errore durante la lettura del file di configurazione", e);
             return "DEMO";

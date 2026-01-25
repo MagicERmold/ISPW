@@ -1,6 +1,12 @@
 package com.stocktrack.model;
 
-public class Stock {
+import java.io.Serial;
+import java.io.Serializable;
+
+public class Stock implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L; // Consigliato per evitare problemi di versione
+
     private final String nome;
     private int quantity;
     private int soglia;

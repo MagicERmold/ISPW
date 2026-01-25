@@ -3,6 +3,7 @@ package com.stocktrack.persistence.memory;
 import com.stocktrack.engineering.exception.StorageException;
 import com.stocktrack.model.Stock;
 import com.stocktrack.persistence.dao.StockDAO;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,14 +28,14 @@ public class InMemoryStockDAO implements StockDAO {
     }
 
     @Override
-    public void updateStockQuantity(String stockName, int newQuantity, String groupUid) {
+    public void updateStockQuantity(String stockName, int newQuantity, String groupUid) throws StorageException {
         for (Stock s : warehouse) {
             if (s.getNome().equals(stockName) && groupUid.equals(s.getGroupUid())) {
                 s.setQuantity(newQuantity);
                 return;
             }
         }
-        // In un caso reale potremmo lanciare new StorageException("Prodotto non trovato")
+        throw new StorageException("Errore durante l'aggiornamento della STOCK");
     }
 
     @Override

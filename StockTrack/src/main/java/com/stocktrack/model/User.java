@@ -1,6 +1,12 @@
 package com.stocktrack.model;
 
-public class User {
+import java.io.Serial;
+import java.io.Serializable;
+
+public class User implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L; // Consigliato per evitare problemi di versione
+
     private final String username;
     private final String password;
     private Role role;

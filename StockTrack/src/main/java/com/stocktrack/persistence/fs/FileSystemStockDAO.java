@@ -24,7 +24,7 @@ public class FileSystemStockDAO implements StockDAO {
             }
 
         } catch (IOException e) {
-            throw new IllegalStateException("Errore critico: Impossibile creare o accedere al file " + CSV_FILE_NAME, e);
+            throw new IllegalStateException("Errore: Impossibile creare o accedere al file " + CSV_FILE_NAME, e);
         }
     }
 

@@ -14,11 +14,14 @@ import java.util.List;
 
 public class HomeCLI {
 
+    // Istanzio il controller
     private final GroupController groupController = new GroupController();
 
     public void start() {
+        // Recupero l'utente corrente
         User currentUser = SessionManager.getInstance().getCurrentUser();
 
+        // Utente non loggato
         if (currentUser == null) {
             System.out.println("Errore: Nessun utente loggato.");
             return;
@@ -41,6 +44,7 @@ public class HomeCLI {
                 showUserMenu();
             }
 
+            // Gestione dell'ingresso
             String input = InputHelper.readString("> ");
 
             // Switch unificato dove possibile o specifico
@@ -101,7 +105,7 @@ public class HomeCLI {
         System.out.println("2. Gestisci Utenti del Gruppo (Visualizza/Rimuovi)");
         System.out.println("3. Genera Lista Spesa (Sottoscorta)");
         System.out.println("0. Logout");
-        System.out.print("> ");
+        System.out.print(">");
     }
 
     private void showUserMenu() {
@@ -109,7 +113,7 @@ public class HomeCLI {
         System.out.println("1. Gestisci Magazzino (Stock)");
         System.out.println("2. Genera Lista Spesa (Sottoscorta)");
         System.out.println("0. Logout");
-        System.out.print("> ");
+        System.out.print(">");
     }
 
     private void generateShoppingList() {
@@ -156,7 +160,7 @@ public class HomeCLI {
                 }
             }
 
-            System.out.println("\nVuoi eliminare un utente? (Scrivi username o premi INVIO per uscire)");
+            System.out.println("\nVuoi eliminare un utente?");
             // Qui usiamo scanner.nextLine() diretto SOLO se vogliamo accettare stringa vuota
             // Ma InputHelper.readString non accetta vuoti.
             // Soluzione: facciamo un metodo ad hoc o usiamo un trucco.
@@ -165,11 +169,11 @@ public class HomeCLI {
             System.out.print("> ");
             // Accediamo allo scanner statico solo se necessario o creiamo metodo in InputHelper allowEmpty
             // Per ora usiamo InputHelper forzando l'utente a scrivere 'esci' o il nome
-            String input = InputHelper.readString("Username (o scrivi 'esci'): ");
+            String input = InputHelper.readString("Username (o scrivi esci): ");
 
             if (!input.equalsIgnoreCase("esci")) {
                 userController.removeUserFromMyGroup(input);
-                System.out.println("Utente rimosso (se esisteva nel gruppo).");
+                System.out.println("Utente: " + input + ", rimosso.");
             }
         } catch (Exception e) {
             System.out.println("Errore: " + e.getMessage());

@@ -4,7 +4,7 @@ import java.util.Scanner;
 
 public class InputHelper {
 
-    // Unica istanza di Scanner per tutta l'app (evita problemi di chiusura stream)
+    // Unica istanza di Scanner per tutta l'app
     private static final Scanner scanner = new Scanner(System.in);
 
     /**

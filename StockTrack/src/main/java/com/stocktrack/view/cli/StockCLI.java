@@ -70,8 +70,6 @@ public class StockCLI {
             StockBean bean = new StockBean(name, quantity, threshold);
             controller.addStock(bean);
             System.out.println("Prodotto aggiunto con successo!");
-        } catch (InvalidProductDataException e) {
-            System.out.println("Errore nei dati: " + e.getMessage());
         } catch (Exception e) {
             System.out.println("Errore durante l'aggiunta: " + e.getMessage());
         }

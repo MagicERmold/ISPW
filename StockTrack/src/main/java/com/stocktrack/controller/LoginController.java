@@ -35,7 +35,7 @@ public class LoginController {
         return false;
     }
 
-    public void register(UserBean userBean) throws IOException, DuplicateUserException, StorageException {
+    public boolean register(UserBean userBean) throws IOException, DuplicateUserException, StorageException {
         // Recupero la modalità di persistenza
         UserDAO userDAO = DAOFactory.getUserDAO();
 
@@ -48,7 +48,12 @@ public class LoginController {
         // Il ruolo vero verrà definito quando entrerà/creerà un gruppo.
         User newUser = new User(userBean.getUsername(), userBean.getPassword(), Role.USER);
 
+        // Loggo l'utente
+        SessionManager.getInstance().login(newUser);
+
         // Salvo l'utente nel database
         userDAO.saveUser(newUser);
+
+        return true;
     }
 }

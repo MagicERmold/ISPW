@@ -16,14 +16,14 @@ public class ManageUsersController {
     public List<User> getMyGroupUsers() throws IOException, StorageException {
         // Recupero l'ADMIN e il suo gruppo associato
         User currentUser = SessionManager.getInstance().getCurrentUser();
-        String myGroup = currentUser.getGroupUid();
+        String myGroup = currentUser.getGroupId();
 
         // Recupero tutti gli utenti associati al mio gruppo
         List<User> allUsers = DAOFactory.getUserDAO().getAllUsers();
         List<User> groupUsers = new ArrayList<>();
 
         for (User u : allUsers) {
-            if (myGroup != null && myGroup.equals(u.getGroupUid())) {
+            if (myGroup != null && myGroup.equals(u.getGroupId())) {
                 groupUsers.add(u);
             }
         }
@@ -43,7 +43,7 @@ public class ManageUsersController {
             throw new UserNotFoundException(usernameToRemove + " non trovato!");
         }
 
-        if (currentUser.getGroupUid() == null || !currentUser.getGroupUid().equals(userToRemove.getGroupUid())) {
+        if (currentUser.getGroupId() == null || !currentUser.getGroupId().equals(userToRemove.getGroupId())) {
             throw new UserNotFoundException("Non hai i permessi per gestire questo utente (Gruppo diverso).");
         }
 
@@ -52,7 +52,7 @@ public class ManageUsersController {
         }
 
         // Rimuovo l'utente dal gruppo
-        userToRemove.setGroupUid(null);
+        userToRemove.setGroupId(null);
         userToRemove.setRole(Role.USER);
 
         // Aggiorno l'utente rimosso nel database

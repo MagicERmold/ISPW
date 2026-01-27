@@ -14,11 +14,11 @@ import java.util.List;
 
 public class ManageStockController {
 
-    // ADMIN: Aggiunge nuovo prodotto (MODIFICATO PER EVITARE DUPLICATI)
+    // ADMIN: Aggiunge nuovo prodotto
     public void addStock(StockBean bean) throws StorageException {
         // Recupero l'utente e controllo se appartiene a un gruppo per sicurezza
         User user = SessionManager.getInstance().getCurrentUser();
-        if (user.getGroupUid() == null) {
+        if (user.getGroupId() == null) {
             throw new StorageException("Devi prima creare o unirti a un gruppo!");
         }
 
@@ -26,17 +26,34 @@ public class ManageStockController {
         StockDAO dao = DAOFactory.getStockDAO();
 
         // Controllo se il prodotto esiste già
-        List<Stock> existingStocks = dao.getAllStocks(user.getGroupUid());
+        List<Stock> existingStocks = dao.getAllStocks(user.getGroupId());
         for (Stock s : existingStocks) {
-            // Confronto Case-Insensitive (Acqua == acqua)
-            if (s.getNome().equalsIgnoreCase(bean.getNome())) {
+            if (s.getName().equalsIgnoreCase(bean.getNome())) {
                 throw new StorageException("Il prodotto '" + bean.getNome() + "' esiste già! Usa 'Registra Acquisto' per aggiornare la quantità.");
             }
         }
 
-        // Se non esiste, creo la STOCK e la salvo nel database
-        Stock stock = new Stock(bean.getNome(), bean.getQuantity(), bean.getSoglia(), user.getGroupUid());
+        // CORREZIONE: Passo anche la categoria al costruttore di Stock
+        Stock stock = new Stock(bean.getNome(), bean.getQuantity(), bean.getThreshold(), user.getGroupId(), bean.getCategory());
         dao.saveStock(stock);
+    }
+
+    // Recupera categorie uniche
+    public List<String> getCategories() throws StorageException {
+        User user = SessionManager.getInstance().getCurrentUser();
+        return DAOFactory.getStockDAO().getAllCategories(user.getGroupId());
+    }
+
+    // Filtra stocks
+    public List<StockBean> getStocksByCategory(String category) throws StorageException {
+        User user = SessionManager.getInstance().getCurrentUser();
+        List<Stock> stocks = DAOFactory.getStockDAO().getStocksByCategory(user.getGroupId(), category);
+
+        List<StockBean> beans = new ArrayList<>();
+        for (Stock s : stocks) {
+            beans.add(new StockBean(s.getName(), s.getQuantity(), s.getThreshold(), s.getCategory()));
+        }
+        return beans;
     }
 
     // USER & ADMIN: Consuma (diminuisce) o Acquista (aumenta)
@@ -46,10 +63,10 @@ public class ManageStockController {
         StockDAO dao = DAOFactory.getStockDAO();
 
         // Cerco il prodotto attuale per sapere la quantità corrente
-        List<Stock> stocks = dao.getAllStocks(user.getGroupUid());
+        List<Stock> stocks = dao.getAllStocks(user.getGroupId());
         Stock target = null;
         for(Stock s : stocks) {
-            if(s.getNome().equalsIgnoreCase(productName)) { // Meglio usare equalsIgnoreCase anche qui
+            if(s.getName().equalsIgnoreCase(productName)) { // Meglio usare equalsIgnoreCase anche qui
                 target = s;
                 break;
             }
@@ -63,23 +80,20 @@ public class ManageStockController {
         if (newQty < 0) throw new StorageException("Non puoi avere quantità negativa!");
 
         // Aggiorno la quantità in memoria
-        dao.updateStockQuantity(target.getNome(), newQty, user.getGroupUid());
+        dao.updateStockQuantity(target.getName(), newQty, user.getGroupId());
     }
 
     // ADMIN & USER: recupero la lista dei prodotti
-    // getAllStocks ha bisogno delle exceptions
-    public List<StockBean> showAllProducts() throws StorageException, IOException {
-        // Recupero utente e il metodo di persistenza
+    public List<StockBean> showAllProducts() throws StorageException {
         StockDAO dao = DAOFactory.getStockDAO();
         User user = SessionManager.getInstance().getCurrentUser();
 
-        // Recupero tutte le STOCKS
-        List<Stock> stocks = dao.getAllStocks(user.getGroupUid());
+        List<Stock> stocks = dao.getAllStocks(user.getGroupId());
 
-        // Creo una lista di STOCKBEAN da restituire alla boundary per creare la tabella
         List <StockBean> stockBeans = new ArrayList<>();
         for (Stock stock : stocks) {
-            stockBeans.add(new StockBean(stock.getNome(), stock.getQuantity(), stock.getSoglia()));
+            // CORREZIONE: Riporto la categoria nella UI
+            stockBeans.add(new StockBean(stock.getName(), stock.getQuantity(), stock.getThreshold(), stock.getCategory()));
         }
         return stockBeans;
     }
@@ -92,13 +106,13 @@ public class ManageStockController {
         User user = SessionManager.getInstance().getCurrentUser();
 
         // Recupero tutte le STOCKS
-        List<Stock> allStocks = dao.getAllStocks(user.getGroupUid());
+        List<Stock> allStocks = dao.getAllStocks(user.getGroupId());
 
         // Creo la lista e controllo quali STOCK hanno la quantity < soglia
         List<StockBean> shoppingList = new ArrayList<>();
         for (Stock stock : allStocks) {
-            if (stock.getQuantity() < stock.getSoglia()) {
-                shoppingList.add(new StockBean(stock.getNome(), stock.getQuantity(), stock.getSoglia()));
+            if (stock.getQuantity() < stock.getThreshold()) {
+                shoppingList.add(new StockBean(stock.getName(), stock.getQuantity(), stock.getThreshold(), stock.getCategory()));
             }
         }
         return shoppingList;
@@ -111,10 +125,10 @@ public class ManageStockController {
         StockDAO dao = DAOFactory.getStockDAO();
 
         // Verifica che il prodotto esista prima di cancellarlo
-        List<Stock> stocks = dao.getAllStocks(user.getGroupUid());
+        List<Stock> stocks = dao.getAllStocks(user.getGroupId());
         boolean exists = false;
         for (Stock s : stocks) {
-            if (s.getNome().equalsIgnoreCase(productName)) {
+            if (s.getName().equalsIgnoreCase(productName)) {
                 exists = true;
                 break;
             }
@@ -126,6 +140,6 @@ public class ManageStockController {
         }
 
         // La dao si occuperà di cancellare la STOCK
-        dao.deleteStock(productName, user.getGroupUid());
+        dao.deleteStock(productName, user.getGroupId());
     }
 }

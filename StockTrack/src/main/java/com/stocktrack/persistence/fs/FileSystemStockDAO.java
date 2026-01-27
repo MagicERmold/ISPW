@@ -7,6 +7,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class FileSystemStockDAO implements StockDAO {
     private static final String CSV_FILE_NAME = "stock_database.csv";
@@ -31,8 +32,8 @@ public class FileSystemStockDAO implements StockDAO {
     @Override
     public void saveStock(Stock stock) throws StorageException{
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
-            String line = String.format("%s,%d,%d,%s",
-                    stock.getNome(), stock.getQuantity(), stock.getSoglia(), stock.getGroupUid());
+            String line = String.format("%s,%d,%d,%s,%s",
+                    stock.getName(), stock.getQuantity(), stock.getThreshold(), stock.getGroupId(), stock.getCategory());
             writer.write(line);
             writer.newLine();
         } catch (IOException e) {
@@ -41,30 +42,12 @@ public class FileSystemStockDAO implements StockDAO {
     }
 
     @Override
-    public List<Stock> getAllStocks(String groupUid) throws StorageException{
-        List<Stock> list = new ArrayList<>();
-        if (groupUid == null || groupUid.equals("null")) return list;
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                if(line.trim().isEmpty()) continue;
-                String[] parts = line.split(",");
-                if (parts.length >= 4) {
-                    // Filtra per gruppo
-                    if (parts[3].equals(groupUid)) {
-                        list.add(new Stock(parts[0], Integer.parseInt(parts[1]), Integer.parseInt(parts[2]), parts[3]));
-                    }
-                }
-            }
-        } catch (IOException e) {
-            throw new StorageException("Errore durante la lettura del magazzino", e);
-        }
-        return list;
+    public List<Stock> getAllStocks(String groupUid){
+        return readAllInternal(groupUid);
     }
 
     @Override
-    public void updateStockQuantity(String stockName, int newQuantity, String groupUid) throws StorageException{
+    public void updateStockQuantity(String stockName, int newQuantity, String groupId) throws StorageException{
         List<String> lines = new ArrayList<>();
         boolean found = false;
 
@@ -72,26 +55,23 @@ public class FileSystemStockDAO implements StockDAO {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");
-                if (parts.length >= 4 && parts[0].equals(stockName) && parts[3].equals(groupUid)) {
-                    // Aggiorna
-                    String newLine = String.format("%s,%d,%s,%s", parts[0], newQuantity, parts[2], parts[3]);
+                if (parts.length >= 4 && parts[0].equals(stockName) && parts[3].equals(groupId)) {
+                    String cat = (parts.length > 4) ? parts[4] : "Generico";
+                    // Riscriviamo mantenendo la categoria esistente
+                    String newLine = String.format("%s,%d,%s,%s,%s", parts[0], newQuantity, parts[2], parts[3], cat);
                     lines.add(newLine);
                     found = true;
                 } else {
                     lines.add(line);
                 }
             }
-        } catch (IOException e) {
-            throw new StorageException("Errore lettura file per aggiornamento", e);
-        }
+        } catch (IOException e) { return; }
 
-        if (found) {
-            writeAllLines(lines);
-        }
+        if (found) rewriteFile(lines);
     }
 
     @Override
-    public void deleteStock(String stockName, String groupUid) throws StorageException {
+    public void deleteStock(String stockName, String groupId) throws StorageException {
         List<String> linesToKeep = new ArrayList<>();
 
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
@@ -99,7 +79,7 @@ public class FileSystemStockDAO implements StockDAO {
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");
                 // Se corrisponde a nome E gruppo, lo saltiamo (delete)
-                if (parts.length >= 4 && parts[0].equals(stockName) && parts[3].equals(groupUid)) {
+                if (parts.length >= 4 && parts[0].equals(stockName) && parts[3].equals(groupId)) {
                     continue;
                 }
                 linesToKeep.add(line);
@@ -109,6 +89,21 @@ public class FileSystemStockDAO implements StockDAO {
         }
 
         writeAllLines(linesToKeep);
+    }
+
+    @Override
+    public List<String> getAllCategories(String groupId){
+        return readAllInternal(groupId).stream()
+                .map(Stock::getCategory)
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Stock> getStocksByCategory(String groupUid, String category) {
+        return readAllInternal(groupUid).stream()
+                .filter(s -> s.getCategory().equalsIgnoreCase(category))
+                .collect(Collectors.toList());
     }
 
     // Metodo helper privato per evitare duplicazione codice scrittura
@@ -121,5 +116,37 @@ public class FileSystemStockDAO implements StockDAO {
         } catch (IOException e) {
             throw new StorageException("Errore scrittura file", e);
         }
+    }
+
+    // Helper per leggere tutto e convertire
+    private List<Stock> readAllInternal(String groupUid) {
+        List<Stock> list = new ArrayList<>();
+        if (!file.exists() || groupUid == null) return list;
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.trim().isEmpty()) continue;
+                String[] parts = line.split(",");
+                if (parts.length >= 4) {
+                    if (parts[3].equals(groupUid)) {
+                        String cat = (parts.length > 4) ? parts[4] : "Generico"; // Compatibilità vecchi file
+                        list.add(new Stock(parts[0], Integer.parseInt(parts[1]), Integer.parseInt(parts[2]), parts[3], cat));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    private void rewriteFile(List<String> lines) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, false))) {
+            for (String s : lines) {
+                writer.write(s);
+                writer.newLine();
+            }
+        } catch (IOException e) { e.printStackTrace(); }
     }
 }

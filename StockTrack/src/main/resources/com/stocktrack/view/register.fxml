@@ -22,5 +22,5 @@
     <Label fx:id="infoLabel" textFill="BLUE" />
 
     <Button text="Registrati" onAction="#handleRegister" defaultButton="true" prefWidth="150" styleClass="action-button"/>
-    <Button text="Torna al Login" onAction="#backToLogin" style="-fx-background-color: transparent; -fx-text-fill: grey; -fx-underline: true;"/>
+    <Button text="Torna al Login" onAction="#backToLogin" />
 </VBox>

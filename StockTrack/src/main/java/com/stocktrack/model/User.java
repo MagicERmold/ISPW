@@ -10,18 +10,19 @@ public class User implements Serializable {
     private final String username;
     private final String password;
     private Role role;
-    private String groupUid;
+    private String groupId;
 
     public User(String username, String password, Role role) {
 
+        // Aggiungi le 4 righe invece di questa cagata
         this(username, password, role, null);
     }
 
-    public User(String username, String password, Role role, String groupUid) {
+    public User(String username, String password, Role role, String groupId) {
         this.username = username;
         this.password = password;
         this.role = role;
-        this.groupUid = "null".equals(groupUid) ? null : groupUid;
+        this.groupId = "null".equals(groupId) ? null : groupId;
     }
 
     // GETTER e SETTER necessari
@@ -39,10 +40,10 @@ public class User implements Serializable {
         this.role = role;
     }
 
-    public String getGroupUid() {
-        return groupUid;
+    public String getGroupId() {
+        return groupId;
     }
-    public void setGroupUid(String groupUid) {
-        this.groupUid = groupUid;
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
     }
 }

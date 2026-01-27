@@ -19,8 +19,8 @@
         </columns>
     </TableView>
 
-    <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-background-color: #f0f0f0; -fx-padding: 10; -fx-background-radius: 5;">
-        <Label text="Azione Rapida:" style="-fx-font-weight: bold;"/>
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <Label text="Azione Rapida:" />
 
         <TextField fx:id="actionQtyField" text="1" prefWidth="60" promptText="Qtà"/>
 
@@ -32,8 +32,8 @@
         <Button text="Elimina Prodotto" onAction="#onDelete" styleClass="danger-button"/>
     </HBox>
 
-    <Label text="Aggiungi Nuovo Prodotto:" style="-fx-font-weight: bold; -fx-padding: 10 0 0 0;"/>
-    <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-border-color: lightgrey; -fx-padding: 10; -fx-background-radius: 5;">
+    <Label text="Aggiungi Nuovo Prodotto:"/>
+    <HBox spacing="10" alignment="CENTER_LEFT">
         <TextField fx:id="newNameField" promptText="Nome"/>
         <TextField fx:id="newQtyField" promptText="Q.tà Iniziale" prefWidth="80"/>
         <TextField fx:id="newThresholdField" promptText="Soglia" prefWidth="60"/>

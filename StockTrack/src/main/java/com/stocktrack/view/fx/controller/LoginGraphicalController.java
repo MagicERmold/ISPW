@@ -40,7 +40,7 @@ public class LoginGraphicalController {
                 // Recuperiamo l'utente loggato per controllare il gruppo
                 User currentUser = SessionManager.getInstance().getCurrentUser();
 
-                if (currentUser.getGroupUid() == null || "null".equals(currentUser.getGroupUid())) {
+                if (currentUser.getGroupId() == null || "null".equals(currentUser.getGroupId())) {
                     // Se non ha un gruppo, lo mandiamo alla schermata di selezione
                     JavaFXApp.setRoot("group_selection");
                 } else {

@@ -25,11 +25,15 @@ public class LoginCLI {
             switch (input) {
                 case 1:
                     if (performLogin()) {
-                        new HomeCLI().start();
+                        HomeCLI home = new HomeCLI();
+                        home.start();
                     }
                     break;
                 case 2:
-                    performRegister();
+                    if(performRegister()){
+                        HomeCLI home = new HomeCLI();
+                        home.start();
+                    }
                     break;
                 case 0:
                     System.out.println("Chiusura applicazione...");
@@ -62,7 +66,7 @@ public class LoginCLI {
         }
     }
 
-    private void performRegister( ) {
+    private boolean performRegister( ) {
         System.out.println("\n--- REGISTRAZIONE ---");
         String username = InputHelper.readUsername("Username: ");
         String password = InputHelper.readPassword("Password: ");
@@ -72,6 +76,7 @@ public class LoginCLI {
         try {
             loginController.register(bean);
             System.out.println("Registrazione avvenuta con successo! Ora puoi effettuare il login.");
+            return true;
         } catch (DuplicateUserException e) {
             System.out.println("Errore di Registrazione: " + e.getMessage());
         } catch (IOException e) {
@@ -79,5 +84,6 @@ public class LoginCLI {
         } catch (StorageException e) {
             throw new RuntimeException(e);
         }
+        return false;
     }
 }

@@ -31,7 +31,7 @@ public class HomeCLI {
         System.out.println("Benvenuto, " + currentUser.getUsername() + " [" + currentUser.getRole() + "]");
 
         // Gestione Gruppo
-        if (currentUser.getGroupUid() == null) {
+        if (currentUser.getGroupId() == null) {
             handleGroupAssignment();
         }
 
@@ -50,7 +50,8 @@ public class HomeCLI {
             // Switch unificato dove possibile o specifico
             switch (input) {
                 case "1":
-                    new StockCLI().start();
+                    StockCLI stockCLI = new StockCLI();
+                    stockCLI.start();
                     break;
                 case "2":
                     if (currentUser.getRole() == Role.ADMIN) {
@@ -134,8 +135,8 @@ public class HomeCLI {
             System.out.println("----------------------------------------------------------");
 
             for (StockBean bean : list) {
-                int daOrdinare = bean.getSoglia() - bean.getQuantity();
-                System.out.printf("%-20s | %-10d | %-10d | %-10d%n", bean.getNome(), bean.getQuantity(), bean.getSoglia(), daOrdinare);
+                int daOrdinare = bean.getThreshold() - bean.getQuantity();
+                System.out.printf("%-20s | %-10d | %-10d | %-10d%n", bean.getNome(), bean.getQuantity(), bean.getThreshold(), daOrdinare);
             }
             System.out.println("----------------------------------------------------------\n");
 
@@ -156,7 +157,7 @@ public class HomeCLI {
                 System.out.printf("%-15s | %-10s | %-15s%n", "USERNAME", "RUOLO", "GRUPPO");
                 System.out.println("------------------------------------------------");
                 for (User u : users) {
-                    System.out.printf("%-15s | %-10s | %-15s%n", u.getUsername(), u.getRole(), (u.getGroupUid() == null ? "N/A" : u.getGroupUid()));
+                    System.out.printf("%-15s | %-10s | %-15s%n", u.getUsername(), u.getRole(), (u.getGroupId() == null ? "N/A" : u.getGroupId()));
                 }
             }
 

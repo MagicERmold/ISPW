@@ -17,7 +17,7 @@
             <TableColumn fx:id="nameCol" text="Prodotto" prefWidth="200"/>
             <TableColumn fx:id="qtyCol" text="Quantità Attuale" prefWidth="120"/>
             <TableColumn fx:id="thresholdCol" text="Soglia Minima" prefWidth="120"/>
-            <TableColumn fx:id="missingCol" text="Da Ordinare" prefWidth="120" style="-fx-text-fill: red; -fx-font-weight: bold;"/>
+            <TableColumn fx:id="missingCol" text="Da Ordinare" prefWidth="120" />
         </columns>
         <placeholder>
             <Label text="Tutto ok! Nessun prodotto in esaurimento."/>

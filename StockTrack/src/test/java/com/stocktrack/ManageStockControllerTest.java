@@ -40,7 +40,7 @@ class ManageStockControllerTest {
         // Usiamo una copia della lista o iteriamo con cautela
         var stocks = dao.getAllStocks(TEST_GROUP);
         for (var s : stocks) {
-            dao.deleteStock(s.getNome(), TEST_GROUP);
+            dao.deleteStock(s.getName(), TEST_GROUP);
         }
 
         SessionManager.getInstance().logout();

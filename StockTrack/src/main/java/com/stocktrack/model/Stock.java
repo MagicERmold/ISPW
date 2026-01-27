@@ -5,38 +5,42 @@ import java.io.Serializable;
 
 public class Stock implements Serializable {
     @Serial
-    private static final long serialVersionUID = 1L; // Consigliato per evitare problemi di versione
-
-    private final String nome;
+    private static final long serialVersionUID = 1L;
+    private final String name;
     private int quantity;
-    private int soglia;
-    private String groupUid;
+    private int threshold;
+    private String groupId;
+    private String category;
 
-    public Stock(String nome, int quantity, int soglia, String groupUid) {
-        this.nome = nome;
+    public Stock(String name, int quantity, int threshold, String groupId, String category) {
+        this.name = name;
         this.quantity = quantity;
-        this.soglia = soglia;
-        this.groupUid = groupUid;
+        this.threshold = threshold;
+        this.groupId = groupId;
+        this.category = category;
     }
 
     // GETTER e SETTER necessari
-    public String getNome() {
-        return nome;
+    public String getName() {
+        return name;
     }
 
     public int getQuantity() {
         return quantity;
     }
-    public int getSoglia() {
-        return soglia;
+    public int getThreshold() {
+        return threshold;
     }
 
-    public String getGroupUid() {
-        return groupUid;
+    public String getGroupId() {
+        return groupId;
     }
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
     }
+
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
 
 }

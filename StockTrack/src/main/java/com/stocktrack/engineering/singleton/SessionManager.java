@@ -17,14 +17,14 @@ public class SessionManager {
     }
 
     public void login(User user) {
-        currentUser = user;
+        this.currentUser = user;
     }
 
     public void logout() {
-        currentUser = null;
+        this.currentUser = null;
     }
 
     public User getCurrentUser() {
-        return currentUser;
+        return this.currentUser;
     }
 }

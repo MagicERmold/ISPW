@@ -9,5 +9,8 @@ public interface StockDAO {
     List<Stock> getAllStocks(String groupUid) throws StorageException;
     void updateStockQuantity(String stockName, int newQuantity, String groupUid) throws StorageException;
     void deleteStock(String stockName, String groupUid) throws StorageException;
+
+    List<String> getAllCategories(String groupId);
+    List<Stock> getStocksByCategory(String groupId, String category);
 }
 

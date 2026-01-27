@@ -15,7 +15,7 @@ public class GroupController {
 
         // Creo il codice del gruppo e lo imposto nell'attributo gruppo dell'utente attuale
         String newGroupUid = "GROUP_" + currentUser.getUsername();
-        currentUser.setGroupUid(newGroupUid);
+        currentUser.setGroupId(newGroupUid);
 
         // L'utente attuale diventa ADMIN
         currentUser.setRole(Role.ADMIN);
@@ -31,7 +31,7 @@ public class GroupController {
         User currentUser = SessionManager.getInstance().getCurrentUser();
 
         // Imposto l'attributo gruppo del CURRENT USER
-        currentUser.setGroupUid(groupUid);
+        currentUser.setGroupId(groupUid);
 
         // Mi assicuro che l'utente sia USER
         currentUser.setRole(Role.USER);

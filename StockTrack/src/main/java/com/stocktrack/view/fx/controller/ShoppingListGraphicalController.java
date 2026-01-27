@@ -28,7 +28,7 @@ public class ShoppingListGraphicalController {
 
         // Calcoliamo la colonna "Da Ordinare" al volo (Soglia - Quantità)
         missingCol.setCellValueFactory(data ->
-                new SimpleIntegerProperty(data.getValue().getSoglia() - data.getValue().getQuantity()).asObject()
+                new SimpleIntegerProperty(data.getValue().getThreshold() - data.getValue().getQuantity()).asObject()
         );
 
         loadData();

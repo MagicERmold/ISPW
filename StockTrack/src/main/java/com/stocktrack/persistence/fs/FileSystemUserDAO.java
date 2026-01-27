@@ -126,7 +126,7 @@ public class FileSystemUserDAO implements UserDAO {
 
     private void writeUserLine(BufferedWriter writer, User user) throws IOException {
         String line = String.format("%s,%s,%s,%s",
-                user.getUsername(), user.getPassword(), user.getRole(), user.getGroupUid());
+                user.getUsername(), user.getPassword(), user.getRole(), user.getGroupId());
         writer.write(line);
         writer.newLine();
     }

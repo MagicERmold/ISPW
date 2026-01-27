@@ -48,7 +48,7 @@ public class RegisterGraphicalController {
 
             if (loginSuccess) {
                 User currentUser = SessionManager.getInstance().getCurrentUser();
-                if (currentUser.getGroupUid() == null || "null".equals(currentUser.getGroupUid())) {
+                if (currentUser.getGroupId() == null || "null".equals(currentUser.getGroupId())) {
                     JavaFXApp.setRoot("group_selection");
                 } else {
                     JavaFXApp.setRoot("home");

@@ -55,7 +55,7 @@ class GroupControllerTest {
         // Verifica Stato Utente in Sessione
         User currentUser = SessionManager.getInstance().getCurrentUser();
         assertEquals(Role.ADMIN, currentUser.getRole(), "Chi crea il gruppo deve diventare ADMIN.");
-        assertEquals(groupUid, currentUser.getGroupUid(), "L'utente deve avere l'ID del gruppo appena creato.");
+        assertEquals(groupUid, currentUser.getGroupId(), "L'utente deve avere l'ID del gruppo appena creato.");
 
         // Verifica Persistenza (DAO)
         UserDAO userDAO = DAOFactory.getUserDAO();
@@ -77,11 +77,11 @@ class GroupControllerTest {
         // Verifica Stato Utente in Sessione
         User currentUser = SessionManager.getInstance().getCurrentUser();
         assertEquals(Role.USER, currentUser.getRole(), "Chi si unisce a un gruppo deve essere USER.");
-        assertEquals(targetGroupUid, currentUser.getGroupUid(), "L'utente deve avere l'ID del gruppo target.");
+        assertEquals(targetGroupUid, currentUser.getGroupId(), "L'utente deve avere l'ID del gruppo target.");
 
         // Verifica Persistenza (DAO)
         UserDAO userDAO = DAOFactory.getUserDAO();
         User storedUser = userDAO.findUserByUsername(TEST_USERNAME);
-        assertEquals(targetGroupUid, storedUser.getGroupUid(), "L'ID del gruppo deve essere persistito nel database.");
+        assertEquals(targetGroupUid, storedUser.getGroupId(), "L'ID del gruppo deve essere persistito nel database.");
     }
 }

@@ -51,7 +51,7 @@ public class SerializableStockDAO implements StockDAO {
         // Filtriamo in memoria
         if (groupUid == null) return new ArrayList<>();
         return all.stream()
-                .filter(s -> groupUid.equals(s.getGroupUid()))
+                .filter(s -> groupUid.equals(s.getGroupId()))
                 .collect(Collectors.toList());
     }
 
@@ -59,7 +59,7 @@ public class SerializableStockDAO implements StockDAO {
     public void updateStockQuantity(String stockName, int newQuantity, String groupUid) throws StorageException {
         List<Stock> stocks = loadAll();
         for (Stock s : stocks) {
-            if (s.getNome().equals(stockName) && groupUid.equals(s.getGroupUid())) {
+            if (s.getName().equals(stockName) && groupUid.equals(s.getGroupId())) {
                 s.setQuantity(newQuantity);
                 break;
             }
@@ -70,7 +70,36 @@ public class SerializableStockDAO implements StockDAO {
     @Override
     public void deleteStock(String stockName, String groupUid) throws StorageException {
         List<Stock> stocks = loadAll();
-        stocks.removeIf(s -> s.getNome().equals(stockName) && groupUid.equals(s.getGroupUid()));
+        stocks.removeIf(s -> s.getName().equals(stockName) && groupUid.equals(s.getGroupId()));
         saveAll(stocks);
+    }
+
+    @Override
+    public List<String> getAllCategories(String groupId) {
+        try {
+            return loadAll().stream()
+                    .filter(s -> groupId.equals(s.getGroupId())) // Filtra per gruppo
+                    .map(Stock::getCategory)                     // Estrae la categoria
+                    .filter(c -> c != null && !c.isEmpty())      // Evita null/vuoti
+                    .distinct()                                  // Rimuove duplicati
+                    .collect(Collectors.toList());
+        } catch (StorageException e) {
+            // L'interfaccia non prevede throws qui, quindi restituiamo lista vuota o logghiamo errore
+            System.err.println("Errore recupero categorie: " + e.getMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    @Override
+    public List<Stock> getStocksByCategory(String groupId, String category) {
+        try {
+            return loadAll().stream()
+                    .filter(s -> groupId.equals(s.getGroupId())) // Filtra per gruppo
+                    .filter(s -> s.getCategory() != null && s.getCategory().equalsIgnoreCase(category)) // Filtra per categoria
+                    .collect(Collectors.toList());
+        } catch (StorageException e) {
+            System.err.println("Errore recupero prodotti per categoria: " + e.getMessage());
+            return new ArrayList<>();
+        }
     }
 }

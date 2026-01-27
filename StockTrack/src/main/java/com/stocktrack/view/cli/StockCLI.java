@@ -2,7 +2,6 @@ package com.stocktrack.view.cli;
 
 import com.stocktrack.bean.StockBean;
 import com.stocktrack.controller.ManageStockController;
-import com.stocktrack.engineering.exception.InvalidProductDataException;
 import com.stocktrack.engineering.exception.StorageException;
 
 import java.io.IOException;
@@ -65,9 +64,10 @@ public class StockCLI {
         String name = InputHelper.readString("Inserisci nome prodotto: ");
         int quantity = InputHelper.readInt("Inserisci quantità iniziale: ");
         int threshold = InputHelper.readInt("Inserisci soglia minima: ");
+        String category = InputHelper.readString("Categoria (es. Cibo, Elettronica): ");
 
         try {
-            StockBean bean = new StockBean(name, quantity, threshold);
+            StockBean bean = new StockBean(name, quantity, threshold, category);
             controller.addStock(bean);
             System.out.println("Prodotto aggiunto con successo!");
         } catch (Exception e) {
@@ -77,26 +77,48 @@ public class StockCLI {
 
     private void showAllStocks() {
         try {
-            List<StockBean> list = controller.showAllProducts();
+            String choice = InputHelper.readString("Vuoi filtrare per categoria? (y/n): ");
+            List<StockBean> list;
 
-            if (list.isEmpty()) {
-                System.out.println("Il magazzino è vuoto.");
-                return;
+            if (choice.equalsIgnoreCase("y")) {
+                // 1. Mostra categorie disponibili
+                List<String> categories = controller.getCategories();
+                if (categories.isEmpty()) {
+                    System.out.println("Nessuna categoria disponibile.");
+                    return;
+                }
+
+                System.out.println("Categorie disponibili: " + categories);
+                String catChoice = InputHelper.readString("Inserisci nome categoria esatto: ");
+
+                // 2. Recupera filtrati
+                list = controller.getStocksByCategory(catChoice);
+            } else {
+                // 3. Recupera tutti
+                list = controller.showAllProducts();
             }
 
-            System.out.println("\n------------------------------------------------");
-            System.out.printf("%-20s | %-10s | %-10s%n", "NOME", "QUANTITÀ", "SOGLIA");
-            System.out.println("------------------------------------------------");
+            // 4. Stampa tabella
+            printTable(list);
 
-            for (StockBean bean : list) {
-                System.out.printf("%-20s | %-10d | %-10d%n", bean.getNome(), bean.getQuantity(), bean.getSoglia());
-            }
-            System.out.println("------------------------------------------------\n");
-        } catch (IOException e) {
-            System.out.println("Errore I/O: " + e.getMessage());
-        } catch (StorageException e) {
-            System.out.println("Errore nel recupero dati: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Errore: " + e.getMessage());
         }
+    }
+
+    private void printTable(List<StockBean> list) {
+        if (list.isEmpty()) {
+            System.out.println("Nessun prodotto trovato.");
+            return;
+        }
+        System.out.println("----------------------------------------------------------------------");
+        System.out.printf("%-15s | %-15s | %-10s | %-10s%n", "NOME", "CATEGORIA", "QUANTITÀ", "SOGLIA");
+        System.out.println("----------------------------------------------------------------------");
+        for (StockBean b : list) {
+            System.out.printf("%-15s | %-15s | %-10d | %-10d%n",
+                    b.getNome(), b.getCategory(), b.getQuantity(), b.getThreshold());
+        }
+        System.out.println("----------------------------------------------------------------------");
     }
 
     private void deleteStock() {

@@ -14,6 +14,7 @@ public class ShoppingListGraphicalController {
 
     @FXML private TableView<StockBean> shoppingTable;
     @FXML private TableColumn<StockBean, String> nameCol;
+    @FXML private TableColumn<StockBean, String> categoryCol; // NUOVO
     @FXML private TableColumn<StockBean, Integer> qtyCol;
     @FXML private TableColumn<StockBean, Integer> thresholdCol;
     @FXML private TableColumn<StockBean, Integer> missingCol;
@@ -23,10 +24,11 @@ public class ShoppingListGraphicalController {
     @FXML
     public void initialize() {
         nameCol.setCellValueFactory(new PropertyValueFactory<>("nome"));
+        categoryCol.setCellValueFactory(new PropertyValueFactory<>("category")); // NUOVO
         qtyCol.setCellValueFactory(new PropertyValueFactory<>("quantity"));
-        thresholdCol.setCellValueFactory(new PropertyValueFactory<>("soglia"));
+        thresholdCol.setCellValueFactory(new PropertyValueFactory<>("threshold")); // Nota: nel Bean il metodo è getThreshold(), verifica che non sia getSoglia()
 
-        // Calcoliamo la colonna "Da Ordinare" al volo (Soglia - Quantità)
+        // Calcolo "Da Ordinare" = Soglia - Quantità
         missingCol.setCellValueFactory(data ->
                 new SimpleIntegerProperty(data.getValue().getThreshold() - data.getValue().getQuantity()).asObject()
         );
@@ -36,7 +38,6 @@ public class ShoppingListGraphicalController {
 
     public void loadData() {
         try {
-            // Usa il metodo che avevamo già creato per filtrare i sottoscorta
             shoppingTable.setItems(FXCollections.observableArrayList(controller.getShoppingList()));
         } catch (Exception e) {
             showAlert("Impossibile calcolare la lista della spesa:\n" + e.getMessage());

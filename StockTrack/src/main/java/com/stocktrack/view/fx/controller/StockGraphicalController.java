@@ -3,141 +3,168 @@ package com.stocktrack.view.fx.controller;
 import com.stocktrack.bean.StockBean;
 import com.stocktrack.controller.ManageStockController;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.KeyCode;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class StockGraphicalController {
 
     @FXML private TableView<StockBean> stockTable;
-    @FXML private TableColumn<StockBean, String> nameCol;
-    @FXML private TableColumn<StockBean, Integer> qtyCol;
-    @FXML private TableColumn<StockBean, Integer> thresholdCol;
+    @FXML private TableColumn<StockBean, String> colName;
+    @FXML private TableColumn<StockBean, String> colCategory; // NUOVA COLONNA
+    @FXML private TableColumn<StockBean, Integer> colQuantity;
+    @FXML private TableColumn<StockBean, Integer> colThreshold;
 
-    // Campi per la modifica quantità (NUOVO)
-    @FXML private TextField actionQtyField;
+    @FXML private TextField txtName;
+    @FXML private TextField txtCategory; // NUOVO CAMPO
+    @FXML private TextField txtQuantity;
+    @FXML private TextField txtThreshold;
 
-    // Campi per nuovo prodotto
-    @FXML private TextField newNameField;
-    @FXML private TextField newQtyField;
-    @FXML private TextField newThresholdField;
+    @FXML private ComboBox<String> cmbFilterCategory; // NUOVO FILTRO
 
     private final ManageStockController controller = new ManageStockController();
+    private final ObservableList<StockBean> tableData = FXCollections.observableArrayList();
 
     @FXML
     public void initialize() {
-        // Collega le colonne ai campi del Bean
-        nameCol.setCellValueFactory(new PropertyValueFactory<>("nome"));
-        qtyCol.setCellValueFactory(new PropertyValueFactory<>("quantity"));
-        thresholdCol.setCellValueFactory(new PropertyValueFactory<>("soglia"));
+        // Collegamento colonne -> attributi Bean
+        colName.setCellValueFactory(new PropertyValueFactory<>("nome"));
+        colCategory.setCellValueFactory(new PropertyValueFactory<>("category")); // Assicurati che StockBean abbia getCategory()
+        colQuantity.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+        colThreshold.setCellValueFactory(new PropertyValueFactory<>("threshold"));
 
-        stockTable.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.DELETE || event.getCode() == KeyCode.BACK_SPACE) {
-                onDelete();
-            }
+        stockTable.setItems(tableData);
+
+        // Listener per il filtro: quando cambi categoria, ricarica la tabella
+        cmbFilterCategory.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            loadStocks();
         });
 
-        loadData();
+        loadCategories(); // Carica le categorie nel menu a tendina
+        loadStocks();     // Carica i dati iniziali
     }
 
+    @FXML
+    private void handleRefresh() {
+        loadCategories();
+        loadStocks();
+    }
+
+    // Metodo pubblico richiamato dal HomeGraphicalController quando si cambia tab
     public void loadData() {
+        loadCategories(); // Ricarica le categorie (nel caso ne siano state aggiunte altrove)
+        loadStocks();     // Ricarica la tabella
+    }
+
+    private void loadCategories() {
         try {
-            stockTable.setItems(FXCollections.observableArrayList(controller.showAllProducts()));
+            List<String> categories = controller.getCategories();
+            // Aggiungiamo un'opzione per vedere tutto
+            List<String> filterOptions = new ArrayList<>();
+            filterOptions.add("Tutte");
+            filterOptions.addAll(categories);
+
+            // Salviamo la selezione corrente per non resettarla
+            String currentSelection = cmbFilterCategory.getValue();
+
+            cmbFilterCategory.setItems(FXCollections.observableArrayList(filterOptions));
+
+            if (currentSelection != null && filterOptions.contains(currentSelection)) {
+                cmbFilterCategory.setValue(currentSelection);
+            } else {
+                cmbFilterCategory.setValue("Tutte");
+            }
         } catch (Exception e) {
-            showAlert("Errore", "Fai qualcosa"); ////**********
+            showAlert(Alert.AlertType.ERROR, "Errore", "Impossibile caricare categorie: " + e.getMessage());
         }
     }
 
-    // --- NUOVA LOGICA CONSUMA/ACQUISTA ---
-
-    @FXML
-    private void onConsume() {
-        int amount = getActionAmount();
-        if (amount > 0) {
-            modifySelection(-amount); // Passiamo valore negativo per consumare
-        }
-    }
-
-    @FXML
-    private void onPurchase() {
-        int amount = getActionAmount();
-        if (amount > 0) {
-            modifySelection(amount); // Passiamo valore positivo per acquistare
-        }
-    }
-
-    // Helper per leggere la quantità dalla casella di testo
-    private int getActionAmount() {
-        String text = actionQtyField.getText();
-        if (text == null || text.trim().isEmpty()) {
-            return 1; // Default a 1 se vuoto
-        }
+    private void loadStocks() {
         try {
-            int val = Integer.parseInt(text);
-            if (val <= 0) throw new NumberFormatException();
-            return val;
-        } catch (NumberFormatException e) {
-            showAlert("Errore Quantità", "Inserisci un numero valido positivo nella casella 'Azione Rapida'.");
-            return 0;
+            tableData.clear();
+            List<StockBean> stocks;
+
+            String selectedCat = cmbFilterCategory.getValue();
+
+            // Logica di filtro
+            if (selectedCat == null || selectedCat.equals("Tutte") || selectedCat.isEmpty()) {
+                stocks = controller.showAllProducts();
+            } else {
+                stocks = controller.getStocksByCategory(selectedCat);
+            }
+
+            tableData.addAll(stocks);
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Errore caricamento", e.getMessage());
         }
     }
 
-    private void modifySelection(int amountChange) {
+    @FXML
+    private void handleAddStock() {
+        try {
+            String name = txtName.getText();
+            String cat = txtCategory.getText(); // Leggiamo la categoria
+            int qty = Integer.parseInt(txtQuantity.getText());
+            int thr = Integer.parseInt(txtThreshold.getText());
+
+            if (name.isEmpty() || cat.isEmpty()) {
+                showAlert(Alert.AlertType.WARNING, "Attenzione", "Nome e Categoria sono obbligatori.");
+                return;
+            }
+
+            // Usiamo il costruttore aggiornato del Bean
+            StockBean newStock = new StockBean(name, qty, thr, cat);
+            controller.addStock(newStock);
+
+            // Pulizia campi
+            txtName.clear();
+            txtCategory.clear();
+            txtQuantity.clear();
+            txtThreshold.clear();
+
+            // Aggiorna categorie e tabella
+            loadCategories();
+            // Seleziona la nuova categoria o "Tutte" per mostrare l'inserimento
+            cmbFilterCategory.setValue("Tutte");
+            loadStocks();
+
+        } catch (NumberFormatException e) {
+            showAlert(Alert.AlertType.ERROR, "Errore Input", "Quantità e Soglia devono essere numeri interi.");
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Errore", e.getMessage());
+        }
+    }
+
+    @FXML
+    private void handleDeleteStock() {
         StockBean selected = stockTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            showAlert("Nessuna Selezione", "Seleziona un prodotto dalla tabella prima di cliccare.");
+            showAlert(Alert.AlertType.WARNING, "Selezione mancante", "Seleziona un prodotto da rimuovere.");
             return;
         }
 
-        try {
-            controller.modifyQuantity(selected.getNome(), amountChange);
-            loadData(); // Ricarica tabella per vedere il numero aggiornato
-            // Opzionale: Resettiamo il campo a 1 dopo l'uso
-            // actionQtyField.setText("1");
-        } catch (Exception e) {
-            showAlert("Errore", e.getMessage());
-        }
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Sei sicuro di voler eliminare " + selected.getNome() + "?", ButtonType.YES, ButtonType.NO);
+        confirm.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.YES) {
+                try {
+                    controller.deleteProduct(selected.getNome());
+                    loadStocks(); // Ricarica tabella
+                    loadCategories(); // Potrebbe essere sparita una categoria
+                } catch (Exception e) {
+                    showAlert(Alert.AlertType.ERROR, "Errore", e.getMessage());
+                }
+            }
+        });
     }
 
-    // --- FINE NUOVA LOGICA ---
-
-    @FXML
-    private void onAddProduct() {
-        try {
-            String name = newNameField.getText();
-            int qty = Integer.parseInt(newQtyField.getText());
-            int threshold = Integer.parseInt(newThresholdField.getText());
-
-            controller.addStock(new StockBean(name, qty, threshold));
-            loadData();
-            newNameField.clear(); newQtyField.clear(); newThresholdField.clear();
-        } catch (NumberFormatException e) {
-            showAlert("Dati Invalidi", "Quantità e Soglia devono essere numeri interi.");
-        } catch (Exception e) {
-            showAlert("Errore Inserimento", e.getMessage());
-        }
-    }
-
-    @FXML
-    private void onDelete() {
-        StockBean selected = stockTable.getSelectionModel().getSelectedItem();
-        if (selected == null) {
-            showAlert("Nessuna Selezione", "Seleziona un prodotto da eliminare.");
-            return;
-        }
-        try {
-            controller.deleteProduct(selected.getNome());
-            loadData();
-        } catch (Exception e) { showAlert("Errore", e.getMessage()); }
-    }
-
-    private void showAlert(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.ERROR); // O Warning
+    private void showAlert(Alert.AlertType type, String title, String content) {
+        Alert alert = new Alert(type);
         alert.setTitle(title);
+        alert.setHeaderText(null);
         alert.setContentText(content);
         alert.showAndWait();
     }

@@ -28,7 +28,5 @@
         <TextField fx:id="groupIdField" promptText="Inserisci ID Gruppo qui..." visible="false"/>
     </VBox>
 
-    <Label fx:id="errorLabel" textFill="RED"/>
-
     <Button text="Continua" onAction="#handleContinue" prefWidth="150"/>
 </VBox>

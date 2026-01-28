@@ -1,23 +1,25 @@
 /* 1. IMPOSTAZIONI GENERALI E SFONDO */
 .root {
-    -fx-font-family: 'Segoe UI', sans-serif;
+    /* Stack di font moderni: Prova prima Roboto o Helvetica, poi ricade su sans-serif standard */
+    -fx-font-family: 'Roboto', 'Open Sans', 'Helvetica Neue', 'Arial', sans-serif;
     -fx-font-size: 14px;
-    /* Sfondo generale: un bianco con una leggerissima tinta menta per non affaticare gli occhi */
-    -fx-background-color: #f1f8f3;
+    /* Sfondo: manteniamo il bianco/menta ma leggermente più pulito */
+    -fx-background-color: #f4fcf6;
 }
 
 /* 2. ETICHETTE E TESTI */
 .label {
-    -fx-text-fill: #444444; /* Grigio scuro morbido invece di nero assoluto */
+    -fx-text-fill: #333333; /* Grigio più deciso per migliorare il contrasto */
 }
 
 /* Titoli Grandi (es. Login/Home) */
 .title-label {
-    -fx-font-size: 26px;
+    -fx-font-family: 'Segoe UI Semibold', 'Arial Bold', sans-serif; /* Un font leggermente più strutturato per i titoli */
+    -fx-font-size: 28px; /* Leggermente più grande */
     -fx-font-weight: bold;
-    /* Verde scuro "Foresta" per i titoli */
-    -fx-text-fill: #2e7d32;
-    -fx-padding: 0 0 10 0;
+    -fx-text-fill: #1b5e20; /* Verde foresta più profondo */
+    -fx-padding: 0 0 15 0;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 2, 0, 0, 1); /* Leggera ombra per dare profondità */
 }
 
 /* Testo descrittivo grigio */
@@ -138,17 +140,17 @@
     -fx-background-color: transparent;
 }
 
-.tab {
-    -fx-background-color: #e0e0e0;
-    -fx-background-radius: 10 10 0 0;
-    -fx-padding: 5 15 5 15;
+/* Miglioramento opzionale per i Tab (Schede) per renderle più leggibili */
+.tab .tab-label {
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
 }
 
 .tab:selected {
     -fx-background-color: #4caf50; /* Tab attiva verde */
 }
 
-.tab:selected .tab-label {
+.tab:selected {
     -fx-text-fill: white;
 }
 

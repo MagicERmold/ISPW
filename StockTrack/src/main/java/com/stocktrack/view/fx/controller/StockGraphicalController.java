@@ -168,4 +168,11 @@ public class StockGraphicalController {
         alert.setContentText(content);
         alert.showAndWait();
     }
+
+    public StockBean getSelectedStock() {
+        if (stockTable != null) {
+            return stockTable.getSelectionModel().getSelectedItem();
+        }
+        return null;
+    }
 }

@@ -6,10 +6,20 @@
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.BorderPane?>
 
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.control.Separator?>
 <BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.stocktrack.view.fx.controller.HomeGraphicalController">
     <top>
         <ToolBar>
-            <Label fx:id="welcomeLabel" text="StockTrack"/>
+            <Label fx:id="welcomeLabel" text="StockTrack" styleClass="title-label"/>
+
+            <Separator orientation="VERTICAL" />
+
+            <Button text="Registra Acquisto (+)" onAction="#handlePurchase" styleClass="action-button"/>
+            <Button text="Registra Consumo (-)" onAction="#handleConsumption" styleClass="danger-button"/>
+
+            <Pane/>
+
             <Button text="Logout" onAction="#handleLogout"/>
         </ToolBar>
     </top>

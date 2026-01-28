@@ -21,8 +21,6 @@
     <TextField fx:id="usernameField" promptText="Username" maxWidth="300"/>
     <PasswordField fx:id="passwordField" promptText="Password" maxWidth="300"/>
 
-    <Label fx:id="errorLabel" textFill="RED" />
-
     <Button text="Accedi" onAction="#handleLogin" defaultButton="true" prefWidth="150" />
 
     <Button text="Non hai un account? Registrati" onAction="#switchToRegister" />

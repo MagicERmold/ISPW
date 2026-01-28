@@ -15,13 +15,17 @@ public class JavaFXApp extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        scene = new Scene(loadFXML("login"), 800, 600); // Ho aumentato un po' la dimensione
+        // Carico la Scene del login
+        scene = new Scene(loadFXML("login"), 800, 600);
 
+        // Carico il css
         String css = Objects.requireNonNull(this.getClass().getResource("/com/stocktrack/view/style.css")).toExternalForm();
         scene.getStylesheets().add(css);
 
+        // Imposto la Scene del Login
         stage.setScene(scene);
         stage.setTitle("StockTrack - Gestione Magazzino");
+        stage.resizableProperty().setValue(Boolean.FALSE);
         stage.show();
     }
 

@@ -7,10 +7,8 @@ import com.stocktrack.model.User;
 import com.stocktrack.view.fx.JavaFXApp;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.paint.Color;
 
 import java.io.IOException;
 
@@ -18,7 +16,6 @@ public class RegisterGraphicalController {
 
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
-    @FXML private Label infoLabel;
 
     private final LoginController loginController = new LoginController();
 
@@ -28,8 +25,20 @@ public class RegisterGraphicalController {
         String pass = passwordField.getText();
 
         if (user.isEmpty() || pass.isEmpty()) {
-            infoLabel.setText("Compila tutti i campi!");
-            infoLabel.setTextFill(Color.RED);
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("ERRORE");
+            alert.setHeaderText("CREDENZIALI REGISTRAZIONE NON VALIDE!");
+            alert.setContentText("Sono stati rilevati dei campi vuoti...");
+            alert.showAndWait();
+            return;
+        }
+
+        if(passwordField.getText().length() < 8) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("ERRORE");
+            alert.setHeaderText("CREDENZIALI NON VALIDE!");
+            alert.setContentText("Password troppo corta, minimo 8 caratteri...");
+            alert.showAndWait();
             return;
         }
 
@@ -40,8 +49,8 @@ public class RegisterGraphicalController {
 
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Successo");
-            alert.setHeaderText(null);
-            alert.setContentText("Registrazione completata! Accesso in corso...");
+            alert.setHeaderText("REGISTRAZIONE COMPLETATA!");
+            alert.setContentText("Accesso in corso...");
             alert.showAndWait();
 
             boolean loginSuccess = loginController.login(bean);
@@ -57,8 +66,10 @@ public class RegisterGraphicalController {
                 JavaFXApp.setRoot("login");
             }
         } catch (Exception e) {
-            infoLabel.setText(e.getMessage());
-            infoLabel.setTextFill(Color.RED);
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("ERRORE");
+            alert.setContentText(e.getMessage());
+            alert.showAndWait();
         }
     }
 
@@ -67,8 +78,10 @@ public class RegisterGraphicalController {
         try {
             JavaFXApp.setRoot("login");
         } catch (IOException e) {
-            infoLabel.setText("Errore caricamento pagina login: " + e.getMessage());
-            infoLabel.setTextFill(Color.RED);
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("ERRORE");
+            alert.setContentText("Errore caricamento pagina login: " + e.getMessage());
+            alert.showAndWait();
         }
     }
 }

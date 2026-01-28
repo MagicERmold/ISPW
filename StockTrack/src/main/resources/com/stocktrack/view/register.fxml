@@ -19,8 +19,6 @@
     <TextField fx:id="usernameField" promptText="Scegli Username" maxWidth="300"/>
     <PasswordField fx:id="passwordField" promptText="Scegli Password" maxWidth="300"/>
 
-    <Label fx:id="infoLabel" textFill="BLUE" />
-
     <Button text="Registrati" onAction="#handleRegister" defaultButton="true" prefWidth="150" styleClass="action-button"/>
     <Button text="Torna al Login" onAction="#backToLogin" />
 </VBox>

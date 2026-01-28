@@ -4,7 +4,7 @@ import com.stocktrack.controller.GroupController;
 import com.stocktrack.engineering.exception.StorageException;
 import com.stocktrack.view.fx.JavaFXApp;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
+import javafx.scene.control.Alert;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 
@@ -14,7 +14,6 @@ public class GroupSelectionGraphicalController {
 
     @FXML private RadioButton joinRadio;
     @FXML private TextField groupIdField;
-    @FXML private Label errorLabel;
 
     private final GroupController groupController = new GroupController();
 
@@ -30,21 +29,34 @@ public class GroupSelectionGraphicalController {
             if (joinRadio.isSelected()) {
                 String id = groupIdField.getText();
                 if (id.isEmpty()) {
-                    errorLabel.setText("Inserisci l'ID del gruppo!");
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    alert.setTitle("ERRORE");
+                    alert.setHeaderText("CAMPO NON VALIDO!");
+                    alert.setContentText("L'ID non può essere vuoto...");
+                    alert.showAndWait();
                     return;
                 }
                 groupController.joinGroup(id);
             } else {
                 String newId = groupController.createGroup();
                 // Potremmo mostrare un popup con il nuovo ID, ma per ora andiamo alla home
-                System.out.println("Gruppo creato: " + newId);
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setHeaderText("GRUPPO CREATO CON SUCCESSO!");
+                alert.setContentText("Il tuo ID associato al gruppo è: " + newId);
+                alert.showAndWait();
             }
             // Vai alla Home
             JavaFXApp.setRoot("home");
         } catch (IOException e) {
-            errorLabel.setText("Errore I/O: " + e.getMessage());
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("ERRORE");
+            alert.setContentText("ErroreI/O: "  + e.getMessage());
+            alert.showAndWait();
         } catch (StorageException e) {
-            System.out.println("Errore nel recupero dati: " + e.getMessage());
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("ERRORE");
+            alert.setContentText("Errore nel recupero dati: " +  e.getMessage());
+            alert.showAndWait();
         }
     }
 }

@@ -7,10 +7,9 @@ import com.stocktrack.engineering.singleton.SessionManager;
 import com.stocktrack.model.User;
 import com.stocktrack.view.fx.JavaFXApp;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
+import javafx.scene.control.Alert;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.paint.Color;
 
 import java.io.IOException;
 
@@ -18,7 +17,6 @@ public class LoginGraphicalController {
 
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
-    @FXML private Label errorLabel;
 
     private final LoginController loginLogic = new LoginController();
 
@@ -28,8 +26,11 @@ public class LoginGraphicalController {
         String password = passwordField.getText();
 
         if (username.isEmpty() || password.isEmpty()) {
-            errorLabel.setText("Inserisci username e password");
-            errorLabel.setTextFill(Color.RED);
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("ERRORE");
+            alert.setHeaderText("CREDENZIALI LOGIN NON VALIDE!");
+            alert.setContentText("Sono stati rilevati dei campi vuoti...");
+            alert.showAndWait();
             return;
         }
 
@@ -48,14 +49,22 @@ public class LoginGraphicalController {
                     JavaFXApp.setRoot("home");
                 }
             } else {
-                errorLabel.setText("Credenziali non valide");
-                errorLabel.setTextFill(Color.RED);
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("ERRORE");
+                alert.setHeaderText("CREDENZIALI NON VALIDE!");
+                alert.showAndWait();
             }
         } catch (IOException e) {
-            errorLabel.setText("Errore I/O: " + e.getMessage());
-            errorLabel.setTextFill(Color.RED);
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("ERRORE");
+            alert.setHeaderText("ERRORE I/O");
+            alert.showAndWait();
         } catch (StorageException e) {
-            System.out.println("Errore nel recupero dati: " + e.getMessage());
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("ERRORE");
+            alert.setHeaderText("ERRORE NEL RECUPERO DATI: " + e.getMessage());
+            alert.setContentText("Sono stati rilevati dei campi vuoti...");
+            alert.showAndWait();
         }
     }
 

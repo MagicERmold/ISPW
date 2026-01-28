@@ -20,7 +20,6 @@ public class SerializableStockDAO implements StockDAO {
         }
     }
 
-    @SuppressWarnings("unchecked")
     private List<Stock> loadAll() throws StorageException {
         if (!file.exists() || file.length() == 0) return new ArrayList<>();
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
@@ -84,8 +83,7 @@ public class SerializableStockDAO implements StockDAO {
                     .distinct()                                  // Rimuove duplicati
                     .collect(Collectors.toList());
         } catch (StorageException e) {
-            // L'interfaccia non prevede throws qui, quindi restituiamo lista vuota o logghiamo errore
-            System.err.println("Errore recupero categorie: " + e.getMessage());
+            // L'interfaccia non prevede throws qui, quindi restituiamo lista vuota
             return new ArrayList<>();
         }
     }
@@ -98,7 +96,7 @@ public class SerializableStockDAO implements StockDAO {
                     .filter(s -> s.getCategory() != null && s.getCategory().equalsIgnoreCase(category)) // Filtra per categoria
                     .collect(Collectors.toList());
         } catch (StorageException e) {
-            System.err.println("Errore recupero prodotti per categoria: " + e.getMessage());
+            // L'interfaccia non prevede throws qui, quindi restituiamo lista vuota
             return new ArrayList<>();
         }
     }

@@ -1,6 +1,7 @@
 package com.stocktrack.controller;
 
 import com.stocktrack.bean.StockBean;
+import com.stocktrack.engineering.exception.InvalidProductDataException;
 import com.stocktrack.engineering.exception.StorageException;
 import com.stocktrack.engineering.factory.DAOFactory;
 import com.stocktrack.engineering.singleton.SessionManager;
@@ -22,6 +23,17 @@ public class ManageStockController {
             throw new StorageException("Devi prima creare o unirti a un gruppo!");
         }
 
+        // VALIDAZIONE DATI: Usiamo l'eccezione personalizzata
+        if (bean.getNome() == null || bean.getNome().trim().isEmpty()) {
+            throw new InvalidProductDataException("Il nome del prodotto non può essere vuoto.");
+        }
+        if (bean.getQuantity() < 0) {
+            throw new InvalidProductDataException("La quantità iniziale non può essere negativa.");
+        }
+        if (bean.getThreshold() < 0) {
+            throw new InvalidProductDataException("La soglia non può essere negativa.");
+        }
+
         // Recupero la persistenza
         StockDAO dao = DAOFactory.getStockDAO();
 
@@ -29,7 +41,7 @@ public class ManageStockController {
         List<Stock> existingStocks = dao.getAllStocks(user.getGroupId());
         for (Stock s : existingStocks) {
             if (s.getName().equalsIgnoreCase(bean.getNome())) {
-                throw new StorageException("Il prodotto '" + bean.getNome() + "' esiste già! Usa 'Registra Acquisto' per aggiornare la quantità.");
+                throw new InvalidProductDataException("Il prodotto '" + bean.getNome() + "' esiste già!");
             }
         }
 
@@ -73,11 +85,16 @@ public class ManageStockController {
         }
 
         // Il prodotto non è stato trovato
-        if(target == null) throw new StorageException("Prodotto non trovato!");
+        if(target == null) {
+            throw new StorageException("Prodotto non trovato!");
+        }
 
         // Il prodotto è stato trovato
         int newQty = target.getQuantity() + amountChange;
-        if (newQty < 0) throw new StorageException("Non puoi avere quantità negativa!");
+        // VALIDAZIONE
+        if (newQty < 0) {
+            throw new InvalidProductDataException("Operazione non valida: la quantità diventerebbe negativa (" + newQty + ").");
+        }
 
         // Aggiorno la quantità in memoria
         dao.updateStockQuantity(target.getName(), newQty, user.getGroupId());
@@ -100,7 +117,7 @@ public class ManageStockController {
 
     // ADMIN & USER: genero la lista di prodotti sotto scorta
     // getAllStocks ha bisogno delle exceptions
-    public List<StockBean> getShoppingList() throws IOException, StorageException {
+    public List<StockBean> getShoppingList() StorageException {
         // Recupero utente e il metodo di persistenza
         StockDAO dao = DAOFactory.getStockDAO();
         User user = SessionManager.getInstance().getCurrentUser();

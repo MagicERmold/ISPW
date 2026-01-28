@@ -42,12 +42,16 @@ public class FileSystemStockDAO implements StockDAO {
     }
 
     @Override
-    public List<Stock> getAllStocks(String groupUid){
-        return readAllInternal(groupUid);
+    public List<Stock> getAllStocks(String groupUid) throws StorageException {
+        try {
+            return readAllInternal(groupUid);
+        } catch (IOException e) {
+            throw new StorageException("Errore lettura database stock", e);
+        }
     }
 
     @Override
-    public void updateStockQuantity(String stockName, int newQuantity, String groupId) throws StorageException{
+    public void updateStockQuantity(String stockName, int newQuantity, String groupId) throws StorageException {
         List<String> lines = new ArrayList<>();
         boolean found = false;
 
@@ -65,9 +69,17 @@ public class FileSystemStockDAO implements StockDAO {
                     lines.add(line);
                 }
             }
-        } catch (IOException e) { return; }
+        } catch (IOException e) {
+            throw new StorageException(e.getMessage());
+        }
 
-        if (found) rewriteFile(lines);
+        if (found) {
+            try {
+                rewriteFile(lines);
+            } catch (IOException e) {
+                throw new StorageException("Errore scrittura file durante aggiornamento stock", e);
+            }
+        }
     }
 
     @Override
@@ -92,18 +104,26 @@ public class FileSystemStockDAO implements StockDAO {
     }
 
     @Override
-    public List<String> getAllCategories(String groupId){
-        return readAllInternal(groupId).stream()
-                .map(Stock::getCategory)
-                .distinct()
-                .collect(Collectors.toList());
+    public List<String> getAllCategories(String groupId) throws StorageException {
+        try {
+            return readAllInternal(groupId).stream()
+                    .map(Stock::getCategory)
+                    .distinct()
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            throw new StorageException("Errore recupero categorie", e);
+        }
     }
 
     @Override
-    public List<Stock> getStocksByCategory(String groupUid, String category) {
-        return readAllInternal(groupUid).stream()
-                .filter(s -> s.getCategory().equalsIgnoreCase(category))
-                .collect(Collectors.toList());
+    public List<Stock> getStocksByCategory(String groupUid, String category) throws StorageException {
+        try {
+            return readAllInternal(groupUid).stream()
+                    .filter(s -> s.getCategory().equalsIgnoreCase(category))
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            throw new StorageException("Errore recupero prodotti per categoria", e);
+        }
     }
 
     // Metodo helper privato per evitare duplicazione codice scrittura
@@ -119,7 +139,7 @@ public class FileSystemStockDAO implements StockDAO {
     }
 
     // Helper per leggere tutto e convertire
-    private List<Stock> readAllInternal(String groupUid) {
+    private List<Stock> readAllInternal(String groupUid) throws IOException {
         List<Stock> list = new ArrayList<>();
         if (!file.exists() || groupUid == null) return list;
 
@@ -135,18 +155,20 @@ public class FileSystemStockDAO implements StockDAO {
                     }
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException e) {
+            throw new IOException("Errore nella scrittura del prodotto", e);
         }
         return list;
     }
 
-    private void rewriteFile(List<String> lines) {
+    private void rewriteFile(List<String> lines) throws IOException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, false))) {
             for (String s : lines) {
                 writer.write(s);
                 writer.newLine();
             }
-        } catch (IOException e) { e.printStackTrace(); }
+        } catch (IOException e) {
+            throw new IOException("Errore nella scrittura del file", e);
+        }
     }
 }

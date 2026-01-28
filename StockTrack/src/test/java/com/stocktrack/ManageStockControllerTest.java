@@ -68,7 +68,7 @@ class ManageStockControllerTest {
             stockController.modifyQuantity("Latte", -10);
         });
 
-        assertEquals("Non puoi avere quantità negativa!", exception.getMessage());
+        assertEquals("Operazione non valida: la quantità diventerebbe negativa (-5).", exception.getMessage());
     }
 
     @Test

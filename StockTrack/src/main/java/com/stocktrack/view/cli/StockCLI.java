@@ -2,9 +2,7 @@ package com.stocktrack.view.cli;
 
 import com.stocktrack.bean.StockBean;
 import com.stocktrack.controller.ManageStockController;
-import com.stocktrack.engineering.exception.StorageException;
 
-import java.io.IOException;
 import java.util.List;
 
 public class StockCLI {

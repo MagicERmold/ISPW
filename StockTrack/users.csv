@@ -1,4 +1,0 @@
-user,user,USER,GROUP_admin
-admin,admin,ADMIN,GROUP_admin
-andreamitico,123456789,ADMIN,GROUP_andreamitico
-pollo123,pollo123,USER,GROUP_andreamitico

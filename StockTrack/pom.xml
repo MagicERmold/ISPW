@@ -17,6 +17,13 @@
 
         <sonar.organization>magicermold</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.coverage.exclusions>
+            **/view/**/*,
+            **/model/**/*,
+            **/bean/**/*,
+            **/engineering/exception/**/*,
+            **/Main.java
+        </sonar.coverage.exclusions>
     </properties>
 
     <dependencies>

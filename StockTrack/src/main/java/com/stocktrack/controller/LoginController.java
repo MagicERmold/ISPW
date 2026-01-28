@@ -13,7 +13,7 @@ import java.io.IOException;
 
 public class LoginController {
 
-    public boolean login(UserBean userBean) StorageException {
+    public boolean login(UserBean userBean) throws IOException, StorageException {
         // Recupero la modalità di persistenza
         UserDAO userDAO = DAOFactory.getUserDAO();
 
@@ -35,7 +35,7 @@ public class LoginController {
         return false;
     }
 
-    public boolean register(UserBean userBean) throws DuplicateUserException, StorageException {
+    public boolean register(UserBean userBean) throws DuplicateUserException, StorageException, IOException {
         // Recupero la modalità di persistenza
         UserDAO userDAO = DAOFactory.getUserDAO();
 

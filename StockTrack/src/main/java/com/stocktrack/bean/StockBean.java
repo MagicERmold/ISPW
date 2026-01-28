@@ -4,7 +4,7 @@ public class StockBean {
     private final String nome;
     private final int quantity;
     private final int threshold;
-    private String category;
+    private final String category;
 
     public StockBean(String nome, int quantity, int threshold) {
         this.nome = nome;

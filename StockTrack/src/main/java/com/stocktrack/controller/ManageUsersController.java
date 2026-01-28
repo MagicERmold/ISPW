@@ -13,7 +13,7 @@ import java.util.List;
 public class ManageUsersController {
 
     // ADMIN: recupera la lista di utenti che si trovano nello stesso gruppo dell'ADMIN
-    public List<User> getMyGroupUsers() StorageException {
+    public List<User> getMyGroupUsers() throws IOException, StorageException {
         // Recupero l'ADMIN e il suo gruppo associato
         User currentUser = SessionManager.getInstance().getCurrentUser();
         String myGroup = currentUser.getGroupId();
@@ -31,7 +31,7 @@ public class ManageUsersController {
     }
 
     // ADMIN: elimina gli utenti dal gruppo dell'ADMIN
-    public void removeUserFromMyGroup(String usernameToRemove) throws StorageException {
+    public void removeUserFromMyGroup(String usernameToRemove) throws StorageException, IOException {
         // Recupero l'ADMIN
         User currentUser = SessionManager.getInstance().getCurrentUser();
 

@@ -8,9 +8,9 @@ public class Stock implements Serializable {
     private static final long serialVersionUID = 1L;
     private final String name;
     private int quantity;
-    private int threshold;
-    private String groupId;
-    private String category;
+    private final int threshold;
+    private final String groupId;
+    private final String category;
 
     public Stock(String name, int quantity, int threshold, String groupId, String category) {
         this.name = name;
@@ -41,6 +41,5 @@ public class Stock implements Serializable {
     }
 
     public String getCategory() { return category; }
-    public void setCategory(String category) { this.category = category; }
 
 }

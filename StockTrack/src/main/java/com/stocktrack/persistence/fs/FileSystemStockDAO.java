@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class FileSystemStockDAO implements StockDAO {
-    private static final String CSV_FILE_NAME = "stock_database.csv";
+    private static final String CSV_FILE_NAME = "stocks.csv";
     private static final Logger logger = Logger.getLogger(FileSystemStockDAO.class.getName());
     private final File file = new File(CSV_FILE_NAME);
 

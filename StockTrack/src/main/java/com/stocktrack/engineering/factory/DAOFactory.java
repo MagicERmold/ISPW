@@ -26,31 +26,23 @@ public class DAOFactory {
     public static StockDAO getStockDAO() throws StorageException {
         String type = readPersistenceTypeFromConfig();
 
-        switch (type.toUpperCase()) {
-            case "DEMO":
-                return new InMemoryStockDAO();
-            case "FULL-FS":
-                return new FileSystemStockDAO();
-            case "FULL-SR":
-                return new SerializableStockDAO();
-            default:
-                throw new IllegalArgumentException("Tipo di persistenza non valido: " + type);
-        }
+        return switch (type.toUpperCase()) {
+            case "DEMO" -> new InMemoryStockDAO();
+            case "FULL-FS" -> new FileSystemStockDAO();
+            case "FULL-SR" -> new SerializableStockDAO();
+            default -> throw new IllegalArgumentException("Tipo di persistenza non valido: " + type);
+        };
     }
 
     public static UserDAO getUserDAO() throws IOException {
         String type = readPersistenceTypeFromConfig();
 
-        switch (type.toUpperCase()) {
-            case "DEMO":
-                return new InMemoryUserDAO();
-            case "FULL-FS":
-                return new FileSystemUserDAO();
-            case "FULL-SR":
-                return new SerializableUserDAO();
-            default:
-                throw new IllegalArgumentException("Tipo di persistenza non valido: " + type);
-        }
+        return switch (type.toUpperCase()) {
+            case "DEMO" -> new InMemoryUserDAO();
+            case "FULL-FS" -> new FileSystemUserDAO();
+            case "FULL-SR" -> new SerializableUserDAO();
+            default -> throw new IllegalArgumentException("Tipo di persistenza non valido: " + type);
+        };
     }
 
     private static String readPersistenceTypeFromConfig()  {

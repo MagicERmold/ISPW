@@ -16,7 +16,7 @@ import java.util.List;
 public class ManageStockController {
 
     // ADMIN: Aggiunge nuovo prodotto
-    public void addStock(StockBean bean) throws StorageException {
+    public void addStock(StockBean bean) throws StorageException, InvalidProductDataException {
         // Recupero l'utente e controllo se appartiene a un gruppo per sicurezza
         User user = SessionManager.getInstance().getCurrentUser();
         if (user.getGroupId() == null) {
@@ -69,7 +69,7 @@ public class ManageStockController {
     }
 
     // USER & ADMIN: Consuma (diminuisce) o Acquista (aumenta)
-    public void modifyQuantity(String productName, int amountChange) throws StorageException {
+    public void modifyQuantity(String productName, int amountChange) throws StorageException, InvalidProductDataException, IOException {
         // Recupero l'utente e il metodo di persistenza
         User user = SessionManager.getInstance().getCurrentUser();
         StockDAO dao = DAOFactory.getStockDAO();
@@ -117,7 +117,7 @@ public class ManageStockController {
 
     // ADMIN & USER: genero la lista di prodotti sotto scorta
     // getAllStocks ha bisogno delle exceptions
-    public List<StockBean> getShoppingList() StorageException {
+    public List<StockBean> getShoppingList() throws StorageException {
         // Recupero utente e il metodo di persistenza
         StockDAO dao = DAOFactory.getStockDAO();
         User user = SessionManager.getInstance().getCurrentUser();

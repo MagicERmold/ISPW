@@ -140,7 +140,7 @@ public class HomeCLI {
             }
             System.out.println("----------------------------------------------------------\n");
 
-        } catch (IOException | StorageException e) {
+        } catch (StorageException e) {
             System.out.println("Errore nel recupero dati: " + e.getMessage());
         }
     }

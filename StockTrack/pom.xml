@@ -21,7 +21,8 @@
             **/view/**/*,
             **/model/**/*,
             **/bean/**/*,
-            **/engineering/exception/**/*,
+            **/persistence/**/*,
+            **/engineering/**/*,
             **/Main.java
         </sonar.coverage.exclusions>
     </properties>

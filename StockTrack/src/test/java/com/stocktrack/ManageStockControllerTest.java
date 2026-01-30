@@ -57,7 +57,7 @@ class ManageStockControllerTest {
         assertDoesNotThrow(() -> stockController.addStock(newStock),
                 "L'aggiunta di un prodotto valido non deve lanciare eccezioni.");
 
-        List<StockBean> products = stockController.showAllProducts();
+        List<StockBean> products = stockController.showAllStocks();
 
         StockBean result = products.stream()
                 .filter(p -> p.getNome().equals("Pasta"))
@@ -135,14 +135,14 @@ class ManageStockControllerTest {
         // Azione 1: Acquisto (+5)
         stockController.modifyQuantity("Biscotti", 5);
 
-        StockBean updated = stockController.showAllProducts().stream()
+        StockBean updated = stockController.showAllStocks().stream()
                 .filter(p -> p.getNome().equals("Biscotti")).findFirst().orElseThrow();
         assertEquals(15, updated.getQuantity(), "10 + 5 dovrebbe fare 15.");
 
         // Azione 2: Consumo (-3)
         stockController.modifyQuantity("Biscotti", -3);
 
-        updated = stockController.showAllProducts().stream()
+        updated = stockController.showAllStocks().stream()
                 .filter(p -> p.getNome().equals("Biscotti")).findFirst().orElseThrow();
         assertEquals(12, updated.getQuantity(), "15 - 3 dovrebbe fare 12.");
     }
@@ -196,19 +196,19 @@ class ManageStockControllerTest {
      * Test Req: Cancellazione Prodotto.
      */
     @Test
-    void testDeleteProduct() throws Exception {
+    void testDeleteStock() throws Exception {
         stockController.addStock(new StockBean("DaCancellare", 5, 1));
 
         // Cancellazione
-        stockController.deleteProduct("DaCancellare");
+        stockController.deleteStock("DaCancellare");
 
         // Verifica che non esista più
-        List<StockBean> list = stockController.showAllProducts();
+        List<StockBean> list = stockController.showAllStocks();
         boolean exists = list.stream().anyMatch(p -> p.getNome().equals("DaCancellare"));
         assertFalse(exists, "Il prodotto dovrebbe essere stato rimosso.");
 
         // Verifica errore su prodotto inesistente
-        assertThrows(StorageException.class, () -> stockController.deleteProduct("NonEsiste"));
+        assertThrows(StorageException.class, () -> stockController.deleteStock("NonEsiste"));
     }
 
     /**

@@ -93,7 +93,7 @@ public class StockCLI {
                 list = controller.getStocksByCategory(catChoice);
             } else {
                 // 3. Recupera tutti
-                list = controller.showAllProducts();
+                list = controller.showAllStocks();
             }
 
             // 4. Stampa tabella
@@ -126,7 +126,7 @@ public class StockCLI {
 
         if ("s".equalsIgnoreCase(confirm)) {
             try {
-                controller.deleteProduct(name);
+                controller.deleteStock(name);
                 System.out.println("Prodotto '" + name + "' eliminato con successo.");
             } catch (Exception e) {
                 System.out.println("Errore: " + e.getMessage());

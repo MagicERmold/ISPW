@@ -100,6 +100,6 @@ class LoginControllerTest {
         loginController.register(userBean);
 
         // 2. Seconda registrazione identica -> Deve lanciare DuplicateUserException
-        assertThrows(DuplicateUserException.class, () -> {loginController.register(userBean);}, "Dovrebbe lanciare DuplicateUserException se l'username è già in uso.");
+        assertThrows(DuplicateUserException.class, () -> loginController.register(userBean), "Dovrebbe lanciare DuplicateUserException se l'username è già in uso.");
     }
 }

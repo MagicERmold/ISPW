@@ -101,7 +101,7 @@ public class ManageStockController {
     }
 
     // ADMIN & USER: recupero la lista dei prodotti
-    public List<StockBean> showAllProducts() throws StorageException {
+    public List<StockBean> showAllStocks() throws StorageException {
         StockDAO dao = DAOFactory.getStockDAO();
         User user = SessionManager.getInstance().getCurrentUser();
 
@@ -136,7 +136,7 @@ public class ManageStockController {
     }
 
     // ADMIN: cancella STOCK dalla memoria
-    public void deleteProduct(String productName) throws StorageException {
+    public void deleteStock(String productName) throws StorageException {
         // Recupero utente e il metodo di persistenza
         User user = SessionManager.getInstance().getCurrentUser();
         StockDAO dao = DAOFactory.getStockDAO();

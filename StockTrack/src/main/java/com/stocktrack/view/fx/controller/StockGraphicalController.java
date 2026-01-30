@@ -92,7 +92,7 @@ public class StockGraphicalController {
 
             // Logica di filtro
             if (selectedCat == null || selectedCat.equals("Tutte") || selectedCat.isEmpty()) {
-                stocks = controller.showAllProducts();
+                stocks = controller.showAllStocks();
             } else {
                 stocks = controller.getStocksByCategory(selectedCat);
             }
@@ -151,7 +151,7 @@ public class StockGraphicalController {
         confirm.showAndWait().ifPresent(response -> {
             if (response == ButtonType.YES) {
                 try {
-                    controller.deleteProduct(selected.getNome());
+                    controller.deleteStock(selected.getNome());
                     loadStocks(); // Ricarica tabella
                     loadCategories(); // Potrebbe essere sparita una categoria
                 } catch (Exception e) {

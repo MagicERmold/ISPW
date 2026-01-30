@@ -25,4 +25,4 @@ jobs:
     # 3. Esegue i test con Maven
     # L'opzione -B (batch mode) riduce l'output inutile nei log
     - name: Build with Maven and Run Tests
-      run: mvn -B test --file pom.xml
+      run: mvn -B test --file StockTrack/pom.xml

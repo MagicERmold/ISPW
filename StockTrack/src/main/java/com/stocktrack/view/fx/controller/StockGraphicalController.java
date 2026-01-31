@@ -28,7 +28,7 @@ public class StockGraphicalController {
 
     private final ManageStockController controller = new ManageStockController();
     private final ObservableList<StockBean> tableData = FXCollections.observableArrayList();
-    private final String t = "Tutte";
+    private final static String t = "Tutte";
 
     @FXML
     public void initialize() {

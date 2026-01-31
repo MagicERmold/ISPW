@@ -35,10 +35,6 @@ public class HomeCLI {
         }
 
         boolean loggedIn = true;
-        //********************
-        //********************
-        //********************
-        // Risolve il nesting?
         Role r =  currentUser.getRole();
 
         while (loggedIn) {
@@ -50,36 +46,9 @@ public class HomeCLI {
             }
 
             // Gestione dell'ingresso
+            // Legge input e delega la logica
             String input = InputHelper.readString(">> ");
-
-            // Switch unificato dove possibile o specifico
-            switch (input) {
-                case "1":
-                    StockCLI stockCLI = new StockCLI();
-                    stockCLI.start();
-                    break;
-                case "2":
-                    if (r == Role.ADMIN) {
-                        manageUsers();
-                    } else {
-                        generateShoppingList();
-                    }
-                    break;
-                case "3":
-                    if (r == Role.ADMIN) {
-                        generateShoppingList();
-                    } else {
-                        InputHelper.print("Opzione non valida.");
-                    }
-                    break;
-                case "0":
-                    InputHelper.print("Logout effettuato.");
-                    SessionManager.getInstance().logout();
-                    loggedIn = false;
-                    break;
-                default:
-                    InputHelper.print("Opzione non valida.");
-            }
+            loggedIn = processCommand(input, r);
         }
     }
 
@@ -177,5 +146,42 @@ public class HomeCLI {
         } catch (Exception e) {
             InputHelper.print("Errore: " + e.getMessage());
         }
+    }
+
+    private boolean processCommand(String input, Role role) {
+        switch (input) {
+            case "1":
+                new StockCLI().start();
+                return true;
+            case "2":
+                return handleOptionTwo(role);
+            case "3":
+                return handleOptionThree(role);
+            case "0":
+                InputHelper.print("Logout effettuato.");
+                SessionManager.getInstance().logout();
+                return false; // Ferma il ciclo while
+            default:
+                InputHelper.print("Opzione non valida.");
+                return true;
+        }
+    }
+
+    private boolean handleOptionTwo(Role role) {
+        if (role == Role.ADMIN) {
+            manageUsers();
+        } else {
+            generateShoppingList();
+        }
+        return true;
+    }
+
+    private boolean handleOptionThree(Role role) {
+        if (role == Role.ADMIN) {
+            generateShoppingList();
+        } else {
+            InputHelper.print("Opzione non valida.");
+        }
+        return true;
     }
 }

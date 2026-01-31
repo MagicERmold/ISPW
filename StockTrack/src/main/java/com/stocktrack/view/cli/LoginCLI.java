@@ -79,7 +79,8 @@ public class LoginCLI {
         } catch (DuplicateUserException e) {
             InputHelper.print("Errore di Registrazione: " + e.getMessage());
         } catch (StorageException e) {
-            throw new RuntimeException(e);
+            InputHelper.print("Errore critico di sistema (Database): " + e.getMessage());
+            return false;
         }
         return false;
     }

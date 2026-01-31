@@ -12,7 +12,7 @@ public class SerializableUserDAO implements UserDAO {
     private static final String FILE_NAME = "users.ser";
     private final File file;
 
-    public SerializableUserDAO() {
+    public SerializableUserDAO() throws StorageException {
         this.file = new File(FILE_NAME);
         // Se il file non esiste, salviamo una lista vuota per inizializzarlo
         if (!file.exists()) {
@@ -33,13 +33,11 @@ public class SerializableUserDAO implements UserDAO {
     }
 
     // Metodo helper per salvare l'intera lista
-    private void saveAll(List<User> users) {
+    private void saveAll(List<User> users) throws StorageException {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
             oos.writeObject(users);
         } catch (IOException e) {
-            // Qui convertiamo la unchecked in Runtime o gestiamo diversamente,
-            // ma dato che l'interfaccia richiede StorageException, la rilanciamo nei metodi pubblici
-            throw new RuntimeException("Errore critico salvataggio serializzato", e);
+            throw new StorageException("Errore critico salvataggio serializzato", e);
         }
     }
 

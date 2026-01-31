@@ -48,8 +48,7 @@ public class StockGraphicalController {
 
     @FXML
     private void handleRefresh() {
-        loadCategories();
-        loadStocks();
+        loadData();
     }
 
     // Metodo pubblico richiamato dal HomeGraphicalController quando si cambia tab

@@ -6,7 +6,6 @@ import com.stocktrack.persistence.dao.StockDAO;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class InMemoryStockDAO implements StockDAO {
     private static final List<Stock> warehouse = new ArrayList<>();

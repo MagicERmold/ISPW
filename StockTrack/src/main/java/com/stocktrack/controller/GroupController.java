@@ -5,11 +5,10 @@ import com.stocktrack.engineering.singleton.SessionManager;
 import com.stocktrack.model.Role; // Importante
 import com.stocktrack.model.User;
 import com.stocktrack.engineering.factory.DAOFactory;
-import java.io.IOException;
 
 public class GroupController {
 
-    public String createGroup() throws IOException, StorageException {
+    public String createGroup() throws StorageException {
         // Recupero l'utente attuale da SessionManager
         User currentUser = SessionManager.getInstance().getCurrentUser();
 
@@ -26,7 +25,7 @@ public class GroupController {
         return newGroupUid;
     }
 
-    public void joinGroup(String groupUid) throws IOException, StorageException {
+    public void joinGroup(String groupUid) throws StorageException {
         // Recupero l'utente attuale
         User currentUser = SessionManager.getInstance().getCurrentUser();
 

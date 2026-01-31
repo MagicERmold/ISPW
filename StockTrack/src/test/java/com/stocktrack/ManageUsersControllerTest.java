@@ -12,7 +12,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -29,7 +28,7 @@ class ManageUsersControllerTest {
     private final String testGroup = "AlphaTeam";
 
     @BeforeEach
-    void setUp() throws IOException, StorageException {
+    void setUp() throws StorageException {
         manageUsersController = new ManageUsersController();
         userDAO = DAOFactory.getUserDAO();
 
@@ -70,7 +69,7 @@ class ManageUsersControllerTest {
      * Verifica che vengano restituiti solo gli utenti appartenenti allo stesso gruppo dell'admin.
      */
     @Test
-    void testGetMyGroupUsers() throws IOException, StorageException {
+    void testGetMyGroupUsers() throws StorageException {
         // Setup: Creo un collega (stesso gruppo) e un estraneo (gruppo diverso)
         User colleague = new User("colleague", "pass", Role.USER, testGroup);
         User outsider = new User("outsider", "pass", Role.USER, "BetaTeam");
@@ -98,7 +97,7 @@ class ManageUsersControllerTest {
      * Verifica che un utente venga rimosso correttamente (GroupId -> null, Role -> USER).
      */
     @Test
-    void testRemoveUserFromMyGroupSuccess() throws IOException, StorageException {
+    void testRemoveUserFromMyGroupSuccess() throws StorageException {
         // Setup: Utente da rimuovere
         String victimName = "victim";
         User victim = new User(victimName, "pass", Role.USER, testGroup);

@@ -9,11 +9,9 @@ import com.stocktrack.model.Role;
 import com.stocktrack.model.User;
 import com.stocktrack.persistence.dao.UserDAO;
 
-import java.io.IOException;
-
 public class LoginController {
 
-    public boolean login(UserBean userBean) throws IOException, StorageException {
+    public boolean login(UserBean userBean) throws StorageException {
         // Recupero la modalità di persistenza
         UserDAO userDAO = DAOFactory.getUserDAO();
 
@@ -35,7 +33,7 @@ public class LoginController {
         return false;
     }
 
-    public boolean register(UserBean userBean) throws DuplicateUserException, StorageException, IOException {
+    public boolean register(UserBean userBean) throws DuplicateUserException, StorageException {
         // Recupero la modalità di persistenza
         UserDAO userDAO = DAOFactory.getUserDAO();
 

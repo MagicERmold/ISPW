@@ -49,12 +49,12 @@ public class GroupSelectionGraphicalController {
             JavaFXApp.setRoot("home");
         } catch (IOException e) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("ERRORE");
+            alert.setTitle("ERRORE ");
             alert.setContentText("ErroreI/O: "  + e.getMessage());
             alert.showAndWait();
         } catch (StorageException e) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("ERRORE");
+            alert.setTitle("ERRORE  ");
             alert.setContentText("Errore nel recupero dati: " +  e.getMessage());
             alert.showAndWait();
         }

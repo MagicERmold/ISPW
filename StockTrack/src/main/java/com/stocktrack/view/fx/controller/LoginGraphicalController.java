@@ -50,18 +50,18 @@ public class LoginGraphicalController {
                 }
             } else {
                 Alert alert = new Alert(Alert.AlertType.WARNING);
-                alert.setTitle("ERRORE");
+                alert.setTitle("ERRORE ");
                 alert.setHeaderText("CREDENZIALI NON VALIDE!");
                 alert.showAndWait();
             }
         } catch (IOException e) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("ERRORE");
+            alert.setTitle("ERRORE  ");
             alert.setHeaderText("ERRORE I/O");
             alert.showAndWait();
         } catch (StorageException e) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("ERRORE");
+            alert.setTitle("ERRORE   ");
             alert.setHeaderText("ERRORE NEL RECUPERO DATI: " + e.getMessage());
             alert.setContentText("Sono stati rilevati dei campi vuoti...");
             alert.showAndWait();

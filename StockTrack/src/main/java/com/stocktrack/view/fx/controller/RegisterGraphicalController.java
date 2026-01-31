@@ -35,7 +35,7 @@ public class RegisterGraphicalController {
 
         if(passwordField.getText().length() < 8) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("ERRORE");
+            alert.setTitle("ERRORE ");
             alert.setHeaderText("CREDENZIALI NON VALIDE!");
             alert.setContentText("Password troppo corta, minimo 8 caratteri...");
             alert.showAndWait();
@@ -67,7 +67,7 @@ public class RegisterGraphicalController {
             }
         } catch (Exception e) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("ERRORE");
+            alert.setTitle("ERRORE  ");
             alert.setContentText(e.getMessage());
             alert.showAndWait();
         }
@@ -79,7 +79,7 @@ public class RegisterGraphicalController {
             JavaFXApp.setRoot("login");
         } catch (IOException e) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("ERRORE");
+            alert.setTitle("ERRORE   ");
             alert.setContentText("Errore caricamento pagina login: " + e.getMessage());
             alert.showAndWait();
         }

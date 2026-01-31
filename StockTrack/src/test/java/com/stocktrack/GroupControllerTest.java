@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class GroupControllerTest {
 
     private GroupController groupController;
-    private final String TEST_USERNAME = "groupTester";
+    private final String testUsername = "groupTester";
 
     @BeforeEach
     void setUp() throws Exception {
@@ -23,7 +23,7 @@ class GroupControllerTest {
 
         // Setup: Creiamo un utente base senza gruppo e lo logghiamo
         // Inizialmente è USER e ha groupUid null (o "null")
-        User user = new User(TEST_USERNAME, "password", Role.USER, null);
+        User user = new User(testUsername, "password", Role.USER, null);
 
         // Salviamo l'utente nel DAO perché il controller chiamerà updateUser()
         DAOFactory.getUserDAO().saveUser(user);
@@ -35,7 +35,7 @@ class GroupControllerTest {
     @AfterEach
     void tearDown() throws Exception {
         // Pulizia: Rimuoviamo l'utente di test
-        DAOFactory.getUserDAO().deleteUser(TEST_USERNAME);
+        DAOFactory.getUserDAO().deleteUser(testUsername);
         SessionManager.getInstance().logout();
     }
 
@@ -50,7 +50,7 @@ class GroupControllerTest {
 
         // Verifica Output
         assertNotNull(groupUid, "Il metodo deve restituire l'ID del nuovo gruppo.");
-        assertTrue(groupUid.contains(TEST_USERNAME), "L'ID del gruppo dovrebbe contenere lo username di chi l'ha creato.");
+        assertTrue(groupUid.contains(testUsername), "L'ID del gruppo dovrebbe contenere lo username di chi l'ha creato.");
 
         // Verifica Stato Utente in Sessione
         User currentUser = SessionManager.getInstance().getCurrentUser();
@@ -59,7 +59,7 @@ class GroupControllerTest {
 
         // Verifica Persistenza (DAO)
         UserDAO userDAO = DAOFactory.getUserDAO();
-        User storedUser = userDAO.findUserByUsername(TEST_USERNAME);
+        User storedUser = userDAO.findUserByUsername(testUsername);
         assertEquals(Role.ADMIN, storedUser.getRole(), "Il ruolo ADMIN deve essere persistito nel database.");
     }
 
@@ -81,7 +81,7 @@ class GroupControllerTest {
 
         // Verifica Persistenza (DAO)
         UserDAO userDAO = DAOFactory.getUserDAO();
-        User storedUser = userDAO.findUserByUsername(TEST_USERNAME);
+        User storedUser = userDAO.findUserByUsername(testUsername);
         assertEquals(targetGroupUid, storedUser.getGroupId(), "L'ID del gruppo deve essere persistito nel database.");
     }
 }

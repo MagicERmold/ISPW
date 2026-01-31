@@ -40,9 +40,7 @@ public class StockGraphicalController {
         stockTable.setItems(tableData);
 
         // Listener per il filtro: quando cambi categoria, ricarica la tabella
-        cmbFilterCategory.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            loadStocks();
-        });
+        cmbFilterCategory.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> loadStocks());
 
         loadCategories(); // Carica le categorie nel menu a tendina
         loadStocks();     // Carica i dati iniziali

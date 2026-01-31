@@ -4,12 +4,15 @@ import java.util.Scanner;
 
 public class InputHelper {
 
+    private InputHelper() {}
+
     // Unica istanza di Scanner per tutta l'app
     private static final Scanner scanner = new Scanner(System.in);
 
     /**
      * Legge una stringa non vuota.
      */
+    @SuppressWarnings("java:S106")
     public static String readString(String prompt) {
         while (true) {
             System.out.print(prompt);
@@ -25,6 +28,7 @@ public class InputHelper {
      * Legge un intero in modo robusto.
      * Evita il crash se l'utente inserisce testo e pulisce il buffer correttamente.
      */
+    @SuppressWarnings("java:S106")
     public static int readInt(String prompt) {
         while (true) {
             System.out.print(prompt);
@@ -37,6 +41,7 @@ public class InputHelper {
         }
     }
 
+    @SuppressWarnings("java:S106")
     public static String readUsername(String prompt) {
         while (true) {
             String input = readString(prompt);
@@ -47,6 +52,7 @@ public class InputHelper {
         }
     }
 
+    @SuppressWarnings("java:S106")
     public static String readPassword(String prompt) {
         while (true) {
             String input = readString(prompt);

@@ -7,7 +7,6 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 public class FileSystemStockDAO implements StockDAO {
     private static final String CSV_FILE_NAME = "stocks.csv";
@@ -109,7 +108,7 @@ public class FileSystemStockDAO implements StockDAO {
             return readAllInternal(groupId).stream()
                     .map(Stock::getCategory)
                     .distinct()
-                    .collect(Collectors.toList());
+                    .toList();
         } catch (IOException e) {
             throw new StorageException("Errore recupero categorie", e);
         }
@@ -120,7 +119,7 @@ public class FileSystemStockDAO implements StockDAO {
         try {
             return readAllInternal(groupUid).stream()
                     .filter(s -> s.getCategory().equalsIgnoreCase(category))
-                    .collect(Collectors.toList());
+                    .toList();
         } catch (IOException e) {
             throw new StorageException("Errore recupero prodotti per categoria", e);
         }
@@ -148,11 +147,9 @@ public class FileSystemStockDAO implements StockDAO {
             while ((line = reader.readLine()) != null) {
                 if (line.trim().isEmpty()) continue;
                 String[] parts = line.split(",");
-                if (parts.length >= 4) {
-                    if (parts[3].equals(groupUid)) {
-                        String cat = (parts.length > 4) ? parts[4] : "Generico"; // Compatibilità vecchi file
-                        list.add(new Stock(parts[0], Integer.parseInt(parts[1]), Integer.parseInt(parts[2]), parts[3], cat));
-                    }
+                if (parts.length >= 4 && parts[3].equals(groupUid)) {
+                    String cat = (parts.length > 4) ? parts[4] : "Generico"; // Compatibilità vecchi file
+                    list.add(new Stock(parts[0], Integer.parseInt(parts[1]), Integer.parseInt(parts[2]), parts[3], cat));
                 }
             }
         } catch (IOException e) {

@@ -7,7 +7,6 @@ import com.stocktrack.persistence.dao.StockDAO;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class SerializableStockDAO implements StockDAO {
     private static final String FILE_NAME = "stocks.ser";
@@ -51,7 +50,7 @@ public class SerializableStockDAO implements StockDAO {
         if (groupUid == null) return new ArrayList<>();
         return all.stream()
                 .filter(s -> groupUid.equals(s.getGroupId()))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
@@ -81,7 +80,7 @@ public class SerializableStockDAO implements StockDAO {
                     .map(Stock::getCategory)                     // Estrae la categoria
                     .filter(c -> c != null && !c.isEmpty())      // Evita null/vuoti
                     .distinct()                                  // Rimuove duplicati
-                    .collect(Collectors.toList());
+                    .toList();
         } catch (StorageException e) {
             // L'interfaccia non prevede throws qui, quindi restituiamo lista vuota
             return new ArrayList<>();
@@ -94,7 +93,7 @@ public class SerializableStockDAO implements StockDAO {
             return loadAll().stream()
                     .filter(s -> groupId.equals(s.getGroupId())) // Filtra per gruppo
                     .filter(s -> s.getCategory() != null && s.getCategory().equalsIgnoreCase(category)) // Filtra per categoria
-                    .collect(Collectors.toList());
+                    .toList();
         } catch (StorageException e) {
             // L'interfaccia non prevede throws qui, quindi restituiamo lista vuota
             return new ArrayList<>();

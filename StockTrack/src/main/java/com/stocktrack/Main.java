@@ -1,5 +1,6 @@
 package com.stocktrack;
 
+import com.stocktrack.view.cli.InputHelper;
 import com.stocktrack.view.cli.LoginCLI;
 import com.stocktrack.view.fx.JavaFXApp;
 import javafx.application.Application;
@@ -13,10 +14,10 @@ public class Main {
         String viewType = loadViewType();
 
         if ("GUI".equalsIgnoreCase(viewType)) {
-            System.out.println("Avvio interfaccia grafica (GUI)...");
+            InputHelper.print("Avvio interfaccia grafica (GUI)...");
             Application.launch(JavaFXApp.class, args);
         } else {
-            System.out.println("Avvio interfaccia testuale (CLI)...");
+            InputHelper.print("Avvio interfaccia testuale (CLI)...");
             LoginCLI loginCLI = new LoginCLI();
             loginCLI.start();
         }
@@ -26,13 +27,13 @@ public class Main {
         Properties prop = new Properties();
         try (InputStream input = Main.class.getClassLoader().getResourceAsStream("config.properties")) {
             if (input == null) {
-                System.out.println("Attenzione: config.properties non trovato. Default su CLI.");
+                InputHelper.print("Attenzione: config.properties non trovato. Default su CLI.");
                 return "CLI";
             }
             prop.load(input);
             return prop.getProperty("view.type");
         } catch (IOException ex) {
-            System.err.println("Errore lettura config: " + ex.getMessage());
+            InputHelper.print("Errore lettura config: " + ex.getMessage());
             return "CLI";
         }
     }

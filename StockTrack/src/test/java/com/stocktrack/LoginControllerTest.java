@@ -13,14 +13,12 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 class LoginControllerTest {
 
     private LoginController loginController;
-    private final String TEST_USERNAME = "testUser";
+    private final String testUsername = "testUser";
 
     @BeforeEach
     void setUp() {
@@ -36,8 +34,8 @@ class LoginControllerTest {
         try {
             UserDAO userDAO = DAOFactory.getUserDAO();
             // Controllo se l'utente esiste prima di provare a cancellarlo per evitare errori nel teardown
-            if (userDAO.findUserByUsername(TEST_USERNAME) != null) {
-                userDAO.deleteUser(TEST_USERNAME);
+            if (userDAO.findUserByUsername(testUsername) != null) {
+                userDAO.deleteUser(testUsername);
             }
         } catch (Exception e) {
             System.err.println("Errore durante la pulizia del test: " + e.getMessage());
@@ -50,19 +48,19 @@ class LoginControllerTest {
      */
     @Test
     void testRegisterSuccess() {
-        UserBean newUser = new UserBean(TEST_USERNAME, "password123");
+        UserBean newUser = new UserBean(testUsername, "password123");
 
         assertDoesNotThrow(() -> loginController.register(newUser), "La registrazione non dovrebbe lanciare eccezioni.");
 
         // Verifica diretta sul DAO (persistenza in-memory)
         try {
             UserDAO userDAO = DAOFactory.getUserDAO();
-            User retrievedUser = userDAO.findUserByUsername(TEST_USERNAME);
+            User retrievedUser = userDAO.findUserByUsername(testUsername);
 
             assertNotNull(retrievedUser, "L'utente dovrebbe essere presente nel DAO dopo la registrazione.");
-            assertEquals(TEST_USERNAME, retrievedUser.getUsername());
+            assertEquals(testUsername, retrievedUser.getUsername());
             assertEquals(Role.USER, retrievedUser.getRole(), "Il ruolo predefinito deve essere USER.");
-        } catch (IOException | StorageException e) {
+        } catch ( StorageException e) {
             fail("Errore durante la verifica dei dati: " + e.getMessage());
         }
     }
@@ -74,7 +72,7 @@ class LoginControllerTest {
     @Test
     void testLoginSuccess() throws Exception {
         // Setup: Registriamo prima l'utente
-        UserBean userBean = new UserBean(TEST_USERNAME, "password123");
+        UserBean userBean = new UserBean(testUsername, "password123");
         loginController.register(userBean);
 
         // Azione: Tentativo di login
@@ -85,7 +83,7 @@ class LoginControllerTest {
 
         User sessionUser = SessionManager.getInstance().getCurrentUser();
         assertNotNull(sessionUser, "L'utente dovrebbe essere salvato nel SessionManager.");
-        assertEquals(TEST_USERNAME, sessionUser.getUsername());
+        assertEquals(testUsername, sessionUser.getUsername());
     }
 
     /**
@@ -94,7 +92,7 @@ class LoginControllerTest {
      */
     @Test
     void testDuplicateUserException() throws Exception {
-        UserBean userBean = new UserBean(TEST_USERNAME, "password123");
+        UserBean userBean = new UserBean(testUsername, "password123");
 
         // 1. Prima registrazione (deve avere successo)
         loginController.register(userBean);

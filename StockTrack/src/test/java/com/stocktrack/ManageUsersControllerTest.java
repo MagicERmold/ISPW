@@ -25,8 +25,8 @@ class ManageUsersControllerTest {
 
     private ManageUsersController manageUsersController;
     private UserDAO userDAO;
-    private final String ADMIN_USER = "adminUser";
-    private final String TEST_GROUP = "AlphaTeam";
+    private final String adminUser = "adminUser";
+    private final String testGroup = "AlphaTeam";
 
     @BeforeEach
     void setUp() throws IOException, StorageException {
@@ -38,13 +38,13 @@ class ManageUsersControllerTest {
 
         // 2. Assicurati che il DB sia pulito (rimuovi utenti dei test precedenti)
         // Nota: Se usi InMemoryDAO, basta un reset, ma per sicurezza cancelliamo quelli noti
-        safeDeleteUser(ADMIN_USER);
+        safeDeleteUser(adminUser);
         safeDeleteUser("colleague");
         safeDeleteUser("outsider");
         safeDeleteUser("victim");
 
         // 3. Crea e Logga l'ADMIN (Necessario perché il controller usa SessionManager)
-        User admin = new User(ADMIN_USER, "pass123", Role.ADMIN, TEST_GROUP);
+        User admin = new User(adminUser, "pass123", Role.ADMIN, testGroup);
         userDAO.saveUser(admin);
         SessionManager.getInstance().login(admin);
     }
@@ -53,7 +53,7 @@ class ManageUsersControllerTest {
     void tearDown() throws StorageException {
         SessionManager.getInstance().logout();
         // Pulizia dati
-        safeDeleteUser(ADMIN_USER);
+        safeDeleteUser(adminUser);
         safeDeleteUser("colleague");
         safeDeleteUser("outsider");
         safeDeleteUser("victim");
@@ -72,7 +72,7 @@ class ManageUsersControllerTest {
     @Test
     void testGetMyGroupUsers() throws IOException, StorageException {
         // Setup: Creo un collega (stesso gruppo) e un estraneo (gruppo diverso)
-        User colleague = new User("colleague", "pass", Role.USER, TEST_GROUP);
+        User colleague = new User("colleague", "pass", Role.USER, testGroup);
         User outsider = new User("outsider", "pass", Role.USER, "BetaTeam");
 
         userDAO.saveUser(colleague);
@@ -101,7 +101,7 @@ class ManageUsersControllerTest {
     void testRemoveUserFromMyGroupSuccess() throws IOException, StorageException {
         // Setup: Utente da rimuovere
         String victimName = "victim";
-        User victim = new User(victimName, "pass", Role.USER, TEST_GROUP);
+        User victim = new User(victimName, "pass", Role.USER, testGroup);
         userDAO.saveUser(victim);
 
         // Azione
@@ -147,6 +147,6 @@ class ManageUsersControllerTest {
      */
     @Test
     void testRemoveSelfException() {
-        assertThrows(UserNotFoundException.class, () -> manageUsersController.removeUserFromMyGroup(ADMIN_USER), "Non dovrebbe essere possibile rimuovere se stessi.");
+        assertThrows(UserNotFoundException.class, () -> manageUsersController.removeUserFromMyGroup(adminUser), "Non dovrebbe essere possibile rimuovere se stessi.");
     }
 }

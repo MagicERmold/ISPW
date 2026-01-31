@@ -43,11 +43,9 @@ public class FileSystemUserDAO implements UserDAO {
                     continue;
                 }
                 String[] parts = line.split(",");
-                if (parts.length >= 3) {
-                    if (parts[0].equals(username)) {
-                        String group = (parts.length > 3) ? parts[3] : null;
-                        return new User(parts[0], parts[1], Role.valueOf(parts[2]), group);
-                    }
+                if (parts.length >= 3 && parts[0].equals(username)) {
+                    String group = (parts.length > 3) ? parts[3] : null;
+                    return new User(parts[0], parts[1], Role.valueOf(parts[2]), group);
                 }
             }
         } catch (IOException e) {

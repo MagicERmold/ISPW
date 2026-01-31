@@ -24,14 +24,14 @@ import static org.junit.jupiter.api.Assertions.*;
 class ManageStockControllerTest {
 
     private ManageStockController stockController;
-    private final String TEST_GROUP = "GROUP_TEST";
+    private final String groupTest = "GROUP_TEST";
 
     @BeforeEach
     void setUp() {
         stockController = new ManageStockController();
         // Setup: Logghiamo un utente con privilegi ADMIN e un gruppo valido
-        String TEST_USER_NAME = "stockTester";
-        User user = new User(TEST_USER_NAME, "pass", Role.ADMIN, TEST_GROUP);
+        String testUserName = "stockTester";
+        User user = new User(testUserName, "pass", Role.ADMIN, groupTest);
         SessionManager.getInstance().login(user);
     }
 
@@ -39,9 +39,9 @@ class ManageStockControllerTest {
     void tearDown() throws Exception {
         // Pulizia: Rimuoviamo tutti gli stock creati durante i test per il gruppo di test
         StockDAO dao = DAOFactory.getStockDAO();
-        var stocks = dao.getAllStocks(TEST_GROUP);
+        var stocks = dao.getAllStocks(groupTest);
         for (var s : stocks) {
-            dao.deleteStock(s.getName(), TEST_GROUP);
+            dao.deleteStock(s.getName(), groupTest);
         }
         SessionManager.getInstance().logout();
     }

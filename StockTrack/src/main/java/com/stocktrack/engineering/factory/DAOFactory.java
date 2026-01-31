@@ -34,7 +34,7 @@ public class DAOFactory {
         };
     }
 
-    public static UserDAO getUserDAO() throws IOException {
+    public static UserDAO getUserDAO() {
         String type = readPersistenceTypeFromConfig();
 
         return switch (type.toUpperCase()) {

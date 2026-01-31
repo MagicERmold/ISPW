@@ -14,6 +14,7 @@ public class JavaFXApp extends Application {
     private static Scene scene;
 
     @Override
+    @SuppressWarnings("java:S2696")
     public void start(Stage stage) throws IOException {
         // Carico la Scene del login
         scene = new Scene(loadFXML("login"), 800, 600);

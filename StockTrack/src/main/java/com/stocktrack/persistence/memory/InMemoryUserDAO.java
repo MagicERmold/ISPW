@@ -12,23 +12,6 @@ public class InMemoryUserDAO implements UserDAO {
     // Simuliamo il database con una Mappa in memoria (RAM)
     private static final Map<String, User> usersDB = new HashMap<>();
 
-    /*
-    static {
-        // Solamente per test
-        // Utente Admin del gruppo "GROUP_admin"
-        User admin = new User("admin", "admin", Role.ADMIN, "GROUP_admin");
-        usersDB.put(admin.getUsername(), admin);
-
-        // Utente User che appartiene allo STESSO GRUPPO (così possiamo testare la gestione)
-        User user = new User("user", "user", Role.USER, "GROUP_admin");
-        usersDB.put(user.getUsername(), user);
-
-        // Utente esterno (per verificare che NON venga visto dall'admin)
-        User outsider = new User("straniero", "123", Role.ADMIN, "GROUP_altro");
-        usersDB.put(outsider.getUsername(), outsider);
-    }
-    */
-
     @Override
     public User findUserByUsername(String username) {
         // Recupero l'utente dalla memoria

@@ -54,7 +54,7 @@ public class InMemoryStockDAO implements StockDAO {
                 .map(Stock::getCategory)                       // Prendi il nome della categoria
                 .filter(c -> c != null && !c.isEmpty())        // Ignora null o vuoti
                 .distinct()                                    // <--- RIMUOVE I DUPLICATI
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override

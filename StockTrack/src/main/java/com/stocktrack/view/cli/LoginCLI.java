@@ -5,7 +5,6 @@ import com.stocktrack.controller.LoginController;
 import com.stocktrack.engineering.exception.DuplicateUserException;
 import com.stocktrack.engineering.exception.StorageException;
 
-import java.io.IOException;
 
 public class LoginCLI {
 
@@ -60,7 +59,7 @@ public class LoginCLI {
                 InputHelper.print("Errore: Credenziali non valide.");
                 return false;
             }
-        } catch (IOException | StorageException e) {
+        } catch (StorageException e) {
             InputHelper.print("Errore di sistema durante il login: " + e.getMessage());
             return false;
         }
@@ -79,8 +78,6 @@ public class LoginCLI {
             return true;
         } catch (DuplicateUserException e) {
             InputHelper.print("Errore di Registrazione: " + e.getMessage());
-        } catch (IOException e) {
-            InputHelper.print("Errore di sistema: " + e.getMessage());
         } catch (StorageException e) {
             throw new RuntimeException(e);
         }

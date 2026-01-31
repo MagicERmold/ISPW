@@ -9,7 +9,6 @@ import com.stocktrack.engineering.singleton.SessionManager;
 import com.stocktrack.model.Role;
 import com.stocktrack.model.User;
 
-import java.io.IOException;
 import java.util.List;
 
 public class HomeCLI {
@@ -101,7 +100,7 @@ public class HomeCLI {
                 groupController.joinGroup(groupId);
                 InputHelper.print("Ti sei unito al gruppo " + groupId);
             }
-        } catch (IOException | StorageException e) {
+        } catch (StorageException e) {
             InputHelper.print("Errore salvataggio gruppo: " + e.getMessage());
         }
     }

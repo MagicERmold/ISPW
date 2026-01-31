@@ -28,7 +28,7 @@ public class StockGraphicalController {
 
     private final ManageStockController controller = new ManageStockController();
     private final ObservableList<StockBean> tableData = FXCollections.observableArrayList();
-    private final static String t = "Tutte";
+    private static final String all = "Tutte";
 
     @FXML
     public void initialize() {
@@ -63,7 +63,7 @@ public class StockGraphicalController {
             List<String> categories = controller.getCategories();
             // Aggiungiamo un'opzione per vedere tutto
             List<String> filterOptions = new ArrayList<>();
-            filterOptions.add(t);
+            filterOptions.add(all);
             filterOptions.addAll(categories);
 
             // Salviamo la selezione corrente per non resettarla
@@ -74,7 +74,7 @@ public class StockGraphicalController {
             if (currentSelection != null && filterOptions.contains(currentSelection)) {
                 cmbFilterCategory.setValue(currentSelection);
             } else {
-                cmbFilterCategory.setValue(t);
+                cmbFilterCategory.setValue(all);
             }
         } catch (Exception e) {
             showAlert(Alert.AlertType.ERROR, "Errore", "Impossibile caricare categorie: " + e.getMessage());
@@ -89,7 +89,7 @@ public class StockGraphicalController {
             String selectedCat = cmbFilterCategory.getValue();
 
             // Logica di filtro
-            if (selectedCat == null || selectedCat.equals(t) || selectedCat.isEmpty()) {
+            if (selectedCat == null || selectedCat.equals(all) || selectedCat.isEmpty()) {
                 stocks = controller.showAllStocks();
             } else {
                 stocks = controller.getStocksByCategory(selectedCat);
@@ -127,7 +127,7 @@ public class StockGraphicalController {
             // Aggiorna categorie e tabella
             loadCategories();
             // Seleziona la nuova categoria o "Tutte" per mostrare l'inserimento
-            cmbFilterCategory.setValue(t);
+            cmbFilterCategory.setValue(all);
             loadStocks();
 
         } catch (NumberFormatException e) {

@@ -23,12 +23,12 @@ public class HomeCLI {
 
         // Utente non loggato
         if (currentUser == null) {
-            System.out.println("Errore: Nessun utente loggato.");
+            InputHelper.print("Errore: Nessun utente loggato.");
             return;
         }
 
-        System.out.println("\n--- HOME PAGE ---");
-        System.out.println("Benvenuto, " + currentUser.getUsername() + " [" + currentUser.getRole() + "]");
+        InputHelper.print("\n--- HOME PAGE ---");
+        InputHelper.print("Benvenuto, " + currentUser.getUsername() + " [" + currentUser.getRole() + "]");
 
         // Gestione Gruppo
         if (currentUser.getGroupId() == null) {
@@ -36,16 +36,22 @@ public class HomeCLI {
         }
 
         boolean loggedIn = true;
+        //********************
+        //********************
+        //********************
+        // Risolve il nesting?
+        Role r =  currentUser.getRole();
+
         while (loggedIn) {
             // Mostriamo opzioni diverse in base al ruolo
-            if (currentUser.getRole() == Role.ADMIN) {
+            if (r == Role.ADMIN) {
                 showAdminMenu();
             } else {
                 showUserMenu();
             }
 
             // Gestione dell'ingresso
-            String input = InputHelper.readString("> ");
+            String input = InputHelper.readString(">> ");
 
             // Switch unificato dove possibile o specifico
             switch (input) {
@@ -54,130 +60,123 @@ public class HomeCLI {
                     stockCLI.start();
                     break;
                 case "2":
-                    if (currentUser.getRole() == Role.ADMIN) {
+                    if (r == Role.ADMIN) {
                         manageUsers();
                     } else {
                         generateShoppingList();
                     }
                     break;
                 case "3":
-                    if (currentUser.getRole() == Role.ADMIN) {
+                    if (r == Role.ADMIN) {
                         generateShoppingList();
                     } else {
-                        System.out.println("Opzione non valida.");
+                        InputHelper.print("Opzione non valida.");
                     }
                     break;
                 case "0":
-                    System.out.println("Logout effettuato.");
+                    InputHelper.print("Logout effettuato.");
                     SessionManager.getInstance().logout();
                     loggedIn = false;
                     break;
                 default:
-                    System.out.println("Opzione non valida.");
+                    InputHelper.print("Opzione non valida.");
             }
         }
     }
 
     private void handleGroupAssignment() {
-        System.out.println("\nATTENZIONE: Non appartieni a nessun gruppo.");
-        System.out.println("1. Crea un nuovo gruppo famigliare/personale");
-        System.out.println("2. Unisciti a un gruppo esistente (serve ID)");
+        InputHelper.print("\nATTENZIONE: Non appartieni a nessun gruppo.");
+        InputHelper.print("1. Crea un nuovo gruppo famigliare/personale");
+        InputHelper.print("2. Unisciti a un gruppo esistente (serve ID)");
 
-        String choice = InputHelper.readString("> ");
+        String choice = InputHelper.readString(">> ");
 
         try {
             if ("1".equals(choice)) {
                 String newId = groupController.createGroup();
-                System.out.println("Gruppo creato! Il tuo ID Gruppo è: " + newId);
-                System.out.println("Condividilo con chi vuoi far accedere al tuo magazzino.");
+                InputHelper.print("Gruppo creato! Il tuo ID Gruppo è: " + newId);
+                InputHelper.print("Condividilo con chi vuoi far accedere al tuo magazzino.");
             } else if ("2".equals(choice)) {
                 String groupId = InputHelper.readString("Inserisci ID Gruppo: ");
                 groupController.joinGroup(groupId);
-                System.out.println("Ti sei unito al gruppo " + groupId);
+                InputHelper.print("Ti sei unito al gruppo " + groupId);
             }
         } catch (IOException | StorageException e) {
-            System.out.println("Errore salvataggio gruppo: " + e.getMessage());
+            InputHelper.print("Errore salvataggio gruppo: " + e.getMessage());
         }
     }
 
     private void showAdminMenu() {
-        System.out.println("\nCosa vuoi fare?");
-        System.out.println("1. Gestisci Magazzino (Stock)");
-        System.out.println("2. Gestisci Utenti del Gruppo (Visualizza/Rimuovi)");
-        System.out.println("3. Genera Lista Spesa (Sottoscorta)");
-        System.out.println("0. Logout");
-        System.out.print(">");
+        InputHelper.print("\nCosa vuoi fare?");
+        InputHelper.print("1. Gestisci Magazzino (Stock)");
+        InputHelper.print("2. Gestisci Utenti del Gruppo (Visualizza/Rimuovi)");
+        InputHelper.print("3. Genera Lista Spesa (Sottoscorta)");
+        InputHelper.print("0. Logout");
     }
 
     private void showUserMenu() {
-        System.out.println("\nCosa vuoi fare?");
-        System.out.println("1. Gestisci Magazzino (Stock)");
-        System.out.println("2. Genera Lista Spesa (Sottoscorta)");
-        System.out.println("0. Logout");
-        System.out.print(">");
+        InputHelper.print("\nCosa vuoi fare?");
+        InputHelper.print("1. Gestisci Magazzino (Stock)");
+        InputHelper.print("2. Genera Lista Spesa (Sottoscorta)");
+        InputHelper.print("0. Logout");
     }
 
     private void generateShoppingList() {
         ManageStockController controller = new ManageStockController();
-        System.out.println("\n*** GENERAZIONE LISTA SPESA (Prodotti Sottoscorta) ***");
+        InputHelper.print("\n*** GENERAZIONE LISTA SPESA (Prodotti Sottoscorta) ***");
 
         try {
             List<StockBean> list = controller.getShoppingList();
 
             if (list.isEmpty()) {
-                System.out.println("Tutto ok! Nessun prodotto è sotto la soglia minima.");
+                InputHelper.print("Tutto ok! Nessun prodotto è sotto la soglia minima.");
                 return;
             }
 
-            System.out.println("ATTENZIONE: I seguenti prodotti sono in esaurimento:");
-            System.out.println("----------------------------------------------------------");
-            System.out.printf("%-20s | %-10s | %-10s | %-10s%n", "NOME", "QUANTITÀ", "SOGLIA", "DA ORDINARE");
-            System.out.println("----------------------------------------------------------");
+            InputHelper.print("ATTENZIONE: I seguenti prodotti sono in esaurimento:");
+            InputHelper.print("---------------------------------------------------------- ");
+            InputHelper.printf("%-20s | %-10s | %-10s | %-10s%n", "NOME", "QUANTITÀ", "SOGLIA", "DA ORDINARE");
+            InputHelper.print("----------------------------------------------------------  ");
 
             for (StockBean bean : list) {
                 int daOrdinare = bean.getThreshold() - bean.getQuantity();
-                System.out.printf("%-20s | %-10d | %-10d | %-10d%n", bean.getNome(), bean.getQuantity(), bean.getThreshold(), daOrdinare);
+                InputHelper.printf("%-20s | %-10d | %-10d | %-10d%n", bean.getNome(), bean.getQuantity(), bean.getThreshold(), daOrdinare);
             }
-            System.out.println("----------------------------------------------------------\n");
+            InputHelper.print("----------------------------------------------------------   \n");
 
         } catch (StorageException e) {
-            System.out.println("Errore nel recupero dati: " + e.getMessage());
+            InputHelper.print("Errore nel recupero dati: " + e.getMessage());
         }
     }
 
     private void manageUsers() {
         ManageUsersController userController = new ManageUsersController();
-        System.out.println("\n--- GESTIONE UTENTI (TUO GRUPPO) ---");
+        InputHelper.print("\n--- GESTIONE UTENTI (TUO GRUPPO) ---");
         try {
             List<User> users = userController.getMyGroupUsers();
 
             if (users.isEmpty()) {
-                System.out.println("Nessun altro utente trovato nel tuo gruppo.");
+                InputHelper.print("Nessun altro utente trovato nel tuo gruppo.");
             } else {
-                System.out.printf("%-15s | %-10s | %-15s%n", "USERNAME", "RUOLO", "GRUPPO");
-                System.out.println("------------------------------------------------");
+                InputHelper.printf2("%-15s | %-10s | %-15s%n", "USERNAME", "RUOLO", "GRUPPO");
+                InputHelper.print("------------------------------------------------");
                 for (User u : users) {
-                    System.out.printf("%-15s | %-10s | %-15s%n", u.getUsername(), u.getRole(), (u.getGroupId() == null ? "N/A" : u.getGroupId()));
+                    InputHelper.printf2("%-15s | %-10s | %-15s%n", u.getUsername(), u.getRole(), (u.getGroupId() == null ? "N/A" : u.getGroupId()));
                 }
             }
 
-            System.out.println("\nVuoi eliminare un utente?");
-            // Qui usiamo scanner.nextLine() diretto SOLO se vogliamo accettare stringa vuota
-            // Ma InputHelper.readString non accetta vuoti.
-            // Soluzione: facciamo un metodo ad hoc o usiamo un trucco.
-            // Per semplicità qui chiediamo esplicitamente:
+            InputHelper.print("\nVuoi eliminare un utente?");
 
-            System.out.print("> ");
-            // Accediamo allo scanner statico solo se necessario o creiamo metodo in InputHelper allowEmpty
-            // Per ora usiamo InputHelper forzando l'utente a scrivere 'esci' o il nome
+            InputHelper.print(">> ");
+
             String input = InputHelper.readString("Username (o scrivi esci): ");
 
             if (!input.equalsIgnoreCase("esci")) {
                 userController.removeUserFromMyGroup(input);
-                System.out.println("Utente: " + input + ", rimosso.");
+                InputHelper.print("Utente: " + input + ", rimosso.");
             }
         } catch (Exception e) {
-            System.out.println("Errore: " + e.getMessage());
+            InputHelper.print("Errore: " + e.getMessage());
         }
     }
 }

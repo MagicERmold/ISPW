@@ -12,13 +12,13 @@ public class StockCLI {
         boolean running = true;
 
         while (running) {
-            System.out.println("\n--- GESTIONE MAGAZZINO ---");
-            System.out.println("1. Aggiungi nuovo prodotto (Nuova Scheda)");
-            System.out.println("2. Mostra tutti i prodotti");
-            System.out.println("3. Registra Consumo (-)");
-            System.out.println("4. Registra Acquisto (+)");
-            System.out.println("5. Elimina Prodotto (Rimuovi scheda)");
-            System.out.println("0. Torna al menu principale");
+            InputHelper.print("\n--- GESTIONE MAGAZZINO ---");
+            InputHelper.print("1. Aggiungi nuovo prodotto (Nuova Scheda)");
+            InputHelper.print("2. Mostra tutti i prodotti");
+            InputHelper.print("3. Registra Consumo (-)");
+            InputHelper.print("4. Registra Acquisto (+)");
+            InputHelper.print("5. Elimina Prodotto (Rimuovi scheda)");
+            InputHelper.print("0. Torna al menu principale");
 
             int input = InputHelper.readInt("Scegli un'opzione: ");
 
@@ -42,7 +42,7 @@ public class StockCLI {
                     running = false;
                     break;
                 default:
-                    System.out.println("Opzione non valida.");
+                    InputHelper.print("Opzione non valida.");
             }
         }
     }
@@ -52,9 +52,9 @@ public class StockCLI {
         int qty = InputHelper.readInt("Quantità da " + (sign > 0 ? "aggiungere" : "rimuovere") + ": ");
         try {
             controller.modifyQuantity(name, qty * sign);
-            System.out.println("Operazione completata!");
+            InputHelper.print("Operazione completata!");
         } catch (Exception e) {
-            System.out.println("Errore: " + e.getMessage());
+            InputHelper.print("Errore durante la modifica della Stock: " + e.getMessage());
         }
     }
 
@@ -67,9 +67,9 @@ public class StockCLI {
         try {
             StockBean bean = new StockBean(name, quantity, threshold, category);
             controller.addStock(bean);
-            System.out.println("Prodotto aggiunto con successo!");
+            InputHelper.print("Prodotto aggiunto con successo!");
         } catch (Exception e) {
-            System.out.println("Errore durante l'aggiunta: " + e.getMessage());
+            InputHelper.print("Errore durante l'aggiunta della Stock: " + e.getMessage());
         }
     }
 
@@ -82,11 +82,11 @@ public class StockCLI {
                 // 1. Mostra categorie disponibili
                 List<String> categories = controller.getCategories();
                 if (categories.isEmpty()) {
-                    System.out.println("Nessuna categoria disponibile.");
+                    InputHelper.print("Nessuna categoria disponibile.");
                     return;
                 }
 
-                System.out.println("Categorie disponibili: " + categories);
+                InputHelper.print("Categorie disponibili: " + categories);
                 String catChoice = InputHelper.readString("Inserisci nome categoria esatto: ");
 
                 // 2. Recupera filtrati
@@ -100,39 +100,39 @@ public class StockCLI {
             printTable(list);
 
         } catch (Exception e) {
-            System.out.println("Errore: " + e.getMessage());
+            InputHelper.print("Errore durante la visione delle Stocks: " + e.getMessage());
         }
     }
 
     private void printTable(List<StockBean> list) {
         if (list.isEmpty()) {
-            System.out.println("Nessun prodotto trovato.");
+            InputHelper.print("Nessun prodotto trovato.");
             return;
         }
-        System.out.println("----------------------------------------------------------------------");
-        System.out.printf("%-15s | %-15s | %-10s | %-10s%n", "NOME", "CATEGORIA", "QUANTITÀ", "SOGLIA");
-        System.out.println("----------------------------------------------------------------------");
+        InputHelper.print("---------------------------------------------------------------------- ");
+        InputHelper.printf("%-15s | %-15s | %-10s | %-10s%n", "NOME", "CATEGORIA", "QUANTITÀ", "SOGLIA");
+        InputHelper.print("----------------------------------------------------------------------  ");
         for (StockBean b : list) {
-            System.out.printf("%-15s | %-15s | %-10d | %-10d%n",
+            InputHelper.printf("%-15s | %-15s | %-10d | %-10d%n",
                     b.getNome(), b.getCategory(), b.getQuantity(), b.getThreshold());
         }
-        System.out.println("----------------------------------------------------------------------");
+        InputHelper.print("----------------------------------------------------------------------   ");
     }
 
     private void deleteStock() {
-        System.out.println("\n--- ELIMINAZIONE PRODOTTO ---");
+        InputHelper.print("\n--- ELIMINAZIONE PRODOTTO ---");
         String name = InputHelper.readString("Nome del prodotto da eliminare: ");
         String confirm = InputHelper.readString("Sei sicuro? (s/n): ");
 
         if ("s".equalsIgnoreCase(confirm)) {
             try {
                 controller.deleteStock(name);
-                System.out.println("Prodotto '" + name + "' eliminato con successo.");
+                InputHelper.print("Prodotto '" + name + "' eliminato con successo.");
             } catch (Exception e) {
-                System.out.println("Errore: " + e.getMessage());
+                InputHelper.print("Errore durante l'eliminazione del prodotto: " + e.getMessage());
             }
         } else {
-            System.out.println("Operazione annullata.");
+            InputHelper.print("Operazione annullata.");
         }
     }
 }

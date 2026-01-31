@@ -13,12 +13,12 @@ public class LoginCLI {
 
     public void start() {
         boolean running = true;
-        System.out.println("=== BENVENUTO IN STOCKTRACK ===");
+        InputHelper.print("=== BENVENUTO IN STOCKTRACK ===");
 
         while (running) {
-            System.out.println("\n1. Login");
-            System.out.println("2. Register");
-            System.out.println("0. Esci");
+            InputHelper.print("\n1. Login");
+            InputHelper.print("2. Register");
+            InputHelper.print("0. Esci");
 
             int input = InputHelper.readInt("Scegli un'opzione: ");
 
@@ -36,11 +36,11 @@ public class LoginCLI {
                     }
                     break;
                 case 0:
-                    System.out.println("Chiusura applicazione...");
+                    InputHelper.print("Chiusura applicazione...");
                     running = false;
                     break;
                 default:
-                    System.out.println("Opzione non valida.");
+                    InputHelper.print("Opzione non valida.");
             }
         }
     }
@@ -54,20 +54,20 @@ public class LoginCLI {
         try {
             boolean success = loginController.login(userBean);
             if (success) {
-                System.out.println("Login effettuato con successo!");
+                InputHelper.print("Login effettuato con successo!");
                 return true;
             } else {
-                System.out.println("Errore: Credenziali non valide.");
+                InputHelper.print("Errore: Credenziali non valide.");
                 return false;
             }
         } catch (IOException | StorageException e) {
-            System.out.println("Errore di sistema durante il login: " + e.getMessage());
+            InputHelper.print("Errore di sistema durante il login: " + e.getMessage());
             return false;
         }
     }
 
     private boolean performRegister( ) {
-        System.out.println("\n--- REGISTRAZIONE ---");
+        InputHelper.print("\n--- REGISTRAZIONE ---");
         String username = InputHelper.readUsername("Username: ");
         String password = InputHelper.readPassword("Password: ");
 
@@ -75,12 +75,12 @@ public class LoginCLI {
 
         try {
             loginController.register(bean);
-            System.out.println("Registrazione avvenuta con successo! Ora puoi effettuare il login.");
+            InputHelper.print("Registrazione avvenuta con successo! Ora puoi effettuare il login.");
             return true;
         } catch (DuplicateUserException e) {
-            System.out.println("Errore di Registrazione: " + e.getMessage());
+            InputHelper.print("Errore di Registrazione: " + e.getMessage());
         } catch (IOException e) {
-            System.out.println("Errore di sistema: " + e.getMessage());
+            InputHelper.print("Errore di sistema: " + e.getMessage());
         } catch (StorageException e) {
             throw new RuntimeException(e);
         }

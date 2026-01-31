@@ -56,4 +56,19 @@ public class InputHelper {
             System.out.println("ERRORE: Password troppo corta.");
         }
     }
+
+    @SuppressWarnings("java:S106") // Soppresso SOLO qui
+    public static void print(String message) {
+        System.out.println(message);
+    }
+
+    @SuppressWarnings("java:S106") // Soppresso SOLO qui
+    public static void printf(String message, Object object1, Object object2, Object object3, Object object4) {
+        System.out.printf(message,  object1, object2, object3, object4);
+    }
+
+    @SuppressWarnings("java:S106") // Soppresso SOLO qui
+    public static void printf2(String message, Object object1, Object object2, Object object3) {
+        System.out.printf(message,  object1, object2, object3);
+    }
 }

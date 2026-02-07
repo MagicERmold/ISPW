@@ -113,7 +113,7 @@ public class ManageStockController {
     }
 
     // Genero la lista di prodotti sotto scorta
-    public List<StockBean> getShoppingList() throws StorageException, IOException {
+    public List<StockBean> getShoppingList() throws StorageException {
         // Recupero utente e il metodo di persistenza
         StockDAO dao = DAOFactory.getStockDAO();
         User user = SessionManager.getInstance().getCurrentUser();

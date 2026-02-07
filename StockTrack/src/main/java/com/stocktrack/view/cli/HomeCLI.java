@@ -116,7 +116,7 @@ public class HomeCLI {
         } catch (StorageException e) {
             InputHelper.print("Errore nel recupero dati: " + e.getMessage());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            InputHelper.print("Errore critico di I/O durante la generazione della lista: " + e.getMessage());
         }
     }
 

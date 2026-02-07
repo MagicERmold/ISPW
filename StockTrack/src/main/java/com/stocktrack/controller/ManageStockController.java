@@ -16,7 +16,7 @@ import java.util.List;
 public class ManageStockController {
 
     // Aggiunta nuova STOCK nel magazzino
-    public void addStock(StockBean bean) throws StorageException, InvalidProductDataException, IOException {
+    public void addStock(StockBean bean) throws StorageException, InvalidProductDataException {
         // Recupero l'utente e controllo se appartiene a un gruppo per sicurezza
         User user = SessionManager.getInstance().getCurrentUser();
         if (user.getGroupId() == null) {
@@ -50,13 +50,13 @@ public class ManageStockController {
     }
 
     // Recupera categorie uniche
-    public List<String> getCategories() throws StorageException, IOException {
+    public List<String> getCategories() throws StorageException {
         User user = SessionManager.getInstance().getCurrentUser();
         return DAOFactory.getStockDAO().getAllCategories(user.getGroupId());
     }
 
     // Filtra STOCKS e restituisce la lista delle STOCKS filtrate per categoria
-    public List<StockBean> getStocksByCategory(String category) throws StorageException, IOException {
+    public List<StockBean> getStocksByCategory(String category) throws StorageException {
         User user = SessionManager.getInstance().getCurrentUser();
         List<Stock> stocks = DAOFactory.getStockDAO().getStocksByCategory(user.getGroupId(), category);
 
@@ -99,7 +99,7 @@ public class ManageStockController {
     }
 
     // Recupero tutte le STOCKS dal database
-    public List<StockBean> showAllStocks() throws StorageException, IOException {
+    public List<StockBean> showAllStocks() throws StorageException {
         StockDAO dao = DAOFactory.getStockDAO();
         User user = SessionManager.getInstance().getCurrentUser();
 
@@ -132,7 +132,7 @@ public class ManageStockController {
     }
 
     // Cancella STOCK dal database
-    public void deleteStock(String productName) throws StorageException, IOException {
+    public void deleteStock(String productName) throws StorageException {
         User user = SessionManager.getInstance().getCurrentUser();
         StockDAO dao = DAOFactory.getStockDAO();
 

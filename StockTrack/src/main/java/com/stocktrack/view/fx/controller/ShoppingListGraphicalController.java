@@ -31,7 +31,6 @@ public class ShoppingListGraphicalController {
     // Lista osservabile che contiene tutti i dati originali
     private ObservableList<StockBean> masterData = FXCollections.observableArrayList();
     // Lista filtrata collegata alla tabella
-    private FilteredList<StockBean> filteredData;
 
     @FXML
     public void initialize() {
@@ -54,7 +53,7 @@ public class ShoppingListGraphicalController {
 
     private void setupFilter() {
         // Creiamo la FilteredList basata sui dati master
-        filteredData = new FilteredList<>(masterData, p -> true);
+        FilteredList<StockBean> filteredData = new FilteredList<>(masterData, p -> true);
         shoppingTable.setItems(filteredData);
 
         // Listener per il cambio di selezione nella ComboBox

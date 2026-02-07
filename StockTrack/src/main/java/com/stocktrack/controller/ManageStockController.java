@@ -15,15 +15,15 @@ import java.util.List;
 
 public class ManageStockController {
 
-    // ADMIN: Aggiunge nuovo prodotto
-    public void addStock(StockBean bean) throws StorageException, InvalidProductDataException {
+    // Aggiunta nuova STOCK nel magazzino
+    public void addStock(StockBean bean) throws StorageException, InvalidProductDataException, IOException {
         // Recupero l'utente e controllo se appartiene a un gruppo per sicurezza
         User user = SessionManager.getInstance().getCurrentUser();
         if (user.getGroupId() == null) {
             throw new StorageException("Devi prima creare o unirti a un gruppo!");
         }
 
-        // VALIDAZIONE DATI: Usiamo l'eccezione personalizzata
+        // VALIDAZIONE DATI
         if (bean.getNome() == null || bean.getNome().trim().isEmpty()) {
             throw new InvalidProductDataException("Il nome del prodotto non può essere vuoto.");
         }
@@ -45,19 +45,18 @@ public class ManageStockController {
             }
         }
 
-        // CORREZIONE: Passo anche la categoria al costruttore di Stock
         Stock stock = new Stock(bean.getNome(), bean.getQuantity(), bean.getThreshold(), user.getGroupId(), bean.getCategory());
         dao.saveStock(stock);
     }
 
     // Recupera categorie uniche
-    public List<String> getCategories() throws StorageException {
+    public List<String> getCategories() throws StorageException, IOException {
         User user = SessionManager.getInstance().getCurrentUser();
         return DAOFactory.getStockDAO().getAllCategories(user.getGroupId());
     }
 
-    // Filtra stocks
-    public List<StockBean> getStocksByCategory(String category) throws StorageException {
+    // Filtra STOCKS e restituisce la lista delle STOCKS filtrate per categoria
+    public List<StockBean> getStocksByCategory(String category) throws StorageException, IOException {
         User user = SessionManager.getInstance().getCurrentUser();
         List<Stock> stocks = DAOFactory.getStockDAO().getStocksByCategory(user.getGroupId(), category);
 
@@ -68,9 +67,8 @@ public class ManageStockController {
         return beans;
     }
 
-    // USER & ADMIN: Consuma (diminuisce) o Acquista (aumenta)
+    // Consuma (diminuisce) o Acquista (aumenta) STOCKS
     public void modifyQuantity(String productName, int amountChange) throws StorageException, InvalidProductDataException, IOException {
-        // Recupero l'utente e il metodo di persistenza
         User user = SessionManager.getInstance().getCurrentUser();
         StockDAO dao = DAOFactory.getStockDAO();
 
@@ -78,7 +76,7 @@ public class ManageStockController {
         List<Stock> stocks = dao.getAllStocks(user.getGroupId());
         Stock target = null;
         for(Stock s : stocks) {
-            if(s.getName().equalsIgnoreCase(productName)) { // Meglio usare equalsIgnoreCase anche qui
+            if(s.getName().equalsIgnoreCase(productName)) {
                 target = s;
                 break;
             }
@@ -100,8 +98,8 @@ public class ManageStockController {
         dao.updateStockQuantity(target.getName(), newQty, user.getGroupId());
     }
 
-    // ADMIN & USER: recupero la lista dei prodotti
-    public List<StockBean> showAllStocks() throws StorageException {
+    // Recupero tutte le STOCKS dal database
+    public List<StockBean> showAllStocks() throws StorageException, IOException {
         StockDAO dao = DAOFactory.getStockDAO();
         User user = SessionManager.getInstance().getCurrentUser();
 
@@ -109,15 +107,13 @@ public class ManageStockController {
 
         List <StockBean> stockBeans = new ArrayList<>();
         for (Stock stock : stocks) {
-            // CORREZIONE: Riporto la categoria nella UI
             stockBeans.add(new StockBean(stock.getName(), stock.getQuantity(), stock.getThreshold(), stock.getCategory()));
         }
         return stockBeans;
     }
 
-    // ADMIN & USER: genero la lista di prodotti sotto scorta
-    // getAllStocks ha bisogno delle exceptions
-    public List<StockBean> getShoppingList() throws StorageException {
+    // Genero la lista di prodotti sotto scorta
+    public List<StockBean> getShoppingList() throws StorageException, IOException {
         // Recupero utente e il metodo di persistenza
         StockDAO dao = DAOFactory.getStockDAO();
         User user = SessionManager.getInstance().getCurrentUser();
@@ -135,9 +131,8 @@ public class ManageStockController {
         return shoppingList;
     }
 
-    // ADMIN: cancella STOCK dalla memoria
-    public void deleteStock(String productName) throws StorageException {
-        // Recupero utente e il metodo di persistenza
+    // Cancella STOCK dal database
+    public void deleteStock(String productName) throws StorageException, IOException {
         User user = SessionManager.getInstance().getCurrentUser();
         StockDAO dao = DAOFactory.getStockDAO();
 

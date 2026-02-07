@@ -15,16 +15,16 @@ public class StockGraphicalController {
 
     @FXML private TableView<StockBean> stockTable;
     @FXML private TableColumn<StockBean, String> colName;
-    @FXML private TableColumn<StockBean, String> colCategory; // NUOVA COLONNA
+    @FXML private TableColumn<StockBean, String> colCategory;
     @FXML private TableColumn<StockBean, Integer> colQuantity;
     @FXML private TableColumn<StockBean, Integer> colThreshold;
 
     @FXML private TextField txtName;
-    @FXML private TextField txtCategory; // NUOVO CAMPO
+    @FXML private TextField txtCategory;
     @FXML private TextField txtQuantity;
     @FXML private TextField txtThreshold;
 
-    @FXML private ComboBox<String> cmbFilterCategory; // NUOVO FILTRO
+    @FXML private ComboBox<String> cmbFilterCategory;
 
     private final ManageStockController controller = new ManageStockController();
     private final ObservableList<StockBean> tableData = FXCollections.observableArrayList();

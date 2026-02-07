@@ -4,22 +4,34 @@ import com.stocktrack.bean.StockBean;
 import com.stocktrack.controller.ManageStockController;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+
+import java.util.List;
 
 public class ShoppingListGraphicalController {
 
     @FXML private TableView<StockBean> shoppingTable;
     @FXML private TableColumn<StockBean, String> nameCol;
-    @FXML private TableColumn<StockBean, String> categoryCol; // NUOVO
+    @FXML private TableColumn<StockBean, String> categoryCol;
     @FXML private TableColumn<StockBean, Integer> qtyCol;
     @FXML private TableColumn<StockBean, Integer> thresholdCol;
     @FXML private TableColumn<StockBean, Integer> missingCol;
 
+    @FXML private ComboBox<String> cmbFilterCategory;
+
     private final ManageStockController controller = new ManageStockController();
+
+    // Lista osservabile che contiene tutti i dati originali
+    private ObservableList<StockBean> masterData = FXCollections.observableArrayList();
+    // Lista filtrata collegata alla tabella
+    private FilteredList<StockBean> filteredData;
 
     @FXML
     public void initialize() {
@@ -33,15 +45,56 @@ public class ShoppingListGraphicalController {
                 new SimpleIntegerProperty(data.getValue().getThreshold() - data.getValue().getQuantity()).asObject()
         );
 
+        // Inizializzazione del filtro
+        setupFilter();
+
+        // Caricamento dati
         loadData();
+    }
+
+    private void setupFilter() {
+        // Creiamo la FilteredList basata sui dati master
+        filteredData = new FilteredList<>(masterData, p -> true);
+        shoppingTable.setItems(filteredData);
+
+        // Listener per il cambio di selezione nella ComboBox
+        cmbFilterCategory.valueProperty().addListener((observable, oldValue, newValue) -> filteredData.setPredicate(stock -> {
+            // Se "Tutte le Categorie" o nullo, mostra tutto
+            if (newValue == null || newValue.equals("Tutte le Categorie")) {
+                return true;
+            }
+            // Filtra per categoria (ignora maiuscole/minuscole per sicurezza)
+            return stock.getCategory().equalsIgnoreCase(newValue);
+        }));
     }
 
     public void loadData() {
         try {
-            shoppingTable.setItems(FXCollections.observableArrayList(controller.getShoppingList()));
+            List<StockBean> list = controller.getShoppingList();
+            masterData.setAll(list);
+
+            // Popoliamo la ComboBox con le categorie uniche presenti nella lista
+            populateCategoryCombo(list);
+
         } catch (Exception e) {
             showAlert("Impossibile calcolare la lista della spesa:\n" + e.getMessage());
         }
+    }
+
+    private void populateCategoryCombo(List<StockBean> list) {
+        // Estraiamo le categorie uniche
+        List<String> categories = list.stream()
+                .map(StockBean::getCategory)
+                .distinct()
+                .sorted()
+                .toList();
+
+        ObservableList<String> comboItems = FXCollections.observableArrayList();
+        comboItems.add("Tutte le Categorie"); // Opzione di default per resettare il filtro
+        comboItems.addAll(categories);
+
+        cmbFilterCategory.setItems(comboItems);
+        cmbFilterCategory.getSelectionModel().selectFirst();
     }
 
     private void showAlert(String content) {

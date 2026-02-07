@@ -13,8 +13,6 @@ public class User implements Serializable {
     private String groupId;
 
     public User(String username, String password, Role role) {
-
-        // Aggiungi le 4 righe invece di questa cagata
         this(username, password, role, null);
     }
 

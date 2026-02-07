@@ -2,6 +2,7 @@ package com.stocktrack.view.fx.controller;
 
 import com.stocktrack.bean.UserBean;
 import com.stocktrack.controller.LoginController;
+import com.stocktrack.engineering.exception.StorageException;
 import com.stocktrack.engineering.singleton.SessionManager;
 import com.stocktrack.model.User;
 import com.stocktrack.view.fx.JavaFXApp;
@@ -20,7 +21,7 @@ public class RegisterGraphicalController {
     private final LoginController loginController = new LoginController();
 
     @FXML
-    private void handleRegister() {
+    private void handleRegister() throws StorageException, IOException {
         String user = usernameField.getText();
         String pass = passwordField.getText();
 
@@ -52,7 +53,14 @@ public class RegisterGraphicalController {
             alert.setHeaderText("REGISTRAZIONE COMPLETATA!");
             alert.setContentText("Accesso in corso...");
             alert.showAndWait();
+        } catch (Exception e) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("ERRORE  ");
+            alert.setContentText(e.getMessage());
+            alert.showAndWait();
+        }
 
+        try{
             boolean loginSuccess = loginController.login(bean);
 
             if (loginSuccess) {
@@ -65,11 +73,10 @@ public class RegisterGraphicalController {
             } else {
                 JavaFXApp.setRoot("login");
             }
-        } catch (Exception e) {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("ERRORE  ");
-            alert.setContentText(e.getMessage());
-            alert.showAndWait();
+        } catch (StorageException e) {
+            // Da sistemare
+        } catch (IOException e) {
+            throw new IOException();
         }
     }
 

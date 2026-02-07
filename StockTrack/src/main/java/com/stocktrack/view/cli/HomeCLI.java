@@ -9,6 +9,7 @@ import com.stocktrack.engineering.singleton.SessionManager;
 import com.stocktrack.model.Role;
 import com.stocktrack.model.User;
 
+import java.io.IOException;
 import java.util.List;
 
 public class HomeCLI {
@@ -114,6 +115,8 @@ public class HomeCLI {
 
         } catch (StorageException e) {
             InputHelper.print("Errore nel recupero dati: " + e.getMessage());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

@@ -9,7 +9,7 @@
             stylesheets="@style.css">
 
     <top>
-        <HBox spacing="10" alignment="CENTER_LEFT" styleClass="header-section">
+        <HBox spacing="10" alignment="CENTER_LEFT">
             <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
             <Label text="Gestione Magazzino" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
 
@@ -44,11 +44,11 @@
                 <TextField fx:id="txtCategory" promptText="Categoria (es. Cibo)"/>
                 <TextField fx:id="txtQuantity" promptText="Quantità" prefWidth="80"/>
                 <TextField fx:id="txtThreshold" promptText="Soglia" prefWidth="80"/>
-                <Button text="Aggiungi Prodotto" onAction="#handleAddStock" styleClass="btn-primary"/>
+                <Button text="Aggiungi Prodotto" onAction="#handleAddStock"/>
             </HBox>
 
             <HBox spacing="10" alignment="CENTER_RIGHT">
-                <Button text="Rimuovi Selezionato" onAction="#handleDeleteStock" styleClass="btn-danger"/>
+                <Button text="Rimuovi Selezionato" onAction="#handleDeleteStock"/>
             </HBox>
         </VBox>
     </bottom>

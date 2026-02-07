@@ -11,7 +11,7 @@ import java.util.List;
 
 public class ManageUsersController {
 
-    // ADMIN: recupera la lista di utenti che si trovano nello stesso gruppo dell'ADMIN
+    // Recupera la lista di utenti che si trovano nello stesso gruppo dell'ADMIN
     public List<User> getMyGroupUsers() throws StorageException {
         // Recupero l'ADMIN e il suo gruppo associato
         User currentUser = SessionManager.getInstance().getCurrentUser();

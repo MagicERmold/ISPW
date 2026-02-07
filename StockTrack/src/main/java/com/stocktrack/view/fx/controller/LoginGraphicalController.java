@@ -58,12 +58,13 @@ public class LoginGraphicalController {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("ERRORE  ");
             alert.setHeaderText("ERRORE I/O");
+            alert.setContentText(e.getMessage());
             alert.showAndWait();
         } catch (StorageException e) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("ERRORE   ");
             alert.setHeaderText("ERRORE NEL RECUPERO DATI: " + e.getMessage());
-            alert.setContentText("Sono stati rilevati dei campi vuoti...");
+            alert.setContentText(e.getMessage());
             alert.showAndWait();
         }
     }

@@ -64,10 +64,7 @@ class ManageUsersControllerTest {
         }
     }
 
-    /**
-     * Test: getMyGroupUsers
-     * Verifica che vengano restituiti solo gli utenti appartenenti allo stesso gruppo dell'admin.
-     */
+    
     @Test
     void testGetMyGroupUsers() throws StorageException {
         // Setup: Creo un collega (stesso gruppo) e un estraneo (gruppo diverso)

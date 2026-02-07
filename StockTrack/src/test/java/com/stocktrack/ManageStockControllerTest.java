@@ -17,10 +17,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Test class for ManageStockController.
- * Author: [Il Tuo Nome] [La Tua Matricola]
- */
 class ManageStockControllerTest {
 
     private ManageStockController stockController;

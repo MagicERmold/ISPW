@@ -64,7 +64,7 @@ class ManageUsersControllerTest {
         }
     }
 
-    
+
     @Test
     void testGetMyGroupUsers() throws StorageException {
         // Setup: Creo un collega (stesso gruppo) e un estraneo (gruppo diverso)

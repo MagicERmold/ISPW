@@ -9,7 +9,6 @@ import com.stocktrack.engineering.singleton.SessionManager;
 import com.stocktrack.model.Role;
 import com.stocktrack.model.User;
 
-import java.io.IOException;
 import java.util.List;
 
 public class HomeCLI {
@@ -115,8 +114,6 @@ public class HomeCLI {
 
         } catch (StorageException e) {
             InputHelper.print("Errore nel recupero dati: " + e.getMessage());
-        } catch (IOException e) {
-            InputHelper.print("Errore critico di I/O durante la generazione della lista: " + e.getMessage());
         }
     }
 

@@ -14,7 +14,6 @@ public class SerializableUserDAO implements UserDAO {
 
     public SerializableUserDAO() throws StorageException {
         this.file = new File(FILE_NAME);
-        // Se il file non esiste, salviamo una lista vuota per inizializzarlo
         if (!file.exists()) {
             saveAll(new ArrayList<>());
         }
@@ -61,7 +60,7 @@ public class SerializableUserDAO implements UserDAO {
 
     @Override
     public void updateUser(User user) throws StorageException {
-        saveUser(user); // In una lista serializzata, save e update sono identici (sovrascrittura)
+        saveUser(user);
     }
 
     @Override

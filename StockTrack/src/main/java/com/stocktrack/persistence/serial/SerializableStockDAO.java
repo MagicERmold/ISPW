@@ -19,6 +19,7 @@ public class SerializableStockDAO implements StockDAO {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private List<Stock> loadAll() throws StorageException {
         if (!file.exists() || file.length() == 0) return new ArrayList<>();
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
@@ -76,13 +77,12 @@ public class SerializableStockDAO implements StockDAO {
     public List<String> getAllCategories(String groupId) {
         try {
             return loadAll().stream()
-                    .filter(s -> groupId.equals(s.getGroupId())) // Filtra per gruppo
-                    .map(Stock::getCategory)                     // Estrae la categoria
-                    .filter(c -> c != null && !c.isEmpty())      // Evita null/vuoti
-                    .distinct()                                  // Rimuove duplicati
+                    .filter(s -> groupId.equals(s.getGroupId()))
+                    .map(Stock::getCategory)
+                    .filter(c -> c != null && !c.isEmpty())
+                    .distinct()
                     .toList();
         } catch (StorageException e) {
-            // L'interfaccia non prevede throws qui, quindi restituiamo lista vuota
             return new ArrayList<>();
         }
     }
@@ -91,11 +91,10 @@ public class SerializableStockDAO implements StockDAO {
     public List<Stock> getStocksByCategory(String groupId, String category) {
         try {
             return loadAll().stream()
-                    .filter(s -> groupId.equals(s.getGroupId())) // Filtra per gruppo
-                    .filter(s -> s.getCategory() != null && s.getCategory().equalsIgnoreCase(category)) // Filtra per categoria
+                    .filter(s -> groupId.equals(s.getGroupId()))
+                    .filter(s -> s.getCategory() != null && s.getCategory().equalsIgnoreCase(category))
                     .toList();
         } catch (StorageException e) {
-            // L'interfaccia non prevede throws qui, quindi restituiamo lista vuota
             return new ArrayList<>();
         }
     }

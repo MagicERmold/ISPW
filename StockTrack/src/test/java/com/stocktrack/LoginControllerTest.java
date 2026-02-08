@@ -24,14 +24,11 @@ class LoginControllerTest {
     @BeforeEach
     void setUp() {
         loginController = new LoginController();
-        // Assicuriamoci che la sessione sia pulita prima di ogni test
         SessionManager.getInstance().logout();
     }
 
     @AfterEach
     void tearDown() {
-        // Pulizia: rimuovere l'utente creato per non influenzare altri test
-        // Questo è fondamentale poiché InMemoryUserDAO usa una mappa statica
         try {
             UserDAO userDAO = DAOFactory.getUserDAO();
             // Controllo se l'utente esiste prima di provare a cancellarlo per evitare errori nel teardown
@@ -43,17 +40,12 @@ class LoginControllerTest {
         }
     }
 
-    /**
-     * Test Req: Registrazione utente.
-     * Verifica che un nuovo utente venga salvato correttamente con ruolo default USER.
-     */
     @Test
     void testRegisterSuccess() {
         UserBean newUser = new UserBean(testUsername, "password123");
 
         assertDoesNotThrow(() -> loginController.register(newUser), "La registrazione non dovrebbe lanciare eccezioni.");
 
-        // Verifica diretta sul DAO (persistenza in-memory)
         try {
             UserDAO userDAO = DAOFactory.getUserDAO();
             User retrievedUser = userDAO.findUserByUsername(testUsername);
@@ -66,20 +58,13 @@ class LoginControllerTest {
         }
     }
 
-    /**
-     * Test Req: Login utente.
-     * Verifica che il login funzioni e popoli il SessionManager.
-     */
     @Test
     void testLoginSuccess() throws Exception {
-        // Setup: Registriamo prima l'utente
         UserBean userBean = new UserBean(testUsername, "password123");
         loginController.register(userBean);
 
-        // Azione: Tentativo di login
         boolean loginResult = loginController.login(userBean);
 
-        // Verifica
         assertTrue(loginResult, "Il login dovrebbe restituire true con credenziali corrette.");
 
         User sessionUser = SessionManager.getInstance().getCurrentUser();
@@ -87,18 +72,12 @@ class LoginControllerTest {
         assertEquals(testUsername, sessionUser.getUsername());
     }
 
-    /**
-     * Test Req: Gestione Eccezioni (DuplicateUserException).
-     * Verifica che non sia possibile registrare due utenti con lo stesso username.
-     */
     @Test
     void testDuplicateUserException() throws Exception {
         UserBean userBean = new UserBean(testUsername, "password123");
 
-        // 1. Prima registrazione (deve avere successo)
         loginController.register(userBean);
 
-        // 2. Seconda registrazione identica -> Deve lanciare DuplicateUserException
         assertThrows(DuplicateUserException.class, () -> loginController.register(userBean), "Dovrebbe lanciare DuplicateUserException se l'username è già in uso.");
     }
 }

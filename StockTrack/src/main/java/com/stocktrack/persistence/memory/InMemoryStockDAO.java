@@ -43,16 +43,15 @@ public class InMemoryStockDAO implements StockDAO {
         warehouse.removeIf(s -> s.getName().equals(stockName) && groupUid.equals(s.getGroupId()));
     }
 
-    // --- CORREZIONE QUI SOTTO ---
     @Override
     public List<String> getAllCategories(String groupUid) {
         if(groupUid == null) return new ArrayList<>();
 
         return warehouse.stream()
-                .filter(s -> groupUid.equals(s.getGroupId()))  // Prendi solo prodotti del gruppo
-                .map(Stock::getCategory)                       // Prendi il nome della categoria
-                .filter(c -> c != null && !c.isEmpty())        // Ignora null o vuoti
-                .distinct()                                    // <--- RIMUOVE I DUPLICATI
+                .filter(s -> groupUid.equals(s.getGroupId()))
+                .map(Stock::getCategory)
+                .filter(c -> c != null && !c.isEmpty())
+                .distinct()
                 .toList();
     }
 

@@ -32,7 +32,12 @@ public class FileSystemStockDAO implements StockDAO {
     public void saveStock(Stock stock) throws StorageException{
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
             String line = String.format("%s,%d,%d,%s,%s",
-                    stock.getName(), stock.getQuantity(), stock.getThreshold(), stock.getGroupId(), stock.getCategory());
+                    stock.getName(),
+                    stock.getQuantity(),
+                    stock.getThreshold(),
+                    stock.getGroupId(),
+                    stock.getCategory()
+            );
             writer.write(line);
             writer.newLine();
         } catch (IOException e) {
@@ -60,7 +65,6 @@ public class FileSystemStockDAO implements StockDAO {
                 String[] parts = line.split(",");
                 if (parts.length >= 4 && parts[0].equals(stockName) && parts[3].equals(groupId)) {
                     String cat = (parts.length > 4) ? parts[4] : "Generico";
-                    // Riscriviamo mantenendo la categoria esistente
                     String newLine = String.format("%s,%d,%s,%s,%s", parts[0], newQuantity, parts[2], parts[3], cat);
                     lines.add(newLine);
                     found = true;
@@ -125,7 +129,6 @@ public class FileSystemStockDAO implements StockDAO {
         }
     }
 
-    // Metodo helper privato per evitare duplicazione codice scrittura
     private void writeAllLines(List<String> lines) throws StorageException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, false))) {
             for (String s : lines) {
@@ -137,7 +140,6 @@ public class FileSystemStockDAO implements StockDAO {
         }
     }
 
-    // Helper per leggere tutto e convertire
     private List<Stock> readAllInternal(String groupUid) throws IOException {
         List<Stock> list = new ArrayList<>();
         if (!file.exists() || groupUid == null) return list;

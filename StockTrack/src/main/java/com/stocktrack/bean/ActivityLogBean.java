@@ -1,5 +1,6 @@
 package com.stocktrack.bean;
 
+// Test
 public class ActivityLogBean {
     private final String username;
     private final String actionType;

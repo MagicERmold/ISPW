@@ -46,11 +46,11 @@ public class LoginController {
         // Il ruolo vero verrà definito quando entrerà/creerà un gruppo.
         User newUser = new User(userBean.getUsername(), userBean.getPassword(), Role.USER);
 
-        // Loggo l'utente
-        SessionManager.getInstance().login(newUser);
-
         // Salvo l'utente nel database
         userDAO.saveUser(newUser);
+
+        // Apro la sessione solo dopo il salvataggio riuscito
+        SessionManager.getInstance().login(newUser);
 
         return true;
     }

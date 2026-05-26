@@ -17,7 +17,7 @@ public class JavaFXApp extends Application {
     @SuppressWarnings("java:S2696")
     public void start(Stage stage) throws IOException {
         // Carico la Scene del login
-        scene = new Scene(loadFXML("login"), 800, 600);
+        scene = new Scene(loadFXML("login"), 1060, 720);
 
         // Carico il css
         String css = Objects.requireNonNull(this.getClass().getResource("/com/stocktrack/view/style.css")).toExternalForm();
@@ -26,7 +26,8 @@ public class JavaFXApp extends Application {
         // Imposto la Scene del Login
         stage.setScene(scene);
         stage.setTitle("StockTrack - Gestione Magazzino");
-        stage.resizableProperty().setValue(Boolean.FALSE);
+        stage.setMinWidth(980);
+        stage.setMinHeight(660);
         stage.show();
     }
 

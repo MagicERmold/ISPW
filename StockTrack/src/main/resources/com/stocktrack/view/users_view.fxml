@@ -4,15 +4,21 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox spacing="10" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+<VBox spacing="14" styleClass="content-view" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.stocktrack.view.fx.controller.UsersGraphicalController">
-    <padding> <Insets top="10" right="10" bottom="10" left="10"/> </padding>
+    <padding> <Insets top="22" right="24" bottom="24" left="24"/> </padding>
 
-    <Label text="Gestione Membri Gruppo" styleClass="title-label"/>
+    <HBox alignment="CENTER_LEFT" spacing="12.0" styleClass="section-header-inline">
+        <Label styleClass="section-title" text="Membri gruppo" />
+        <Region HBox.hgrow="ALWAYS" />
+        <Button onAction="#handleRemoveUser" styleClass="danger-button" text="Rimuovi selezionato"/>
+    </HBox>
 
-    <TableView fx:id="usersTable" VBox.vgrow="ALWAYS">
+    <TableView fx:id="usersTable" styleClass="data-table" VBox.vgrow="ALWAYS">
         <columns>
             <TableColumn fx:id="usernameCol" text="Username" prefWidth="200"/>
             <TableColumn fx:id="roleCol" text="Ruolo" prefWidth="150"/>
@@ -21,6 +27,4 @@
             <Label text="Nessun altro utente nel gruppo."/>
         </placeholder>
     </TableView>
-
-    <Button text="Rimuovi Utente Selezionato" onAction="#handleRemoveUser" styleClass="danger-button"/>
 </VBox>

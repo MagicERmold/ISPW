@@ -10,6 +10,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.UnaryOperator;
 
 public class StockGraphicalController {
 
@@ -18,6 +19,7 @@ public class StockGraphicalController {
     @FXML private TableColumn<StockBean, String> colCategory;
     @FXML private TableColumn<StockBean, Integer> colQuantity;
     @FXML private TableColumn<StockBean, Integer> colThreshold;
+    @FXML private TableColumn<StockBean, String> colStatus;
 
     @FXML private TextField txtName;
     @FXML private TextField txtCategory;
@@ -37,8 +39,26 @@ public class StockGraphicalController {
         colCategory.setCellValueFactory(new PropertyValueFactory<>("category")); // Assicurati che StockBean abbia getCategory()
         colQuantity.setCellValueFactory(new PropertyValueFactory<>("quantity"));
         colThreshold.setCellValueFactory(new PropertyValueFactory<>("threshold"));
+        colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
 
         stockTable.setItems(tableData);
+        stockTable.setRowFactory(table -> new TableRow<>() {
+            @Override
+            protected void updateItem(StockBean item, boolean empty) {
+                super.updateItem(item, empty);
+                getStyleClass().removeAll("low-stock-row", "empty-stock-row");
+                if (!empty && item != null) {
+                    if (item.isEmpty()) {
+                        getStyleClass().add("empty-stock-row");
+                    } else if (item.isBelowThreshold()) {
+                        getStyleClass().add("low-stock-row");
+                    }
+                }
+            }
+        });
+
+        applyNumericFormatter(txtQuantity);
+        applyNumericFormatter(txtThreshold);
 
         // Listener per il filtro: quando cambi categoria, ricarica la tabella
         cmbFilterCategory.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> loadStocks());
@@ -104,8 +124,8 @@ public class StockGraphicalController {
     @FXML
     private void handleAddStock() {
         try {
-            String name = txtName.getText();
-            String cat = txtCategory.getText(); // Leggiamo la categoria
+            String name = txtName.getText().trim();
+            String cat = txtCategory.getText().trim(); // Leggiamo la categoria
             int qty = Integer.parseInt(txtQuantity.getText());
             int thr = Integer.parseInt(txtThreshold.getText());
 
@@ -172,5 +192,13 @@ public class StockGraphicalController {
             return stockTable.getSelectionModel().getSelectedItem();
         }
         return null;
+    }
+
+    private void applyNumericFormatter(TextField field) {
+        UnaryOperator<TextFormatter.Change> integerFilter = change -> {
+            String newText = change.getControlNewText();
+            return newText.matches("\\d*") ? change : null;
+        };
+        field.setTextFormatter(new TextFormatter<>(integerFilter));
     }
 }

@@ -5,28 +5,30 @@
 <?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.stocktrack.view.fx.controller.GroupSelectionGraphicalController">
-    <padding> <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" /> </padding>
+<StackPane styleClass="auth-screen" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.stocktrack.view.fx.controller.GroupSelectionGraphicalController">
+    <VBox alignment="CENTER_LEFT" maxWidth="520.0" spacing="18.0" styleClass="group-card">
+        <padding>
+            <Insets bottom="42.0" left="42.0" right="42.0" top="42.0" />
+        </padding>
 
-    <Label text="Benvenuto! Configura il tuo Gruppo">
-        <font> <Font size="18.0" /> </font>
-    </Label>
-    <Label text="Non appartieni ancora a nessun magazzino." textFill="GREY"/>
+        <Label styleClass="title-label" text="Configura gruppo" />
+        <Label styleClass="text-secondary" text="Non appartieni ancora a nessun magazzino." />
 
-    <VBox spacing="10" alignment="CENTER_LEFT" maxWidth="400">
-        <RadioButton fx:id="createRadio" text="Crea un nuovo Gruppo (Diventerai Admin)" selected="true">
-            <toggleGroup>
-                <ToggleGroup fx:id="groupToggle"/>
-            </toggleGroup>
-        </RadioButton>
+        <VBox alignment="CENTER_LEFT" maxWidth="420.0" spacing="12.0" styleClass="choice-panel">
+            <RadioButton fx:id="createRadio" selected="true" text="Crea un nuovo gruppo">
+                <toggleGroup>
+                    <ToggleGroup fx:id="groupToggle" />
+                </toggleGroup>
+            </RadioButton>
 
-        <RadioButton fx:id="joinRadio" text="Unisciti a un gruppo esistente" toggleGroup="$groupToggle"/>
+            <RadioButton fx:id="joinRadio" text="Unisciti a un gruppo esistente" toggleGroup="$groupToggle" />
 
-        <TextField fx:id="groupIdField" promptText="Inserisci ID Gruppo qui..." visible="false"/>
+            <TextField fx:id="groupIdField" promptText="ID gruppo" visible="false" />
+        </VBox>
+
+        <Button maxWidth="420.0" onAction="#handleContinue" prefWidth="420.0" styleClass="primary-button" text="Continua" />
     </VBox>
-
-    <Button text="Continua" onAction="#handleContinue" prefWidth="150"/>
-</VBox>
+</StackPane>

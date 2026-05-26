@@ -35,4 +35,26 @@ public class StockBean {
     public String getCategory() {
         return category;
     }
+
+    public boolean isBelowThreshold() {
+        return quantity < threshold;
+    }
+
+    public boolean isEmpty() {
+        return quantity == 0;
+    }
+
+    public int getMissingQuantity() {
+        return Math.max(threshold - quantity, 0);
+    }
+
+    public String getStatus() {
+        if (isEmpty()) {
+            return "Esaurito";
+        }
+        if (isBelowThreshold()) {
+            return "Sottoscorta";
+        }
+        return "OK";
+    }
 }

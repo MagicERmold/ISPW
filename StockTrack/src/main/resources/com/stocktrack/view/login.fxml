@@ -5,23 +5,33 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.stocktrack.view.fx.controller.LoginGraphicalController">
-    <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-    </padding>
+<StackPane styleClass="auth-screen" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.stocktrack.view.fx.controller.LoginGraphicalController">
+    <HBox alignment="CENTER" maxHeight="500.0" maxWidth="860.0" styleClass="auth-shell">
+        <VBox alignment="CENTER_LEFT" prefWidth="380.0" spacing="18.0" styleClass="brand-panel">
+            <padding>
+                <Insets bottom="42.0" left="42.0" right="42.0" top="42.0" />
+            </padding>
+            <Label styleClass="brand-title" text="StockTrack" />
+            <Label styleClass="brand-subtitle" text="Inventario, gruppi e lista spesa in un unico spazio." wrapText="true" />
+            <Label styleClass="brand-chip" text="DEMO / FULL / DBMS" />
+        </VBox>
 
-    <Label text="StockTrack Login">
-        <font>
-            <Font size="24.0" />
-        </font></Label>
+        <VBox alignment="CENTER_LEFT" prefWidth="430.0" spacing="16.0" styleClass="auth-card">
+            <padding>
+                <Insets bottom="42.0" left="42.0" right="42.0" top="42.0" />
+            </padding>
+            <Label styleClass="title-label" text="Accedi" />
+            <Label styleClass="text-secondary" text="Bentornato nel tuo magazzino." />
 
-    <TextField fx:id="usernameField" promptText="Username" maxWidth="300"/>
-    <PasswordField fx:id="passwordField" promptText="Password" maxWidth="300"/>
+            <TextField fx:id="usernameField" maxWidth="320.0" promptText="Username" />
+            <PasswordField fx:id="passwordField" maxWidth="320.0" promptText="Password" />
 
-    <Button text="Accedi" onAction="#handleLogin" defaultButton="true" prefWidth="150" />
-
-    <Button text="Non hai un account? Registrati" onAction="#switchToRegister" />
-</VBox>
+            <Button defaultButton="true" maxWidth="320.0" onAction="#handleLogin" prefWidth="320.0" styleClass="primary-button" text="Accedi" />
+            <Button maxWidth="320.0" onAction="#switchToRegister" prefWidth="320.0" styleClass="link-button" text="Crea un account" />
+        </VBox>
+    </HBox>
+</StackPane>

@@ -10,6 +10,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 
@@ -41,8 +42,18 @@ public class ShoppingListGraphicalController {
 
         // Calcolo "Da Ordinare" = Soglia - Quantità
         missingCol.setCellValueFactory(data ->
-                new SimpleIntegerProperty(data.getValue().getThreshold() - data.getValue().getQuantity()).asObject()
+                new SimpleIntegerProperty(data.getValue().getMissingQuantity()).asObject()
         );
+        shoppingTable.setRowFactory(table -> new TableRow<>() {
+            @Override
+            protected void updateItem(StockBean item, boolean empty) {
+                super.updateItem(item, empty);
+                getStyleClass().removeAll("low-stock-row", "empty-stock-row");
+                if (!empty && item != null) {
+                    getStyleClass().add(item.isEmpty() ? "empty-stock-row" : "low-stock-row");
+                }
+            }
+        });
 
         // Inizializzazione del filtro
         setupFilter();
@@ -84,6 +95,7 @@ public class ShoppingListGraphicalController {
         // Estraiamo le categorie uniche
         List<String> categories = list.stream()
                 .map(StockBean::getCategory)
+                .filter(category -> category != null && !category.isBlank())
                 .distinct()
                 .sorted()
                 .toList();

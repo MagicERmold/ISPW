@@ -21,25 +21,17 @@ public class RegisterGraphicalController {
     private final LoginController loginController = new LoginController();
 
     @FXML
-    private void handleRegister() throws StorageException, IOException {
+    private void handleRegister() {
         String user = usernameField.getText();
         String pass = passwordField.getText();
 
         if (user.isEmpty() || pass.isEmpty()) {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("ERRORE");
-            alert.setHeaderText("CREDENZIALI REGISTRAZIONE NON VALIDE!");
-            alert.setContentText("Sono stati rilevati dei campi vuoti...");
-            alert.showAndWait();
+            showWarning("Credenziali registrazione non valide", "Sono stati rilevati campi vuoti.");
             return;
         }
 
         if(passwordField.getText().length() < 8) {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("ERRORE ");
-            alert.setHeaderText("CREDENZIALI NON VALIDE!");
-            alert.setContentText("Password troppo corta, minimo 8 caratteri...");
-            alert.showAndWait();
+            showWarning("Credenziali non valide", "La password deve contenere almeno 8 caratteri.");
             return;
         }
 
@@ -47,36 +39,19 @@ public class RegisterGraphicalController {
 
         try {
             loginController.register(bean);
-
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Successo");
-            alert.setHeaderText("REGISTRAZIONE COMPLETATA!");
-            alert.setContentText("Accesso in corso...");
-            alert.showAndWait();
-        } catch (Exception e) {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("ERRORE  ");
-            alert.setContentText(e.getMessage());
-            alert.showAndWait();
-        }
-
-        try{
-            boolean loginSuccess = loginController.login(bean);
-
-            if (loginSuccess) {
-                User currentUser = SessionManager.getInstance().getCurrentUser();
-                if (currentUser.getGroupId() == null || "null".equals(currentUser.getGroupId())) {
-                    JavaFXApp.setRoot("group_selection");
-                } else {
-                    JavaFXApp.setRoot("home");
-                }
+            showInfo("Registrazione completata", "Accesso in corso...");
+            User currentUser = SessionManager.getInstance().getCurrentUser();
+            if (currentUser.getGroupId() == null || "null".equals(currentUser.getGroupId())) {
+                JavaFXApp.setRoot("group_selection");
             } else {
-                JavaFXApp.setRoot("login");
+                JavaFXApp.setRoot("home");
             }
         } catch (StorageException e) {
-            // Da sistemare
+            showWarning("Errore nel salvataggio dati", e.getMessage());
         } catch (IOException e) {
-            throw new IOException();
+            showWarning("Errore interfaccia", "Impossibile cambiare schermata: " + e.getMessage());
+        } catch (Exception e) {
+            showWarning("Registrazione non riuscita", e.getMessage());
         }
     }
 
@@ -90,5 +65,21 @@ public class RegisterGraphicalController {
             alert.setContentText("Errore caricamento pagina login: " + e.getMessage());
             alert.showAndWait();
         }
+    }
+
+    private void showWarning(String header, String content) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("StockTrack");
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
+
+    private void showInfo(String header, String content) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("StockTrack");
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 }

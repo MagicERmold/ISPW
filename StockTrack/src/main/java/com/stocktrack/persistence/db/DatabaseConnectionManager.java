@@ -1,0 +1,58 @@
+package com.stocktrack.persistence.db;
+
+import com.stocktrack.engineering.exception.StorageException;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+final class DatabaseConnectionManager {
+    private static final String DEFAULT_JDBC_URL = "jdbc:h2:./stocktrack-db";
+    private static final String DEFAULT_JDBC_USER = "sa";
+    private static final String DEFAULT_JDBC_PASSWORD = "";
+
+    private DatabaseConnectionManager() {
+    }
+
+    static Connection getConnection() throws StorageException {
+        try {
+            Class.forName("org.h2.Driver");
+            return DriverManager.getConnection(
+                    System.getProperty("stocktrack.jdbc.url", DEFAULT_JDBC_URL),
+                    System.getProperty("stocktrack.jdbc.user", DEFAULT_JDBC_USER),
+                    System.getProperty("stocktrack.jdbc.password", DEFAULT_JDBC_PASSWORD)
+            );
+        } catch (ClassNotFoundException e) {
+            throw new StorageException("Driver DBMS H2 non disponibile", e);
+        } catch (SQLException e) {
+            throw new StorageException("Connessione al DBMS non riuscita", e);
+        }
+    }
+
+    static void initializeSchema() throws StorageException {
+        try (Connection connection = getConnection();
+             Statement statement = connection.createStatement()) {
+            statement.executeUpdate("""
+                    CREATE TABLE IF NOT EXISTS users (
+                        username VARCHAR(80) PRIMARY KEY,
+                        password VARCHAR(255) NOT NULL,
+                        role VARCHAR(20) NOT NULL,
+                        group_id VARCHAR(120)
+                    )
+                    """);
+            statement.executeUpdate("""
+                    CREATE TABLE IF NOT EXISTS stocks (
+                        name VARCHAR(120) NOT NULL,
+                        quantity INT NOT NULL,
+                        threshold_value INT NOT NULL,
+                        group_id VARCHAR(120) NOT NULL,
+                        category VARCHAR(80) NOT NULL,
+                        PRIMARY KEY (group_id, name)
+                    )
+                    """);
+        } catch (SQLException e) {
+            throw new StorageException("Inizializzazione schema DBMS non riuscita", e);
+        }
+    }
+}

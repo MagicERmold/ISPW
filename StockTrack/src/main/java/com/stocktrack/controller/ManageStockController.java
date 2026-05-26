@@ -9,7 +9,6 @@ import com.stocktrack.model.Stock;
 import com.stocktrack.model.User;
 import com.stocktrack.persistence.dao.StockDAO;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,7 +67,7 @@ public class ManageStockController {
     }
 
     // Consuma (diminuisce) o Acquista (aumenta) STOCKS
-    public void modifyQuantity(String productName, int amountChange) throws StorageException, InvalidProductDataException, IOException {
+    public void modifyQuantity(String productName, int amountChange) throws StorageException, InvalidProductDataException {
         User user = SessionManager.getInstance().getCurrentUser();
         StockDAO dao = DAOFactory.getStockDAO();
 

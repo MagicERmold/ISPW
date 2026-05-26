@@ -3,6 +3,8 @@ package com.stocktrack.engineering.factory;
 import com.stocktrack.engineering.exception.StorageException;
 import com.stocktrack.persistence.dao.StockDAO;
 import com.stocktrack.persistence.dao.UserDAO;
+import com.stocktrack.persistence.db.DatabaseStockDAO;
+import com.stocktrack.persistence.db.DatabaseUserDAO;
 import com.stocktrack.persistence.fs.FileSystemStockDAO;
 import com.stocktrack.persistence.fs.FileSystemUserDAO;
 import com.stocktrack.persistence.memory.InMemoryStockDAO;
@@ -30,6 +32,7 @@ public class DAOFactory {
             case "DEMO" -> new InMemoryStockDAO();
             case "FULL-FS" -> new FileSystemStockDAO();
             case "FULL-SR" -> new SerializableStockDAO();
+            case "FULL-DB" -> new DatabaseStockDAO();
             default -> throw new IllegalArgumentException("Tipo di persistenza non valido: " + type);
         };
     }
@@ -41,6 +44,7 @@ public class DAOFactory {
             case "DEMO" -> new InMemoryUserDAO();
             case "FULL-FS" -> new FileSystemUserDAO();
             case "FULL-SR" -> new SerializableUserDAO();
+            case "FULL-DB" -> new DatabaseUserDAO();
             default -> throw new IllegalArgumentException("Tipo di persistenza non valido: " + type);
         };
     }

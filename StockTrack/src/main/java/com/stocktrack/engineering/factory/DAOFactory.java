@@ -27,6 +27,10 @@ public class DAOFactory {
     private static final Logger logger = Logger.getLogger(DAOFactory.class.getName());
     private static final String CONFIG_FILE = "config.properties";
     private static final String PERSISTENCE_TYPE_KEY = "persistence.type";
+    private static final String DEMO = "DEMO";
+    private static final String FULL_FS = "FULL-FS";
+    private static final String FULL_SR = "FULL-SR";
+    private static final String FULL_DB = "FULL-DB";
 
     private DAOFactory() {}
 
@@ -34,10 +38,10 @@ public class DAOFactory {
         String type = readPersistenceTypeFromConfig();
 
         return switch (type.toUpperCase()) {
-            case "DEMO" -> new InMemoryStockDAO();
-            case "FULL-FS" -> new FileSystemStockDAO();
-            case "FULL-SR" -> new SerializableStockDAO();
-            case "FULL-DB" -> new DatabaseStockDAO();
+            case DEMO -> new InMemoryStockDAO();
+            case FULL_FS -> new FileSystemStockDAO();
+            case FULL_SR -> new SerializableStockDAO();
+            case FULL_DB -> new DatabaseStockDAO();
             default -> throw new IllegalArgumentException("Tipo di persistenza non valido: " + type);
         };
     }
@@ -46,10 +50,10 @@ public class DAOFactory {
         String type = readPersistenceTypeFromConfig();
 
         return switch (type.toUpperCase()) {
-            case "DEMO" -> new InMemoryUserDAO();
-            case "FULL-FS" -> new FileSystemUserDAO();
-            case "FULL-SR" -> new SerializableUserDAO();
-            case "FULL-DB" -> new DatabaseUserDAO();
+            case DEMO -> new InMemoryUserDAO();
+            case FULL_FS -> new FileSystemUserDAO();
+            case FULL_SR -> new SerializableUserDAO();
+            case FULL_DB -> new DatabaseUserDAO();
             default -> throw new IllegalArgumentException("Tipo di persistenza non valido: " + type);
         };
     }
@@ -58,10 +62,10 @@ public class DAOFactory {
         String type = readPersistenceTypeFromConfig();
 
         return switch (type.toUpperCase()) {
-            case "DEMO" -> new InMemoryActivityLogDAO();
-            case "FULL-FS" -> new FileSystemActivityLogDAO();
-            case "FULL-SR" -> new SerializableActivityLogDAO();
-            case "FULL-DB" -> new DatabaseActivityLogDAO();
+            case DEMO -> new InMemoryActivityLogDAO();
+            case FULL_FS -> new FileSystemActivityLogDAO();
+            case FULL_SR -> new SerializableActivityLogDAO();
+            case FULL_DB -> new DatabaseActivityLogDAO();
             default -> throw new IllegalArgumentException("Tipo di persistenza non valido: " + type);
         };
     }
@@ -72,13 +76,13 @@ public class DAOFactory {
         try(InputStream inputStream = DAOFactory.class.getClassLoader().getResourceAsStream(CONFIG_FILE)) {
             if(inputStream == null) {
                 logger.warning(() -> "Impossibile trovare " + CONFIG_FILE + ". Defaulting to DEMO.");
-                return "DEMO";
+                return DEMO;
             }
             prop.load(inputStream);
-            return prop.getProperty(PERSISTENCE_TYPE_KEY, "DEMO");
+            return prop.getProperty(PERSISTENCE_TYPE_KEY, DEMO);
         } catch(IOException e) {
             logger.log(Level.SEVERE, "Errore durante la lettura del file di configurazione", e);
-            return "DEMO";
+            return DEMO;
         }
     }
 }

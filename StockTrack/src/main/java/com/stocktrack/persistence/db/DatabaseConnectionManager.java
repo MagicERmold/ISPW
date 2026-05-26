@@ -17,14 +17,11 @@ final class DatabaseConnectionManager {
 
     static Connection getConnection() throws StorageException {
         try {
-            Class.forName("org.h2.Driver");
             return DriverManager.getConnection(
                     System.getProperty("stocktrack.jdbc.url", DEFAULT_JDBC_URL),
                     System.getProperty("stocktrack.jdbc.user", DEFAULT_JDBC_USER),
                     System.getProperty("stocktrack.jdbc.password", DEFAULT_JDBC_PASSWORD)
             );
-        } catch (ClassNotFoundException e) {
-            throw new StorageException("Driver DBMS H2 non disponibile", e);
         } catch (SQLException e) {
             throw new StorageException("Connessione al DBMS non riuscita", e);
         }

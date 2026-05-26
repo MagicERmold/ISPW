@@ -85,18 +85,22 @@ public class FileSystemUserDAO implements UserDAO {
                 }
                 String[] parts = CsvCodec.split(line);
                 if (parts.length >= 3) {
-                    String group = parts.length > 3 ? parts[3] : null;
-                    try {
-                        users.add(new User(parts[0], parts[1], Role.valueOf(parts[2]), group));
-                    } catch (IllegalArgumentException e) {
-                        throw new StorageException("Riga utente malformata: " + line, e);
-                    }
+                    users.add(parseUserLine(parts, line));
                 }
             }
         } catch (IOException e) {
             throw new StorageException("Errore lettura utenti", e);
         }
         return users;
+    }
+
+    private User parseUserLine(String[] parts, String line) throws StorageException {
+        String group = parts.length > 3 ? parts[3] : null;
+        try {
+            return new User(parts[0], parts[1], Role.valueOf(parts[2]), group);
+        } catch (IllegalArgumentException e) {
+            throw new StorageException("Riga utente malformata: " + line, e);
+        }
     }
 
     @Override

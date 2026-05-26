@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ManageStockController {
+    private static final String ACTIVITY_TYPE_WAREHOUSE = "MAGAZZINO";
     private final ActivityLogController activityLogController = new ActivityLogController();
 
     // Aggiunta nuova STOCK nel magazzino
@@ -43,7 +44,7 @@ public class ManageStockController {
 
         Stock stock = new Stock(bean.getNome(), bean.getQuantity(), bean.getThreshold(), user.getGroupId(), bean.getCategory());
         dao.saveStock(stock);
-        activityLogController.recordActivity("MAGAZZINO",
+        activityLogController.recordActivity(ACTIVITY_TYPE_WAREHOUSE,
                 "ha aggiunto " + bean.getQuantity() + " unita di " + bean.getNome());
     }
 
@@ -95,7 +96,7 @@ public class ManageStockController {
         // Aggiorno la quantità in memoria
         dao.updateStockQuantity(target.getName(), newQty, user.getGroupId());
         String action = amountChange > 0 ? "ha comprato " : "ha usato ";
-        activityLogController.recordActivity("MAGAZZINO",
+        activityLogController.recordActivity(ACTIVITY_TYPE_WAREHOUSE,
                 action + Math.abs(amountChange) + " unita di " + target.getName());
     }
 
@@ -154,6 +155,6 @@ public class ManageStockController {
 
         // La dao si occuperà di cancellare la STOCK
         dao.deleteStock(productName, user.getGroupId());
-        activityLogController.recordActivity("MAGAZZINO", "ha eliminato il prodotto " + productName);
+        activityLogController.recordActivity(ACTIVITY_TYPE_WAREHOUSE, "ha eliminato il prodotto " + productName);
     }
 }

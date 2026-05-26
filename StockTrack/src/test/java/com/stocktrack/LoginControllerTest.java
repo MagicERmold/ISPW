@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
 class LoginControllerTest {
 
     private LoginController loginController;
@@ -31,7 +30,6 @@ class LoginControllerTest {
     void tearDown() {
         try {
             UserDAO userDAO = DAOFactory.getUserDAO();
-            // Controllo se l'utente esiste prima di provare a cancellarlo per evitare errori nel teardown
             if (userDAO.findUserByUsername(testUsername) != null) {
                 userDAO.deleteUser(testUsername);
             }
@@ -53,7 +51,9 @@ class LoginControllerTest {
             assertNotNull(retrievedUser, "L'utente dovrebbe essere presente nel DAO dopo la registrazione.");
             assertEquals(testUsername, retrievedUser.getUsername());
             assertEquals(Role.USER, retrievedUser.getRole(), "Il ruolo predefinito deve essere USER.");
-        } catch ( StorageException e) {
+            assertNotEquals("password123", retrievedUser.getPassword(), "La password non deve essere salvata in chiaro.");
+            assertTrue(retrievedUser.getPassword().startsWith("SHA256:"), "La password deve essere salvata come hash SHA-256.");
+        } catch (StorageException e) {
             fail("Errore durante la verifica dei dati: " + e.getMessage());
         }
     }
@@ -78,6 +78,17 @@ class LoginControllerTest {
 
         loginController.register(userBean);
 
-        assertThrows(DuplicateUserException.class, () -> loginController.register(userBean), "Dovrebbe lanciare DuplicateUserException se l'username è già in uso.");
+        assertThrows(DuplicateUserException.class, () -> loginController.register(userBean),
+                "Dovrebbe lanciare DuplicateUserException se l'username e gia in uso.");
+    }
+
+    @Test
+    void testLegacyPlainPasswordStillWorks() throws Exception {
+        UserDAO userDAO = DAOFactory.getUserDAO();
+        userDAO.saveUser(new User(testUsername, "password123", Role.USER));
+
+        boolean loginResult = loginController.login(new UserBean(testUsername, "password123"));
+
+        assertTrue(loginResult, "Il login deve supportare anche vecchie password salvate in chiaro.");
     }
 }

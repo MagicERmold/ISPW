@@ -80,7 +80,10 @@ public class DatabaseStockDAO implements StockDAO {
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, stockName);
             statement.setString(2, groupUid);
-            statement.executeUpdate();
+            int deletedRows = statement.executeUpdate();
+            if (deletedRows == 0) {
+                throw new StorageException("Prodotto non trovato nel DBMS");
+            }
         } catch (SQLException e) {
             throw new StorageException("Errore eliminazione prodotto da DBMS", e);
         }

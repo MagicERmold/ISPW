@@ -13,7 +13,7 @@ public class SerializableStockDAO implements StockDAO {
     private final File file;
 
     public SerializableStockDAO() throws StorageException {
-        this.file = new File(FILE_NAME);
+        this.file = new File(System.getProperty("stocktrack.serial.stock.file", FILE_NAME));
         if (!file.exists()) {
             saveAll(new ArrayList<>());
         }
@@ -57,11 +57,16 @@ public class SerializableStockDAO implements StockDAO {
     @Override
     public void updateStockQuantity(String stockName, int newQuantity, String groupUid) throws StorageException {
         List<Stock> stocks = loadAll();
+        boolean found = false;
         for (Stock s : stocks) {
-            if (s.getName().equals(stockName) && groupUid.equals(s.getGroupId())) {
+            if (s.getName().equalsIgnoreCase(stockName) && groupUid.equals(s.getGroupId())) {
                 s.setQuantity(newQuantity);
+                found = true;
                 break;
             }
+        }
+        if (!found) {
+            throw new StorageException("Prodotto non trovato nel file serializzato");
         }
         saveAll(stocks);
     }
@@ -69,33 +74,34 @@ public class SerializableStockDAO implements StockDAO {
     @Override
     public void deleteStock(String stockName, String groupUid) throws StorageException {
         List<Stock> stocks = loadAll();
-        stocks.removeIf(s -> s.getName().equals(stockName) && groupUid.equals(s.getGroupId()));
+        boolean removed = stocks.removeIf(s -> s.getName().equalsIgnoreCase(stockName) && groupUid.equals(s.getGroupId()));
+        if (!removed) {
+            throw new StorageException("Prodotto non trovato nel file serializzato");
+        }
         saveAll(stocks);
     }
 
     @Override
-    public List<String> getAllCategories(String groupId) {
-        try {
-            return loadAll().stream()
-                    .filter(s -> groupId.equals(s.getGroupId()))
-                    .map(Stock::getCategory)
-                    .filter(c -> c != null && !c.isEmpty())
-                    .distinct()
-                    .toList();
-        } catch (StorageException e) {
+    public List<String> getAllCategories(String groupId) throws StorageException {
+        if (groupId == null) {
             return new ArrayList<>();
         }
+        return loadAll().stream()
+                .filter(s -> groupId.equals(s.getGroupId()))
+                .map(Stock::getCategory)
+                .filter(c -> c != null && !c.isEmpty())
+                .distinct()
+                .toList();
     }
 
     @Override
-    public List<Stock> getStocksByCategory(String groupId, String category) {
-        try {
-            return loadAll().stream()
-                    .filter(s -> groupId.equals(s.getGroupId()))
-                    .filter(s -> s.getCategory() != null && s.getCategory().equalsIgnoreCase(category))
-                    .toList();
-        } catch (StorageException e) {
+    public List<Stock> getStocksByCategory(String groupId, String category) throws StorageException {
+        if (groupId == null) {
             return new ArrayList<>();
         }
+        return loadAll().stream()
+                .filter(s -> groupId.equals(s.getGroupId()))
+                .filter(s -> s.getCategory() != null && s.getCategory().equalsIgnoreCase(category))
+                .toList();
     }
 }

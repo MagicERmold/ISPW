@@ -1,10 +1,10 @@
 package com.stocktrack.view.fx.controller;
 
 import com.stocktrack.bean.UserBean;
+import com.stocktrack.bean.UserProfileBean;
 import com.stocktrack.controller.LoginController;
+import com.stocktrack.controller.SessionController;
 import com.stocktrack.engineering.exception.StorageException;
-import com.stocktrack.engineering.singleton.SessionManager;
-import com.stocktrack.model.User;
 import com.stocktrack.view.fx.JavaFXApp;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -19,6 +19,7 @@ public class LoginGraphicalController {
     @FXML private PasswordField passwordField;
 
     private final LoginController loginLogic = new LoginController();
+    private final SessionController sessionController = new SessionController();
 
     @FXML
     private void handleLogin() {
@@ -39,9 +40,9 @@ public class LoginGraphicalController {
             boolean success = loginLogic.login(bean);
             if (success) {
                 // Recuperiamo l'utente loggato per controllare il gruppo
-                User currentUser = SessionManager.getInstance().getCurrentUser();
+                UserProfileBean currentUser = sessionController.getCurrentUserProfile();
 
-                if (currentUser.getGroupId() == null || "null".equals(currentUser.getGroupId())) {
+                if (currentUser == null || !currentUser.hasGroup()) {
                     // Se non ha un gruppo, lo mandiamo alla schermata di selezione
                     JavaFXApp.setRoot("group_selection");
                 } else {

@@ -13,7 +13,7 @@ public class SerializableUserDAO implements UserDAO {
     private final File file;
 
     public SerializableUserDAO() throws StorageException {
-        this.file = new File(FILE_NAME);
+        this.file = new File(System.getProperty("stocktrack.serial.user.file", FILE_NAME));
         if (!file.exists()) {
             saveAll(new ArrayList<>());
         }

@@ -99,6 +99,13 @@ class ManageStockControllerTest {
     }
 
     @Test
+    void testShowAllStocksWithoutLoginFails() {
+        SessionManager.getInstance().logout();
+        assertThrows(StorageException.class, () -> stockController.showAllStocks(),
+                "Un utente non autenticato non dovrebbe leggere il magazzino.");
+    }
+
+    @Test
     void testModifyQuantitySuccess() throws Exception {
         stockController.addStock(new StockBean("Biscotti", 10, 2));
 

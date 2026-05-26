@@ -1,10 +1,9 @@
 package com.stocktrack.view.fx.controller;
 
 import com.stocktrack.bean.StockBean;
+import com.stocktrack.bean.UserProfileBean;
 import com.stocktrack.controller.ManageStockController;
-import com.stocktrack.engineering.singleton.SessionManager;
-import com.stocktrack.model.Role;
-import com.stocktrack.model.User;
+import com.stocktrack.controller.SessionController;
 import com.stocktrack.view.fx.JavaFXApp;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -22,18 +21,20 @@ public class HomeGraphicalController {
     // Il nome deve essere: fx:id dell'include + "Controller"
     @FXML private StockGraphicalController stockViewController;
     @FXML private ShoppingListGraphicalController shoppingViewController;
+    @FXML private ActivityLogGraphicalController activityViewController;
     @FXML private UsersGraphicalController usersViewController;
 
     private final ManageStockController stockController = new ManageStockController();
+    private final SessionController sessionController = new SessionController();
 
     @FXML
     public void initialize() {
-        User user = SessionManager.getInstance().getCurrentUser();
+        UserProfileBean user = sessionController.getCurrentUserProfile();
         if (user != null) {
             welcomeLabel.setText("Ciao, " + user.getUsername());
 
             // Nascondi tab utenti se non è admin
-            if (user.getRole() != Role.ADMIN) {
+            if (!user.isAdmin()) {
                 mainTabPane.getTabs().remove(usersTab);
             }
         }
@@ -44,12 +45,13 @@ public class HomeGraphicalController {
         // Ricarica i dati di TUTTE le viste quando cambi tab
         if (stockViewController != null) stockViewController.loadData();
         if (shoppingViewController != null) shoppingViewController.loadData();
+        if (activityViewController != null) activityViewController.loadData();
         if (usersViewController != null) usersViewController.loadData();
     }
 
     @FXML
     private void handleLogout() throws IOException {
-        SessionManager.getInstance().logout();
+        sessionController.logout();
         JavaFXApp.setRoot("login");
     }
 

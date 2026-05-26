@@ -3,7 +3,13 @@ package com.stocktrack.persistence.fs;
 import com.stocktrack.engineering.exception.StorageException;
 import com.stocktrack.model.Stock;
 import com.stocktrack.persistence.dao.StockDAO;
-import java.io.*;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -11,34 +17,28 @@ import java.util.logging.Logger;
 public class FileSystemStockDAO implements StockDAO {
     private static final String CSV_FILE_NAME = "stocks.csv";
     private static final Logger logger = Logger.getLogger(FileSystemStockDAO.class.getName());
-    private final File file = new File(CSV_FILE_NAME);
+    private final File file = new File(System.getProperty("stocktrack.fs.stock.file", CSV_FILE_NAME));
 
     public FileSystemStockDAO() {
         try {
             boolean isCreated = file.createNewFile();
-
             if (isCreated) {
                 logger.info("Nuovo file database creato: " + CSV_FILE_NAME);
-            } else {
-                logger.info("File database già esistente: " + CSV_FILE_NAME);
             }
-
         } catch (IOException e) {
             throw new IllegalStateException("Errore: Impossibile creare o accedere al file " + CSV_FILE_NAME, e);
         }
     }
 
     @Override
-    public void saveStock(Stock stock) throws StorageException{
+    public void saveStock(Stock stock) throws StorageException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
-            String line = String.format("%s,%d,%d,%s,%s",
+            writer.write(CsvCodec.join(
                     stock.getName(),
-                    stock.getQuantity(),
-                    stock.getThreshold(),
+                    String.valueOf(stock.getQuantity()),
+                    String.valueOf(stock.getThreshold()),
                     stock.getGroupId(),
-                    stock.getCategory()
-            );
-            writer.write(line);
+                    stock.getCategory()));
             writer.newLine();
         } catch (IOException e) {
             throw new StorageException("Errore durante il salvataggio del prodotto", e);
@@ -62,39 +62,37 @@ public class FileSystemStockDAO implements StockDAO {
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (parts.length >= 4 && parts[0].equals(stockName) && parts[3].equals(groupId)) {
-                    String cat = (parts.length > 4) ? parts[4] : "Generico";
-                    String newLine = String.format("%s,%d,%s,%s,%s", parts[0], newQuantity, parts[2], parts[3], cat);
-                    lines.add(newLine);
+                String[] parts = CsvCodec.split(line);
+                if (parts.length >= 4 && parts[0].equalsIgnoreCase(stockName) && parts[3].equals(groupId)) {
+                    String category = parts.length > 4 ? parts[4] : "Generico";
+                    lines.add(CsvCodec.join(parts[0], String.valueOf(newQuantity), parts[2], parts[3], category));
                     found = true;
                 } else {
                     lines.add(line);
                 }
             }
         } catch (IOException e) {
-            throw new StorageException(e.getMessage());
+            throw new StorageException("Errore lettura file durante aggiornamento stock", e);
         }
 
-        if (found) {
-            try {
-                rewriteFile(lines);
-            } catch (IOException e) {
-                throw new StorageException("Errore scrittura file durante aggiornamento stock", e);
-            }
+        if (!found) {
+            throw new StorageException("Prodotto non trovato nel file system");
         }
+
+        rewriteFile(lines);
     }
 
     @Override
     public void deleteStock(String stockName, String groupId) throws StorageException {
         List<String> linesToKeep = new ArrayList<>();
+        boolean removed = false;
 
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                // Se corrisponde a nome E gruppo, lo saltiamo (delete)
-                if (parts.length >= 4 && parts[0].equals(stockName) && parts[3].equals(groupId)) {
+                String[] parts = CsvCodec.split(line);
+                if (parts.length >= 4 && parts[0].equalsIgnoreCase(stockName) && parts[3].equals(groupId)) {
+                    removed = true;
                     continue;
                 }
                 linesToKeep.add(line);
@@ -103,7 +101,11 @@ public class FileSystemStockDAO implements StockDAO {
             throw new StorageException("Errore lettura file per eliminazione", e);
         }
 
-        writeAllLines(linesToKeep);
+        if (!removed) {
+            throw new StorageException("Prodotto non trovato nel file system");
+        }
+
+        rewriteFile(linesToKeep);
     }
 
     @Override
@@ -111,6 +113,7 @@ public class FileSystemStockDAO implements StockDAO {
         try {
             return readAllInternal(groupId).stream()
                     .map(Stock::getCategory)
+                    .filter(category -> category != null && !category.isBlank())
                     .distinct()
                     .toList();
         } catch (IOException e) {
@@ -122,52 +125,47 @@ public class FileSystemStockDAO implements StockDAO {
     public List<Stock> getStocksByCategory(String groupUid, String category) throws StorageException {
         try {
             return readAllInternal(groupUid).stream()
-                    .filter(s -> s.getCategory().equalsIgnoreCase(category))
+                    .filter(stock -> stock.getCategory() != null && stock.getCategory().equalsIgnoreCase(category))
                     .toList();
         } catch (IOException e) {
             throw new StorageException("Errore recupero prodotti per categoria", e);
         }
     }
 
-    private void writeAllLines(List<String> lines) throws StorageException {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, false))) {
-            for (String s : lines) {
-                writer.write(s);
-                writer.newLine();
-            }
-        } catch (IOException e) {
-            throw new StorageException("Errore scrittura file", e);
-        }
-    }
-
     private List<Stock> readAllInternal(String groupUid) throws IOException {
         List<Stock> list = new ArrayList<>();
-        if (!file.exists() || groupUid == null) return list;
+        if (!file.exists() || groupUid == null) {
+            return list;
+        }
 
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                if (line.trim().isEmpty()) continue;
-                String[] parts = line.split(",");
+                if (line.trim().isEmpty()) {
+                    continue;
+                }
+                String[] parts = CsvCodec.split(line);
                 if (parts.length >= 4 && parts[3].equals(groupUid)) {
-                    String cat = (parts.length > 4) ? parts[4] : "Generico"; // Compatibilità vecchi file
-                    list.add(new Stock(parts[0], Integer.parseInt(parts[1]), Integer.parseInt(parts[2]), parts[3], cat));
+                    String category = parts.length > 4 ? parts[4] : "Generico";
+                    try {
+                        list.add(new Stock(parts[0], Integer.parseInt(parts[1]), Integer.parseInt(parts[2]), parts[3], category));
+                    } catch (NumberFormatException e) {
+                        throw new IOException("Riga stock malformata: " + line, e);
+                    }
                 }
             }
-        } catch (IOException e) {
-            throw new IOException("Errore nella scrittura del prodotto", e);
         }
         return list;
     }
 
-    private void rewriteFile(List<String> lines) throws IOException {
+    private void rewriteFile(List<String> lines) throws StorageException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, false))) {
-            for (String s : lines) {
-                writer.write(s);
+            for (String line : lines) {
+                writer.write(line);
                 writer.newLine();
             }
         } catch (IOException e) {
-            throw new IOException("Errore nella scrittura del file", e);
+            throw new StorageException("Errore scrittura file", e);
         }
     }
 }

@@ -1,7 +1,7 @@
 package com.stocktrack.view.fx.controller;
 
+import com.stocktrack.bean.UserProfileBean;
 import com.stocktrack.controller.ManageUsersController;
-import com.stocktrack.model.User;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -12,9 +12,9 @@ import javafx.scene.input.KeyCode;
 
 public class UsersGraphicalController {
 
-    @FXML private TableView<User> usersTable;
-    @FXML private TableColumn<User, String> usernameCol;
-    @FXML private TableColumn<User, String> roleCol;
+    @FXML private TableView<UserProfileBean> usersTable;
+    @FXML private TableColumn<UserProfileBean, String> usernameCol;
+    @FXML private TableColumn<UserProfileBean, String> roleCol;
 
     private final ManageUsersController controller = new ManageUsersController();
 
@@ -42,7 +42,7 @@ public class UsersGraphicalController {
 
     @FXML
     private void handleRemoveUser() {
-        User selected = usersTable.getSelectionModel().getSelectedItem();
+        UserProfileBean selected = usersTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
             showAlert("Attenzione", "Seleziona un utente da rimuovere.");
             return;

@@ -34,6 +34,10 @@
                 <fx:include fx:id="shoppingView" source="shopping_list.fxml"/>
             </Tab>
 
+            <Tab text="Attivita" onSelectionChanged="#refreshTabs">
+                <fx:include fx:id="activityView" source="activity_log.fxml"/>
+            </Tab>
+
             <Tab text="Gestione Utenti" fx:id="usersTab" onSelectionChanged="#refreshTabs">
                 <fx:include fx:id="usersView" source="users_view.fxml"/>
             </Tab>

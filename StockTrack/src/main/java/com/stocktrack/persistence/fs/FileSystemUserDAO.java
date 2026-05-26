@@ -5,7 +5,12 @@ import com.stocktrack.model.Role;
 import com.stocktrack.model.User;
 import com.stocktrack.persistence.dao.UserDAO;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -16,16 +21,12 @@ public class FileSystemUserDAO implements UserDAO {
     private final File file;
 
     public FileSystemUserDAO() {
-        this.file = new File(CSV_FILE_NAME);
+        this.file = new File(System.getProperty("stocktrack.fs.user.file", CSV_FILE_NAME));
         try {
             boolean isCreated = file.createNewFile();
-
             if (isCreated) {
                 logger.info("Nuovo file database creato: " + CSV_FILE_NAME);
-            } else {
-                logger.info("File database già esistente: " + CSV_FILE_NAME);
             }
-
         } catch (IOException e) {
             throw new IllegalStateException("Errore critico: Impossibile creare o accedere al file " + CSV_FILE_NAME, e);
         }
@@ -33,23 +34,10 @@ public class FileSystemUserDAO implements UserDAO {
 
     @Override
     public User findUserByUsername(String username) throws StorageException {
-        if (!file.exists()) {
-            return null;
-        }
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                if (line.trim().isEmpty()) {
-                    continue;
-                }
-                String[] parts = line.split(",");
-                if (parts.length >= 3 && parts[0].equals(username)) {
-                    String group = (parts.length > 3) ? parts[3] : null;
-                    return new User(parts[0], parts[1], Role.valueOf(parts[2]), group);
-                }
+        for (User user : getAllUsers()) {
+            if (user.getUsername().equals(username)) {
+                return user;
             }
-        } catch (IOException e) {
-            throw new StorageException("Errore ricerca utente", e);
         }
         return null;
     }
@@ -65,7 +53,7 @@ public class FileSystemUserDAO implements UserDAO {
 
     @Override
     public void updateUser(User user) throws StorageException {
-        List<User> users = getAllUsers(); // Riusiamo il metodo che lancia già StorageException
+        List<User> users = getAllUsers();
         boolean found = false;
 
         for (int i = 0; i < users.size(); i++) {
@@ -76,24 +64,33 @@ public class FileSystemUserDAO implements UserDAO {
             }
         }
 
-        if (found) {
-            rewriteFile(users);
+        if (!found) {
+            users.add(user);
         }
+        rewriteFile(users);
     }
 
     @Override
     public List<User> getAllUsers() throws StorageException {
         List<User> users = new ArrayList<>();
-        if (!file.exists()) return users;
+        if (!file.exists()) {
+            return users;
+        }
 
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                if (line.trim().isEmpty()) continue;
-                String[] parts = line.split(",");
+                if (line.trim().isEmpty()) {
+                    continue;
+                }
+                String[] parts = CsvCodec.split(line);
                 if (parts.length >= 3) {
-                    String group = (parts.length > 3) ? parts[3] : null;
-                    users.add(new User(parts[0], parts[1], Role.valueOf(parts[2]), group));
+                    String group = parts.length > 3 ? parts[3] : null;
+                    try {
+                        users.add(new User(parts[0], parts[1], Role.valueOf(parts[2]), group));
+                    } catch (IllegalArgumentException e) {
+                        throw new StorageException("Riga utente malformata: " + line, e);
+                    }
                 }
             }
         } catch (IOException e) {
@@ -105,7 +102,7 @@ public class FileSystemUserDAO implements UserDAO {
     @Override
     public void deleteUser(String username) throws StorageException {
         List<User> users = getAllUsers();
-        boolean removed = users.removeIf(u -> u.getUsername().equals(username));
+        boolean removed = users.removeIf(user -> user.getUsername().equals(username));
 
         if (removed) {
             rewriteFile(users);
@@ -114,8 +111,8 @@ public class FileSystemUserDAO implements UserDAO {
 
     private void rewriteFile(List<User> users) throws StorageException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, false))) {
-            for (User u : users) {
-                writeUserLine(writer, u);
+            for (User user : users) {
+                writeUserLine(writer, user);
             }
         } catch (IOException e) {
             throw new StorageException("Errore riscrittura utenti", e);
@@ -123,9 +120,7 @@ public class FileSystemUserDAO implements UserDAO {
     }
 
     private void writeUserLine(BufferedWriter writer, User user) throws IOException {
-        String line = String.format("%s,%s,%s,%s",
-                user.getUsername(), user.getPassword(), user.getRole(), user.getGroupId());
-        writer.write(line);
+        writer.write(CsvCodec.join(user.getUsername(), user.getPassword(), user.getRole().name(), user.getGroupId()));
         writer.newLine();
     }
 }

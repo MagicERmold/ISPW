@@ -3,12 +3,17 @@ package com.stocktrack.engineering.factory;
 import com.stocktrack.engineering.exception.StorageException;
 import com.stocktrack.persistence.dao.StockDAO;
 import com.stocktrack.persistence.dao.UserDAO;
+import com.stocktrack.persistence.dao.ActivityLogDAO;
+import com.stocktrack.persistence.db.DatabaseActivityLogDAO;
 import com.stocktrack.persistence.db.DatabaseStockDAO;
 import com.stocktrack.persistence.db.DatabaseUserDAO;
+import com.stocktrack.persistence.fs.FileSystemActivityLogDAO;
 import com.stocktrack.persistence.fs.FileSystemStockDAO;
 import com.stocktrack.persistence.fs.FileSystemUserDAO;
+import com.stocktrack.persistence.memory.InMemoryActivityLogDAO;
 import com.stocktrack.persistence.memory.InMemoryStockDAO;
 import com.stocktrack.persistence.memory.InMemoryUserDAO;
+import com.stocktrack.persistence.serial.SerializableActivityLogDAO;
 import com.stocktrack.persistence.serial.SerializableStockDAO;
 import com.stocktrack.persistence.serial.SerializableUserDAO;
 
@@ -45,6 +50,18 @@ public class DAOFactory {
             case "FULL-FS" -> new FileSystemUserDAO();
             case "FULL-SR" -> new SerializableUserDAO();
             case "FULL-DB" -> new DatabaseUserDAO();
+            default -> throw new IllegalArgumentException("Tipo di persistenza non valido: " + type);
+        };
+    }
+
+    public static ActivityLogDAO getActivityLogDAO() throws StorageException {
+        String type = readPersistenceTypeFromConfig();
+
+        return switch (type.toUpperCase()) {
+            case "DEMO" -> new InMemoryActivityLogDAO();
+            case "FULL-FS" -> new FileSystemActivityLogDAO();
+            case "FULL-SR" -> new SerializableActivityLogDAO();
+            case "FULL-DB" -> new DatabaseActivityLogDAO();
             default -> throw new IllegalArgumentException("Tipo di persistenza non valido: " + type);
         };
     }

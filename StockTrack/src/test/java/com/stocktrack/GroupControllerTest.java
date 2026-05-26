@@ -1,6 +1,7 @@
 package com.stocktrack;
 
 import com.stocktrack.controller.GroupController;
+import com.stocktrack.engineering.exception.StorageException;
 import com.stocktrack.engineering.factory.DAOFactory;
 import com.stocktrack.engineering.singleton.SessionManager;
 import com.stocktrack.model.Role;
@@ -17,14 +18,18 @@ class GroupControllerTest {
 
     private GroupController groupController;
     private final String testUsername = "groupTester";
+    private final String existingGroupOwner = "existingGroupOwner";
+    private final String existingGroupId = "GROUP_EXISTING_123";
 
     @BeforeEach
     void setUp() throws Exception {
         groupController = new GroupController();
 
         User user = new User(testUsername, "password", Role.USER, null);
+        User groupOwner = new User(existingGroupOwner, "password", Role.ADMIN, existingGroupId);
 
         DAOFactory.getUserDAO().saveUser(user);
+        DAOFactory.getUserDAO().saveUser(groupOwner);
 
         SessionManager.getInstance().login(user);
     }
@@ -32,6 +37,7 @@ class GroupControllerTest {
     @AfterEach
     void tearDown() throws Exception {
         DAOFactory.getUserDAO().deleteUser(testUsername);
+        DAOFactory.getUserDAO().deleteUser(existingGroupOwner);
         SessionManager.getInstance().logout();
     }
 
@@ -53,16 +59,25 @@ class GroupControllerTest {
 
     @Test
     void testJoinGroupSuccess() throws Exception {
-        String targetGroupUid = "GROUP_EXISTING_123";
-
-        groupController.joinGroup(targetGroupUid);
+        groupController.joinGroup(existingGroupId);
 
         User currentUser = SessionManager.getInstance().getCurrentUser();
         assertEquals(Role.USER, currentUser.getRole(), "Chi si unisce a un gruppo deve essere USER.");
-        assertEquals(targetGroupUid, currentUser.getGroupId(), "L'utente deve avere l'ID del gruppo target.");
+        assertEquals(existingGroupId, currentUser.getGroupId(), "L'utente deve avere l'ID del gruppo target.");
 
         UserDAO userDAO = DAOFactory.getUserDAO();
         User storedUser = userDAO.findUserByUsername(testUsername);
-        assertEquals(targetGroupUid, storedUser.getGroupId(), "L'ID del gruppo deve essere persistito nel database.");
+        assertEquals(existingGroupId, storedUser.getGroupId(), "L'ID del gruppo deve essere persistito nel database.");
+    }
+
+    @Test
+    void testJoinMissingGroupFails() {
+        assertThrows(StorageException.class, () -> groupController.joinGroup("GROUP_MISSING"));
+    }
+
+    @Test
+    void testCreateGroupWithoutLoginFails() {
+        SessionManager.getInstance().logout();
+        assertThrows(StorageException.class, () -> groupController.createGroup());
     }
 }

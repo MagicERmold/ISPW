@@ -1,13 +1,14 @@
 package com.stocktrack.view.cli;
 
 import com.stocktrack.bean.StockBean;
+import com.stocktrack.bean.ActivityLogBean;
+import com.stocktrack.controller.ActivityLogController;
 import com.stocktrack.controller.GroupController;
 import com.stocktrack.controller.ManageStockController;
 import com.stocktrack.controller.ManageUsersController;
+import com.stocktrack.controller.SessionController;
 import com.stocktrack.engineering.exception.StorageException;
-import com.stocktrack.engineering.singleton.SessionManager;
-import com.stocktrack.model.Role;
-import com.stocktrack.model.User;
+import com.stocktrack.bean.UserProfileBean;
 
 import java.util.List;
 
@@ -15,10 +16,12 @@ public class HomeCLI {
 
     // Istanzio il controller
     private final GroupController groupController = new GroupController();
+    private final ActivityLogController activityLogController = new ActivityLogController();
+    private final SessionController sessionController = new SessionController();
 
     public void start() {
         // Recupero l'utente corrente
-        User currentUser = SessionManager.getInstance().getCurrentUser();
+        UserProfileBean currentUser = sessionController.getCurrentUserProfile();
 
         // Utente non loggato
         if (currentUser == null) {
@@ -30,16 +33,17 @@ public class HomeCLI {
         InputHelper.print("Benvenuto, " + currentUser.getUsername() + " [" + currentUser.getRole() + "]");
 
         // Gestione Gruppo
-        if (currentUser.getGroupId() == null) {
+        if (!currentUser.hasGroup()) {
             handleGroupAssignment();
+            currentUser = sessionController.getCurrentUserProfile();
         }
 
         boolean loggedIn = true;
-        Role r =  currentUser.getRole();
+        boolean admin = currentUser != null && currentUser.isAdmin();
 
         while (loggedIn) {
             // Mostriamo opzioni diverse in base al ruolo
-            if (r == Role.ADMIN) {
+            if (admin) {
                 showAdminMenu();
             } else {
                 showUserMenu();
@@ -48,7 +52,7 @@ public class HomeCLI {
             // Gestione dell'ingresso
             // Legge input e delega la logica
             String input = InputHelper.readString(">> ");
-            loggedIn = processCommand(input, r);
+            loggedIn = processCommand(input, admin);
         }
     }
 
@@ -79,6 +83,7 @@ public class HomeCLI {
         InputHelper.print("1. Gestisci Magazzino (Stock)");
         InputHelper.print("2. Gestisci Utenti del Gruppo (Visualizza/Rimuovi)");
         InputHelper.print("3. Genera Lista Spesa (Sottoscorta)");
+        InputHelper.print("4. Visualizza Attivita Recenti");
         InputHelper.print("0. Logout");
     }
 
@@ -86,6 +91,7 @@ public class HomeCLI {
         InputHelper.print("\nCosa vuoi fare?");
         InputHelper.print("1. Gestisci Magazzino (Stock)");
         InputHelper.print("2. Genera Lista Spesa (Sottoscorta)");
+        InputHelper.print("3. Visualizza Attivita Recenti");
         InputHelper.print("0. Logout");
     }
 
@@ -121,14 +127,14 @@ public class HomeCLI {
         ManageUsersController userController = new ManageUsersController();
         InputHelper.print("\n--- GESTIONE UTENTI (TUO GRUPPO) ---");
         try {
-            List<User> users = userController.getMyGroupUsers();
+            List<UserProfileBean> users = userController.getMyGroupUsers();
 
             if (users.isEmpty()) {
                 InputHelper.print("Nessun altro utente trovato nel tuo gruppo.");
             } else {
                 InputHelper.printf2("%-15s | %-10s | %-15s%n", "USERNAME", "RUOLO", "GRUPPO");
                 InputHelper.print("------------------------------------------------");
-                for (User u : users) {
+                for (UserProfileBean u : users) {
                     InputHelper.printf2("%-15s | %-10s | %-15s%n", u.getUsername(), u.getRole(), (u.getGroupId() == null ? "N/A" : u.getGroupId()));
                 }
             }
@@ -148,18 +154,43 @@ public class HomeCLI {
         }
     }
 
-    private boolean processCommand(String input, Role role) {
+    private void showRecentActivities() {
+        InputHelper.print("\n--- ATTIVITA RECENTI ---");
+        try {
+            List<ActivityLogBean> activities = activityLogController.getRecentActivities();
+            if (activities.isEmpty()) {
+                InputHelper.print("Nessuna attivita registrata.");
+                return;
+            }
+
+            InputHelper.printf("%-17s | %-12s | %-10s | %-40s%n", "DATA", "UTENTE", "TIPO", "DESCRIZIONE");
+            InputHelper.print("--------------------------------------------------------------------------------");
+            for (ActivityLogBean activity : activities) {
+                InputHelper.printf("%-17s | %-12s | %-10s | %-40s%n",
+                        activity.getTimestamp(),
+                        activity.getUsername(),
+                        activity.getActionType(),
+                        activity.getDescription());
+            }
+        } catch (StorageException e) {
+            InputHelper.print("Errore nel recupero attivita: " + e.getMessage());
+        }
+    }
+
+    private boolean processCommand(String input, boolean admin) {
         switch (input) {
             case "1":
                 new StockCLI().start();
                 return true;
             case "2":
-                return handleOptionTwo(role);
+                return handleOptionTwo(admin);
             case "3":
-                return handleOptionThree(role);
+                return handleOptionThree(admin);
+            case "4":
+                return handleOptionFour(admin);
             case "0":
                 InputHelper.print("Logout effettuato.");
-                SessionManager.getInstance().logout();
+                sessionController.logout();
                 return false; // Ferma il ciclo while
             default:
                 InputHelper.print("Opzione non valida.");
@@ -167,8 +198,8 @@ public class HomeCLI {
         }
     }
 
-    private boolean handleOptionTwo(Role role) {
-        if (role == Role.ADMIN) {
+    private boolean handleOptionTwo(boolean admin) {
+        if (admin) {
             manageUsers();
         } else {
             generateShoppingList();
@@ -176,9 +207,18 @@ public class HomeCLI {
         return true;
     }
 
-    private boolean handleOptionThree(Role role) {
-        if (role == Role.ADMIN) {
+    private boolean handleOptionThree(boolean admin) {
+        if (admin) {
             generateShoppingList();
+        } else {
+            showRecentActivities();
+        }
+        return true;
+    }
+
+    private boolean handleOptionFour(boolean admin) {
+        if (admin) {
+            showRecentActivities();
         } else {
             InputHelper.print("Opzione non valida.");
         }

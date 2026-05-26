@@ -30,7 +30,7 @@ public class InMemoryStockDAO implements StockDAO {
     @Override
     public void updateStockQuantity(String stockName, int newQuantity, String groupUid) throws StorageException {
         for (Stock s : warehouse) {
-            if (s.getName().equals(stockName) && groupUid.equals(s.getGroupId())) {
+            if (s.getName().equalsIgnoreCase(stockName) && groupUid.equals(s.getGroupId())) {
                 s.setQuantity(newQuantity);
                 return;
             }
@@ -39,8 +39,11 @@ public class InMemoryStockDAO implements StockDAO {
     }
 
     @Override
-    public void deleteStock(String stockName, String groupUid) {
-        warehouse.removeIf(s -> s.getName().equals(stockName) && groupUid.equals(s.getGroupId()));
+    public void deleteStock(String stockName, String groupUid) throws StorageException {
+        boolean removed = warehouse.removeIf(s -> s.getName().equalsIgnoreCase(stockName) && groupUid.equals(s.getGroupId()));
+        if (!removed) {
+            throw new StorageException("Prodotto non trovato in memoria");
+        }
     }
 
     @Override
@@ -60,7 +63,7 @@ public class InMemoryStockDAO implements StockDAO {
         List<Stock> result = new ArrayList<>();
         if(groupId == null) return result;
         for (Stock s : warehouse) {
-            if (groupId.equals(s.getGroupId()) && category.equals(s.getCategory())) {
+            if (groupId.equals(s.getGroupId()) && s.getCategory() != null && s.getCategory().equalsIgnoreCase(category)) {
                 result.add(s);
             }
         }

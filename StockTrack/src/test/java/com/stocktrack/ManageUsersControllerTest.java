@@ -1,7 +1,9 @@
 package com.stocktrack;
 
+import com.stocktrack.bean.UserProfileBean;
 import com.stocktrack.controller.ManageUsersController;
 import com.stocktrack.engineering.exception.StorageException;
+import com.stocktrack.engineering.exception.UnauthorizedOperationException;
 import com.stocktrack.engineering.exception.UserNotFoundException;
 import com.stocktrack.engineering.factory.DAOFactory;
 import com.stocktrack.engineering.singleton.SessionManager;
@@ -66,7 +68,7 @@ class ManageUsersControllerTest {
         userDAO.saveUser(colleague);
         userDAO.saveUser(outsider);
 
-        List<User> groupUsers = manageUsersController.getMyGroupUsers();
+        List<UserProfileBean> groupUsers = manageUsersController.getMyGroupUsers();
 
 
         assertNotNull(groupUsers);
@@ -110,7 +112,21 @@ class ManageUsersControllerTest {
         User outsider = new User(outsiderName, "pass", Role.USER, "BetaTeam");
         userDAO.saveUser(outsider);
 
-        assertThrows(SecurityException.class, () -> manageUsersController.removeUserFromMyGroup(outsiderName), "Dovrebbe lanciare SecurityException se si tenta di rimuovere un utente di un altro gruppo.");
+        assertThrows(UnauthorizedOperationException.class, () -> manageUsersController.removeUserFromMyGroup(outsiderName), "Dovrebbe lanciare UnauthorizedOperationException se si tenta di rimuovere un utente di un altro gruppo.");
+    }
+
+    @Test
+    void testNonAdminCannotManageUsers() {
+        SessionManager.getInstance().login(new User("plainUser", "pass", Role.USER, testGroup));
+
+        assertThrows(UnauthorizedOperationException.class, () -> manageUsersController.getMyGroupUsers());
+    }
+
+    @Test
+    void testManageUsersWithoutLoginFails() {
+        SessionManager.getInstance().logout();
+
+        assertThrows(StorageException.class, () -> manageUsersController.getMyGroupUsers());
     }
 
     @Test

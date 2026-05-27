@@ -24,7 +24,7 @@ public class ActivityLogGraphicalController {
         usernameCol.setCellValueFactory(new PropertyValueFactory<>("username"));
         actionCol.setCellValueFactory(new PropertyValueFactory<>("actionType"));
         descriptionCol.setCellValueFactory(new PropertyValueFactory<>("description"));
-        loadData();
+        activityTable.setItems(FXCollections.observableArrayList());
     }
 
     public void loadData() {

@@ -42,7 +42,7 @@ public class RegisterGraphicalController {
             loginController.register(bean);
             showInfo("Registrazione completata", "Accesso in corso...");
             UserProfileBean currentUser = sessionController.getCurrentUserProfile();
-            if (currentUser == null || !currentUser.hasGroup()) {
+            if (currentUser == null || currentUser.hasGroup()) {
                 JavaFXApp.setRoot("group_selection");
             } else {
                 JavaFXApp.setRoot("home");

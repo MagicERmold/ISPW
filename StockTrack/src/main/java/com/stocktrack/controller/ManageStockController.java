@@ -11,11 +11,21 @@ import com.stocktrack.persistence.dao.StockDAO;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Controller applicativo per la gestione del magazzino del gruppo corrente.
+ * Valida i dati ricevuti dalla Boundary, coordina i DAO e registra le attivita principali.
+ */
 public class ManageStockController {
     private static final String ACTIVITY_TYPE_WAREHOUSE = "MAGAZZINO";
     private final ActivityLogController activityLogController = new ActivityLogController();
 
-    // Aggiunta nuova STOCK nel magazzino
+    /**
+     * Aggiunge un nuovo prodotto al magazzino del gruppo dell'utente corrente.
+     *
+     * @param bean dati del prodotto inseriti dalla Boundary
+     * @throws StorageException se la sessione o la persistenza non sono disponibili
+     * @throws InvalidProductDataException se i dati del prodotto non sono validi
+     */
     public void addStock(StockBean bean) throws StorageException, InvalidProductDataException {
         // Recupero l'utente e controllo se appartiene a un gruppo per sicurezza
         User user = SessionGuard.requireUserWithGroup();
@@ -48,13 +58,17 @@ public class ManageStockController {
                 "ha aggiunto " + bean.getQuantity() + " unita di " + bean.getNome());
     }
 
-    // Recupera categorie uniche
+    /**
+     * Recupera le categorie presenti nel magazzino del gruppo corrente.
+     */
     public List<String> getCategories() throws StorageException {
         User user = SessionGuard.requireUserWithGroup();
         return DAOFactory.getStockDAO().getAllCategories(user.getGroupId());
     }
 
-    // Filtra STOCKS e restituisce la lista delle STOCKS filtrate per categoria
+    /**
+     * Recupera i prodotti del gruppo corrente filtrati per categoria.
+     */
     public List<StockBean> getStocksByCategory(String category) throws StorageException {
         User user = SessionGuard.requireUserWithGroup();
         List<Stock> stocks = DAOFactory.getStockDAO().getStocksByCategory(user.getGroupId(), category);
@@ -66,7 +80,14 @@ public class ManageStockController {
         return beans;
     }
 
-    // Consuma (diminuisce) o Acquista (aumenta) STOCKS
+    /**
+     * Modifica la quantita di un prodotto registrando acquisti o consumi.
+     *
+     * @param productName nome del prodotto da aggiornare
+     * @param amountChange variazione da applicare, positiva per acquisto e negativa per consumo
+     * @throws StorageException se il prodotto non esiste o la persistenza non e disponibile
+     * @throws InvalidProductDataException se la variazione porterebbe la quantita sotto zero
+     */
     public void modifyQuantity(String productName, int amountChange) throws StorageException, InvalidProductDataException {
         User user = SessionGuard.requireUserWithGroup();
         StockDAO dao = DAOFactory.getStockDAO();
@@ -100,7 +121,9 @@ public class ManageStockController {
                 action + Math.abs(amountChange) + " unita di " + target.getName());
     }
 
-    // Recupero tutte le STOCKS dal database
+    /**
+     * Restituisce tutti i prodotti del magazzino associato al gruppo corrente.
+     */
     public List<StockBean> showAllStocks() throws StorageException {
         StockDAO dao = DAOFactory.getStockDAO();
         User user = SessionGuard.requireUserWithGroup();
@@ -114,7 +137,9 @@ public class ManageStockController {
         return stockBeans;
     }
 
-    // Genero la lista di prodotti sotto scorta
+    /**
+     * Genera la lista della spesa includendo i prodotti sotto la rispettiva soglia.
+     */
     public List<StockBean> getShoppingList() throws StorageException {
         // Recupero utente e il metodo di persistenza
         StockDAO dao = DAOFactory.getStockDAO();
@@ -133,7 +158,12 @@ public class ManageStockController {
         return shoppingList;
     }
 
-    // Cancella STOCK dal database
+    /**
+     * Elimina un prodotto dal magazzino del gruppo corrente.
+     *
+     * @param productName nome del prodotto da cancellare
+     * @throws StorageException se il prodotto non esiste o la persistenza non e disponibile
+     */
     public void deleteStock(String productName) throws StorageException {
         User user = SessionGuard.requireUserWithGroup();
         StockDAO dao = DAOFactory.getStockDAO();

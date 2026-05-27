@@ -1,0 +1,36 @@
+2026-05-27T21:43:15.067422100,activityTester,ACTIVITY_TEST_GROUP,TEST,ha eseguito una attivita di prova
+2026-05-27T21:43:15.119343900,groupTester,GROUP_groupTester,GRUPPO,ha creato il gruppo GROUP_groupTester
+2026-05-27T21:43:15.134132200,groupTester,GROUP_EXISTING_123,GRUPPO,si e unito al gruppo GROUP_EXISTING_123
+2026-05-27T21:43:15.267402800,stockTester,GROUP_TEST,MAGAZZINO,ha aggiunto 5 unita di DaCancellare
+2026-05-27T21:43:15.267402800,stockTester,GROUP_TEST,MAGAZZINO,ha eliminato il prodotto DaCancellare
+2026-05-27T21:43:15.284217600,stockTester,GROUP_TEST,MAGAZZINO,ha aggiunto 10 unita di Biscotti
+2026-05-27T21:43:15.300811300,stockTester,GROUP_TEST,MAGAZZINO,ha comprato 5 unita di Biscotti
+2026-05-27T21:43:15.330258400,stockTester,GROUP_TEST,MAGAZZINO,ha usato 3 unita di Biscotti
+2026-05-27T21:43:15.333824600,stockTester,GROUP_TEST,MAGAZZINO,ha aggiunto 2 unita di Acqua
+2026-05-27T21:43:15.350814300,stockTester,GROUP_TEST,MAGAZZINO,ha aggiunto 10 unita di Pane
+2026-05-27T21:43:15.367564,stockTester,GROUP_TEST,MAGAZZINO,ha aggiunto 3 unita di Vino
+2026-05-27T21:43:15.383884800,stockTester,GROUP_TEST,MAGAZZINO,ha aggiunto 10 unita di Pasta
+2026-05-27T21:43:15.383884800,stockTester,GROUP_TEST,MAGAZZINO,ha aggiunto 5 unita di Sale
+2026-05-27T21:43:15.401954800,stockTester,GROUP_TEST,MAGAZZINO,ha aggiunto 10 unita di Mela
+2026-05-27T21:43:15.417888900,stockTester,GROUP_TEST,MAGAZZINO,ha aggiunto 5 unita di Pera
+2026-05-27T21:43:15.417888900,stockTester,GROUP_TEST,MAGAZZINO,ha aggiunto 5 unita di Carota
+2026-05-27T21:43:15.434870600,stockTester,GROUP_TEST,MAGAZZINO,ha aggiunto 10 unita di Riso
+2026-05-27T21:43:15.551043200,adminUser,AlphaTeam,UTENTI,ha rimosso victim dal gruppo
+2026-05-27T21:44:11.136452200,activityTester,ACTIVITY_TEST_GROUP,TEST,ha eseguito una attivita di prova
+2026-05-27T21:44:11.187013100,groupTester,GROUP_groupTester,GRUPPO,ha creato il gruppo GROUP_groupTester
+2026-05-27T21:44:11.205379100,groupTester,GROUP_EXISTING_123,GRUPPO,si e unito al gruppo GROUP_EXISTING_123
+2026-05-27T21:44:11.319471,stockTester,GROUP_TEST,MAGAZZINO,ha aggiunto 5 unita di DaCancellare
+2026-05-27T21:44:11.319471,stockTester,GROUP_TEST,MAGAZZINO,ha eliminato il prodotto DaCancellare
+2026-05-27T21:44:11.336270300,stockTester,GROUP_TEST,MAGAZZINO,ha aggiunto 10 unita di Biscotti
+2026-05-27T21:44:11.336270300,stockTester,GROUP_TEST,MAGAZZINO,ha comprato 5 unita di Biscotti
+2026-05-27T21:44:11.352897800,stockTester,GROUP_TEST,MAGAZZINO,ha usato 3 unita di Biscotti
+2026-05-27T21:44:11.352897800,stockTester,GROUP_TEST,MAGAZZINO,ha aggiunto 2 unita di Acqua
+2026-05-27T21:44:11.352897800,stockTester,GROUP_TEST,MAGAZZINO,ha aggiunto 10 unita di Pane
+2026-05-27T21:44:11.352897800,stockTester,GROUP_TEST,MAGAZZINO,ha aggiunto 3 unita di Vino
+2026-05-27T21:44:11.369509100,stockTester,GROUP_TEST,MAGAZZINO,ha aggiunto 10 unita di Pasta
+2026-05-27T21:44:11.387446900,stockTester,GROUP_TEST,MAGAZZINO,ha aggiunto 5 unita di Sale
+2026-05-27T21:44:11.406485300,stockTester,GROUP_TEST,MAGAZZINO,ha aggiunto 10 unita di Mela
+2026-05-27T21:44:11.406485300,stockTester,GROUP_TEST,MAGAZZINO,ha aggiunto 5 unita di Pera
+2026-05-27T21:44:11.406485300,stockTester,GROUP_TEST,MAGAZZINO,ha aggiunto 5 unita di Carota
+2026-05-27T21:44:11.420069100,stockTester,GROUP_TEST,MAGAZZINO,ha aggiunto 10 unita di Riso
+2026-05-27T21:44:11.519856500,adminUser,AlphaTeam,UTENTI,ha rimosso victim dal gruppo

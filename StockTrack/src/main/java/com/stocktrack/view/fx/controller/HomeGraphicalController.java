@@ -14,6 +14,10 @@ import java.util.Optional;
 public class HomeGraphicalController {
 
     @FXML private Label welcomeLabel;
+    @FXML private Label operationFeedbackLabel;
+    @FXML private Tab stockTab;
+    @FXML private Tab shoppingTab;
+    @FXML private Tab activityTab;
     @FXML private Tab usersTab;
     @FXML private TabPane mainTabPane;
 
@@ -42,11 +46,17 @@ public class HomeGraphicalController {
 
     @FXML
     private void refreshTabs() {
-        // Ricarica i dati di TUTTE le viste quando cambi tab
-        if (stockViewController != null) stockViewController.loadData();
-        if (shoppingViewController != null) shoppingViewController.loadData();
-        if (activityViewController != null) activityViewController.loadData();
-        if (usersViewController != null) usersViewController.loadData();
+        Tab selectedTab = mainTabPane.getSelectionModel().getSelectedItem();
+        if (selectedTab == stockTab && stockViewController != null) {
+            stockViewController.loadData();
+        } else if (selectedTab == shoppingTab && shoppingViewController != null) {
+            shoppingViewController.loadData();
+        } else if (selectedTab == activityTab && activityViewController != null) {
+            activityViewController.loadData();
+        } else if (selectedTab == usersTab && usersViewController != null
+                && mainTabPane.getTabs().contains(usersTab)) {
+            usersViewController.loadData();
+        }
     }
 
     @FXML
@@ -95,6 +105,7 @@ public class HomeGraphicalController {
 
                 // 4. Aggiorna le viste
                 refreshTabs();
+                operationFeedbackLabel.setText(operationType + " registrato correttamente.");
 
             } catch (NumberFormatException e) {
                 showAlert(Alert.AlertType.ERROR, "Errore", "Inserisci un numero intero valido maggiore di 0.");

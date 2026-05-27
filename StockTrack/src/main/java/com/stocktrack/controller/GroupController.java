@@ -5,9 +5,20 @@ import com.stocktrack.model.Role;
 import com.stocktrack.model.User;
 import com.stocktrack.engineering.factory.DAOFactory;
 
+/**
+ * Controller applicativo responsabile della gestione del gruppo dell'utente corrente.
+ * Crea il gruppo per un nuovo amministratore o collega un utente a un gruppo esistente.
+ */
 public class GroupController {
     private final ActivityLogController activityLogController = new ActivityLogController();
 
+    /**
+     * Crea un gruppo associato all'utente autenticato e promuove tale utente ad amministratore.
+     *
+     * @return identificativo del gruppo creato
+     * @throws StorageException se la sessione non e valida, l'utente ha gia un gruppo
+     *                          o la persistenza non e disponibile
+     */
     public String createGroup() throws StorageException {
         // Recupero l'utente attuale da SessionManager
         User currentUser = SessionGuard.requireLoggedUser();
@@ -29,6 +40,13 @@ public class GroupController {
         return newGroupId;
     }
 
+    /**
+     * Collega l'utente autenticato a un gruppo gia esistente con ruolo USER.
+     *
+     * @param groupId identificativo del gruppo da raggiungere
+     * @throws StorageException se l'id non e valido, il gruppo non esiste
+     *                          o la persistenza non e disponibile
+     */
     public void joinGroup(String groupId) throws StorageException {
         // Recupero l'utente attuale
         User currentUser = SessionGuard.requireLoggedUser();
@@ -50,6 +68,9 @@ public class GroupController {
         activityLogController.recordActivity("GRUPPO", "si e unito al gruppo " + groupId);
     }
 
+    /**
+     * Controlla l'esistenza di un gruppo cercando almeno un utente associato a tale id.
+     */
     private boolean groupExists(String groupId) throws StorageException {
         for (User user : DAOFactory.getUserDAO().getAllUsers()) {
             if (groupId.equals(user.getGroupId())) {

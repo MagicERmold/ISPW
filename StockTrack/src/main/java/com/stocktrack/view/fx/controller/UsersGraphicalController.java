@@ -2,6 +2,7 @@ package com.stocktrack.view.fx.controller;
 
 import com.stocktrack.bean.UserProfileBean;
 import com.stocktrack.controller.ManageUsersController;
+import com.stocktrack.controller.SessionController;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -17,6 +18,7 @@ public class UsersGraphicalController {
     @FXML private TableColumn<UserProfileBean, String> roleCol;
 
     private final ManageUsersController controller = new ManageUsersController();
+    private final SessionController sessionController = new SessionController();
 
     @FXML
     public void initialize() {
@@ -29,10 +31,17 @@ public class UsersGraphicalController {
             }
         });
 
-        loadData();
+        if (isAdminSession()) {
+            loadData();
+        }
     }
 
     public void loadData() {
+        if (!isAdminSession()) {
+            usersTable.setItems(FXCollections.observableArrayList());
+            return;
+        }
+
         try {
             usersTable.setItems(FXCollections.observableArrayList(controller.getMyGroupUsers()));
         } catch (Exception e) {
@@ -62,5 +71,10 @@ public class UsersGraphicalController {
         alert.setTitle(title);
         alert.setContentText(content);
         alert.showAndWait();
+    }
+
+    private boolean isAdminSession() {
+        UserProfileBean currentUser = sessionController.getCurrentUserProfile();
+        return currentUser != null && currentUser.isAdmin();
     }
 }

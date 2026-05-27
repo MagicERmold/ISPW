@@ -3,6 +3,10 @@ package com.stocktrack.model;
 import java.io.Serial;
 import java.io.Serializable;
 
+/**
+ * Entity che rappresenta un utente registrato nel sistema.
+ * Contiene le informazioni persistenti usate da login, gruppi e autorizzazioni.
+ */
 public class User implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L; // Consigliato per evitare problemi di versione
@@ -20,7 +24,7 @@ public class User implements Serializable {
         this.username = username;
         this.password = password;
         this.role = role;
-        this.groupId = "null".equals(groupId) ? null : groupId;
+        this.groupId = groupId == null || groupId.isBlank() || "null".equals(groupId) ? null : groupId;
     }
 
     // GETTER e SETTER necessari

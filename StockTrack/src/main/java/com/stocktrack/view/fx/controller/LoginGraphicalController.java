@@ -42,7 +42,7 @@ public class LoginGraphicalController {
                 // Recuperiamo l'utente loggato per controllare il gruppo
                 UserProfileBean currentUser = sessionController.getCurrentUserProfile();
 
-                if (currentUser == null || !currentUser.hasGroup()) {
+                if (currentUser == null || currentUser.hasGroup()) {
                     // Se non ha un gruppo, lo mandiamo alla schermata di selezione
                     JavaFXApp.setRoot("group_selection");
                 } else {

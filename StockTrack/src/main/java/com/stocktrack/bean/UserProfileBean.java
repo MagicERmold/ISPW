@@ -1,5 +1,9 @@
 package com.stocktrack.bean;
 
+/**
+ * Bean di sola lettura usato per esporre alla Boundary le informazioni pubbliche
+ * dell'utente, senza passare direttamente l'entity User.
+ */
 public class UserProfileBean {
     private final String username;
     private final String role;
@@ -30,6 +34,6 @@ public class UserProfileBean {
     }
 
     public boolean hasGroup() {
-        return groupId != null && !groupId.isBlank();
+        return groupId == null || groupId.isBlank();
     }
 }

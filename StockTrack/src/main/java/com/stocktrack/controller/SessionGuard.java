@@ -6,10 +6,20 @@ import com.stocktrack.engineering.singleton.SessionManager;
 import com.stocktrack.model.Role;
 import com.stocktrack.model.User;
 
+/**
+ * Utility interna al layer Controller per centralizzare i controlli di sessione
+ * e autorizzazione richiesti dai casi d'uso applicativi.
+ */
 final class SessionGuard {
     private SessionGuard() {
     }
 
+    /**
+     * Verifica che esista un utente autenticato.
+     *
+     * @return utente presente nella sessione corrente
+     * @throws StorageException se l'utente non ha ancora effettuato il login
+     */
     static User requireLoggedUser() throws StorageException {
         User currentUser = SessionManager.getInstance().getCurrentUser();
         if (currentUser == null) {
@@ -18,6 +28,12 @@ final class SessionGuard {
         return currentUser;
     }
 
+    /**
+     * Verifica che l'utente autenticato appartenga a un gruppo.
+     *
+     * @return utente autenticato con gruppo associato
+     * @throws StorageException se la sessione non e valida o manca il gruppo
+     */
     static User requireUserWithGroup() throws StorageException {
         User currentUser = requireLoggedUser();
         if (currentUser.getGroupId() == null || currentUser.getGroupId().isBlank()) {
@@ -26,6 +42,13 @@ final class SessionGuard {
         return currentUser;
     }
 
+    /**
+     * Verifica che l'utente autenticato sia amministratore del proprio gruppo.
+     *
+     * @return utente amministratore con gruppo associato
+     * @throws StorageException se la sessione non e valida o l'utente non ha un gruppo
+     * @throws UnauthorizedOperationException se l'utente non ha privilegi di amministratore
+     */
     static User requireAdminWithGroup() throws StorageException {
         User currentUser = requireUserWithGroup();
         if (currentUser.getRole() != Role.ADMIN) {

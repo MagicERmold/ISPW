@@ -3,6 +3,9 @@ package com.stocktrack.model;
 import java.io.Serial;
 import java.io.Serializable;
 
+/**
+ * Entity che rappresenta un prodotto del magazzino associato a uno specifico gruppo.
+ */
 public class Stock implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
@@ -20,7 +23,6 @@ public class Stock implements Serializable {
         this.category = category;
     }
 
-    // GETTER e SETTER necessari
     public String getName() {
         return name;
     }

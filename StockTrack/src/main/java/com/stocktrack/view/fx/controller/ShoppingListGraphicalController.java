@@ -58,8 +58,7 @@ public class ShoppingListGraphicalController {
         // Inizializzazione del filtro
         setupFilter();
 
-        // Caricamento dati
-        loadData();
+        populateCategoryCombo(List.of());
     }
 
     private void setupFilter() {

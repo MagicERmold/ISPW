@@ -4,6 +4,9 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
+/**
+ * Entity che descrive un'attivita eseguita da un utente all'interno del proprio gruppo.
+ */
 public class ActivityLog implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;

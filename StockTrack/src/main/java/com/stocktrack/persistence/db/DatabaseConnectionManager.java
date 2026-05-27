@@ -11,6 +11,7 @@ final class DatabaseConnectionManager {
     private static final String DEFAULT_JDBC_URL = "jdbc:h2:./stocktrack-db";
     private static final String DEFAULT_JDBC_USER = "sa";
     private static final String DEFAULT_JDBC_PASSWORD = "";
+    private static String initializedUrl;
 
     private DatabaseConnectionManager() {
     }
@@ -18,7 +19,7 @@ final class DatabaseConnectionManager {
     static Connection getConnection() throws StorageException {
         try {
             return DriverManager.getConnection(
-                    System.getProperty("stocktrack.jdbc.url", DEFAULT_JDBC_URL),
+                    getJdbcUrl(),
                     System.getProperty("stocktrack.jdbc.user", DEFAULT_JDBC_USER),
                     System.getProperty("stocktrack.jdbc.password", DEFAULT_JDBC_PASSWORD)
             );
@@ -27,7 +28,12 @@ final class DatabaseConnectionManager {
         }
     }
 
-    static void initializeSchema() throws StorageException {
+    static synchronized void initializeSchema() throws StorageException {
+        String currentUrl = getJdbcUrl();
+        if (currentUrl.equals(initializedUrl)) {
+            return;
+        }
+
         try (Connection connection = getConnection();
              Statement statement = connection.createStatement()) {
             statement.executeUpdate("""
@@ -58,8 +64,13 @@ final class DatabaseConnectionManager {
                         created_at VARCHAR(40) NOT NULL
                     )
                     """);
+            initializedUrl = currentUrl;
         } catch (SQLException e) {
             throw new StorageException("Inizializzazione schema DBMS non riuscita", e);
         }
+    }
+
+    private static String getJdbcUrl() {
+        return System.getProperty("stocktrack.jdbc.url", DEFAULT_JDBC_URL);
     }
 }

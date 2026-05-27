@@ -10,8 +10,19 @@ import com.stocktrack.model.Role;
 import com.stocktrack.model.User;
 import com.stocktrack.persistence.dao.UserDAO;
 
+/**
+ * Controller applicativo per autenticazione e registrazione utenti.
+ * Coordina Boundary, DAO e SessionManager mantenendo la logica di login fuori dalla UI.
+ */
 public class LoginController {
 
+    /**
+     * Autentica un utente e apre la sessione se le credenziali sono corrette.
+     *
+     * @param userBean dati inseriti dalla Boundary
+     * @return true se il login riesce, false se username o password non sono validi
+     * @throws StorageException se la persistenza non e disponibile
+     */
     public boolean login(UserBean userBean) throws StorageException {
         // Recupero la modalità di persistenza
         UserDAO userDAO = DAOFactory.getUserDAO();
@@ -34,6 +45,14 @@ public class LoginController {
         return false;
     }
 
+    /**
+     * Registra un nuovo utente con ruolo base e apre la sessione dopo il salvataggio.
+     *
+     * @param userBean dati di registrazione ricevuti dalla Boundary
+     * @return true se la registrazione viene completata
+     * @throws DuplicateUserException se lo username e gia presente
+     * @throws StorageException se la persistenza non e disponibile
+     */
     public boolean register(UserBean userBean) throws DuplicateUserException, StorageException {
         // Recupero la modalità di persistenza
         UserDAO userDAO = DAOFactory.getUserDAO();

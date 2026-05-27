@@ -23,6 +23,11 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Factory centralizzata per la creazione dei DAO in base alla modalita di persistenza.
+ * Consente ai controller applicativi di lavorare sulle interfacce senza conoscere
+ * l'implementazione concreta selezionata nel file di configurazione.
+ */
 public class DAOFactory {
     private static final Logger logger = Logger.getLogger(DAOFactory.class.getName());
     private static final String CONFIG_FILE = "config.properties";
@@ -34,6 +39,9 @@ public class DAOFactory {
 
     private DAOFactory() {}
 
+    /**
+     * Crea il DAO responsabile della persistenza dei prodotti.
+     */
     public static StockDAO getStockDAO() throws StorageException {
         String type = readPersistenceTypeFromConfig();
 
@@ -46,6 +54,9 @@ public class DAOFactory {
         };
     }
 
+    /**
+     * Crea il DAO responsabile della persistenza degli utenti.
+     */
     public static UserDAO getUserDAO() throws StorageException {
         String type = readPersistenceTypeFromConfig();
 
@@ -58,6 +69,9 @@ public class DAOFactory {
         };
     }
 
+    /**
+     * Crea il DAO responsabile della persistenza del log attivita.
+     */
     public static ActivityLogDAO getActivityLogDAO() throws StorageException {
         String type = readPersistenceTypeFromConfig();
 
@@ -70,6 +84,9 @@ public class DAOFactory {
         };
     }
 
+    /**
+     * Legge la modalita di persistenza configurata; in caso di errore usa la demo in memoria.
+     */
     private static String readPersistenceTypeFromConfig()  {
         Properties prop = new Properties();
 

@@ -22,15 +22,25 @@ public class StockGraphicalController {
     @FXML private TableColumn<StockBean, String> colStatus;
 
     @FXML private TextField txtName;
-    @FXML private TextField txtCategory;
+    @FXML private ComboBox<String> cmbProductCategory;
     @FXML private TextField txtQuantity;
     @FXML private TextField txtThreshold;
 
+    @FXML private Label totalProductsLabel;
+    @FXML private Label lowStockProductsLabel;
+    @FXML private Label emptyProductsLabel;
+    @FXML private Label feedbackLabel;
+    @FXML private TextField txtSearch;
     @FXML private ComboBox<String> cmbFilterCategory;
+    @FXML private ComboBox<String> cmbFilterStatus;
 
     private final ManageStockController controller = new ManageStockController();
+    private final ObservableList<StockBean> allStockData = FXCollections.observableArrayList();
     private final ObservableList<StockBean> tableData = FXCollections.observableArrayList();
     private static final String ALL = "Tutte";
+    private static final String STATUS_AVAILABLE = "Disponibili";
+    private static final String STATUS_LOW = "Sotto soglia";
+    private static final String STATUS_EMPTY = "Esauriti";
 
     @FXML
     public void initialize() {
@@ -59,9 +69,14 @@ public class StockGraphicalController {
 
         applyNumericFormatter(txtQuantity);
         applyNumericFormatter(txtThreshold);
+        cmbProductCategory.setEditable(false);
+        cmbFilterStatus.setItems(FXCollections.observableArrayList(ALL, STATUS_AVAILABLE, STATUS_LOW, STATUS_EMPTY));
+        cmbFilterStatus.setValue(ALL);
 
-        // Listener per il filtro: quando cambi categoria, ricarica la tabella
-        cmbFilterCategory.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> loadStocks());
+        // I filtri lavorano sui dati gia caricati, evitando query inutili alla persistenza.
+        txtSearch.textProperty().addListener((obs, oldVal, newVal) -> applyFilters());
+        cmbFilterCategory.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> applyFilters());
+        cmbFilterStatus.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> applyFilters());
 
         loadCategories(); // Carica le categorie nel menu a tendina
         loadStocks();     // Carica i dati iniziali
@@ -96,39 +111,87 @@ public class StockGraphicalController {
             } else {
                 cmbFilterCategory.setValue(ALL);
             }
+            refreshProductCategories(categories);
         } catch (Exception e) {
             showAlert(Alert.AlertType.ERROR, "Errore", "Impossibile caricare categorie: " + e.getMessage());
         }
     }
 
+    private void refreshProductCategories(List<String> categories) {
+        String currentSelection = cmbProductCategory.getValue();
+        cmbProductCategory.setItems(FXCollections.observableArrayList(categories));
+        if (currentSelection != null && categories.contains(currentSelection)) {
+            cmbProductCategory.setValue(currentSelection);
+        }
+    }
+
     private void loadStocks() {
         try {
-            tableData.clear();
-            List<StockBean> stocks;
-
-            String selectedCat = cmbFilterCategory.getValue();
-
-            // Logica di filtro
-            if (selectedCat == null || selectedCat.equals(ALL) || selectedCat.isEmpty()) {
-                stocks = controller.showAllStocks();
-            } else {
-                stocks = controller.getStocksByCategory(selectedCat);
-            }
-
-            tableData.addAll(stocks);
+            allStockData.setAll(controller.showAllStocks());
+            updateDashboard();
+            applyFilters();
         } catch (Exception e) {
             showAlert(Alert.AlertType.ERROR, "Errore caricamento", e.getMessage());
         }
+    }
+
+    private void applyFilters() {
+        String searchText = txtSearch.getText() == null ? "" : txtSearch.getText().trim().toLowerCase();
+        String selectedCategory = cmbFilterCategory.getValue();
+        String selectedStatus = cmbFilterStatus.getValue();
+
+        tableData.setAll(allStockData.stream()
+                .filter(stock -> matchesSearch(stock, searchText))
+                .filter(stock -> selectedCategory == null || selectedCategory.equals(ALL)
+                        || selectedCategory.equalsIgnoreCase(stock.getCategory()))
+                .filter(stock -> matchesStatus(stock, selectedStatus))
+                .toList());
+    }
+
+    private boolean matchesSearch(StockBean stock, String searchText) {
+        if (searchText.isEmpty()) {
+            return true;
+        }
+        String category = stock.getCategory() == null ? "" : stock.getCategory();
+        return stock.getNome().toLowerCase().contains(searchText)
+                || category.toLowerCase().contains(searchText);
+    }
+
+    private boolean matchesStatus(StockBean stock, String selectedStatus) {
+        if (selectedStatus == null || selectedStatus.equals(ALL)) {
+            return true;
+        }
+        return switch (selectedStatus) {
+            case STATUS_AVAILABLE -> !stock.isBelowThreshold() && !stock.isEmpty();
+            case STATUS_LOW -> stock.isBelowThreshold() && !stock.isEmpty();
+            case STATUS_EMPTY -> stock.isEmpty();
+            default -> true;
+        };
+    }
+
+    private void updateDashboard() {
+        int total = allStockData.size();
+        long lowStock = allStockData.stream()
+                .filter(stock -> stock.isBelowThreshold() && !stock.isEmpty())
+                .count();
+        long empty = allStockData.stream()
+                .filter(StockBean::isEmpty)
+                .count();
+
+        totalProductsLabel.setText(String.valueOf(total));
+        lowStockProductsLabel.setText(String.valueOf(lowStock));
+        emptyProductsLabel.setText(String.valueOf(empty));
     }
 
     @FXML
     private void handleAddStock() {
         try {
             String name = txtName.getText().trim();
-            String cat = txtCategory.getText().trim(); // Leggiamo la categoria
+            String cat = cmbProductCategory.getValue();
             int qty = Integer.parseInt(txtQuantity.getText());
             int thr = Integer.parseInt(txtThreshold.getText());
 
+            cat = cat == null ? "" : cat.trim();
             if (name.isEmpty() || cat.isEmpty()) {
                 showAlert(Alert.AlertType.WARNING, "Attenzione", "Nome e Categoria sono obbligatori.");
                 return;
@@ -140,7 +203,7 @@ public class StockGraphicalController {
 
             // Pulizia campi
             txtName.clear();
-            txtCategory.clear();
+            cmbProductCategory.setValue(null);
             txtQuantity.clear();
             txtThreshold.clear();
 
@@ -149,12 +212,36 @@ public class StockGraphicalController {
             // Seleziona la nuova categoria o "Tutte" per mostrare l'inserimento
             cmbFilterCategory.setValue(ALL);
             loadStocks();
+            showFeedback("Prodotto aggiunto correttamente.");
 
         } catch (NumberFormatException e) {
             showAlert(Alert.AlertType.ERROR, "Errore Input", "Quantità e Soglia devono essere numeri interi.");
         } catch (Exception e) {
             showAlert(Alert.AlertType.ERROR, "Errore ", e.getMessage());
         }
+    }
+
+    @FXML
+    private void handleAddCategory() {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Nuova categoria");
+        dialog.setHeaderText(null);
+        dialog.setContentText("Nome categoria:");
+
+        dialog.showAndWait()
+                .map(String::trim)
+                .filter(category -> !category.isEmpty())
+                .ifPresent(this::addCategoryOption);
+    }
+
+    private void addCategoryOption(String category) {
+        boolean alreadyPresent = cmbProductCategory.getItems().stream()
+                .anyMatch(existing -> existing.equalsIgnoreCase(category));
+        if (!alreadyPresent) {
+            cmbProductCategory.getItems().add(category);
+        }
+        cmbProductCategory.setValue(category);
+        showFeedback("Categoria pronta per l'inserimento.");
     }
 
     @FXML
@@ -172,6 +259,7 @@ public class StockGraphicalController {
                     controller.deleteStock(selected.getNome());
                     loadStocks(); // Ricarica tabella
                     loadCategories(); // Potrebbe essere sparita una categoria
+                    showFeedback("Prodotto rimosso correttamente.");
                 } catch (Exception e) {
                     showAlert(Alert.AlertType.ERROR, "Errore  ", e.getMessage());
                 }
@@ -185,6 +273,10 @@ public class StockGraphicalController {
         alert.setHeaderText(null);
         alert.setContentText(content);
         alert.showAndWait();
+    }
+
+    private void showFeedback(String message) {
+        feedbackLabel.setText(message);
     }
 
     public StockBean getSelectedStock() {

@@ -21,20 +21,21 @@
             <Button onAction="#handlePurchase" styleClass="primary-button" text="+ Acquisto" />
             <Button onAction="#handleConsumption" styleClass="danger-button" text="- Consumo" />
 
+            <Label fx:id="operationFeedbackLabel" styleClass="feedback-label" text="" />
             <Button onAction="#handleLogout" styleClass="secondary-button" text="Logout" />
         </HBox>
     </top>
     <center>
         <TabPane fx:id="mainTabPane" styleClass="main-tabs" tabClosingPolicy="UNAVAILABLE">
-            <Tab text="Magazzino" onSelectionChanged="#refreshTabs">
+            <Tab fx:id="stockTab" text="Magazzino" onSelectionChanged="#refreshTabs">
                 <fx:include fx:id="stockView" source="stock_view.fxml"/>
             </Tab>
 
-            <Tab text="Lista Spesa (Sottoscorta)" onSelectionChanged="#refreshTabs">
+            <Tab fx:id="shoppingTab" text="Lista Spesa (Sottoscorta)" onSelectionChanged="#refreshTabs">
                 <fx:include fx:id="shoppingView" source="shopping_list.fxml"/>
             </Tab>
 
-            <Tab text="Attivita" onSelectionChanged="#refreshTabs">
+            <Tab fx:id="activityTab" text="Attivita" onSelectionChanged="#refreshTabs">
                 <fx:include fx:id="activityView" source="activity_log.fxml"/>
             </Tab>
 

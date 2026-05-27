@@ -145,6 +145,61 @@
     -fx-text-fill: #667085;
 }
 
+.dashboard-tile {
+    -fx-background-color: #f7fafc;
+    -fx-background-radius: 7px;
+    -fx-border-color: #e3e8ef;
+    -fx-border-radius: 7px;
+    -fx-padding: 10 12 10 12;
+}
+
+.dashboard-label {
+    -fx-font-size: 12px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #667085;
+}
+
+.dashboard-value {
+    -fx-font-size: 22px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #12343b;
+}
+
+.legend-bar {
+    -fx-padding: 0 4 0 4;
+}
+
+.legend-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: #667085;
+}
+
+.legend-dot-low,
+.legend-dot-empty {
+    -fx-min-width: 14px;
+    -fx-min-height: 14px;
+    -fx-max-width: 14px;
+    -fx-max-height: 14px;
+    -fx-background-radius: 4px;
+}
+
+.legend-dot-low {
+    -fx-background-color: #fff7e6;
+    -fx-border-color: #f0b429;
+    -fx-border-radius: 4px;
+}
+
+.legend-dot-empty {
+    -fx-background-color: #fff1f0;
+    -fx-border-color: #d92d20;
+    -fx-border-radius: 4px;
+}
+
+.feedback-label {
+    -fx-text-fill: #1b7f79;
+    -fx-font-weight: 800;
+}
+
 .choice-panel {
     -fx-background-color: #f7fafc;
     -fx-background-radius: 8px;

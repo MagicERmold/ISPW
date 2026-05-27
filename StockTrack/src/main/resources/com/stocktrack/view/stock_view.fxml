@@ -13,9 +13,36 @@
             <HBox alignment="CENTER_LEFT" spacing="12.0">
                 <Label styleClass="section-title" text="Magazzino" />
                 <Region HBox.hgrow="ALWAYS" />
+                <HBox alignment="CENTER_LEFT" spacing="8.0" styleClass="legend-bar">
+                    <Label styleClass="legend-dot-low" text=" " />
+                    <Label styleClass="legend-label" text="Sotto soglia" />
+                    <Label styleClass="legend-dot-empty" text=" " />
+                    <Label styleClass="legend-label" text="Esaurito" />
+                </HBox>
+                <Button onAction="#handleRefresh" styleClass="secondary-button" text="Aggiorna" />
+            </HBox>
+
+            <HBox alignment="CENTER_LEFT" spacing="10.0">
+                <VBox styleClass="dashboard-tile" HBox.hgrow="ALWAYS">
+                    <Label styleClass="dashboard-label" text="Prodotti totali" />
+                    <Label fx:id="totalProductsLabel" styleClass="dashboard-value" text="0" />
+                </VBox>
+                <VBox styleClass="dashboard-tile" HBox.hgrow="ALWAYS">
+                    <Label styleClass="dashboard-label" text="Sotto soglia" />
+                    <Label fx:id="lowStockProductsLabel" styleClass="dashboard-value" text="0" />
+                </VBox>
+                <VBox styleClass="dashboard-tile" HBox.hgrow="ALWAYS">
+                    <Label styleClass="dashboard-label" text="Esauriti" />
+                    <Label fx:id="emptyProductsLabel" styleClass="dashboard-value" text="0" />
+                </VBox>
+            </HBox>
+
+            <HBox alignment="CENTER_LEFT" spacing="12.0">
+                <TextField fx:id="txtSearch" HBox.hgrow="ALWAYS" promptText="Cerca per nome o categoria" />
                 <Label styleClass="field-label" text="Categoria" />
                 <ComboBox fx:id="cmbFilterCategory" prefWidth="180" promptText="Tutte" />
-                <Button onAction="#handleRefresh" styleClass="secondary-button" text="Aggiorna" />
+                <Label styleClass="field-label" text="Stato" />
+                <ComboBox fx:id="cmbFilterStatus" prefWidth="160" promptText="Tutte" />
             </HBox>
         </VBox>
     </top>
@@ -46,13 +73,15 @@
 
             <HBox alignment="CENTER_LEFT" spacing="10.0">
                 <TextField fx:id="txtName" HBox.hgrow="ALWAYS" promptText="Nome prodotto"/>
-                <TextField fx:id="txtCategory" HBox.hgrow="ALWAYS" promptText="Categoria"/>
+                <ComboBox fx:id="cmbProductCategory" HBox.hgrow="ALWAYS" promptText="Categoria"/>
+                <Button onAction="#handleAddCategory" styleClass="secondary-button" text="+ Categoria"/>
                 <TextField fx:id="txtQuantity" prefWidth="100" promptText="Quantita"/>
                 <TextField fx:id="txtThreshold" prefWidth="100" promptText="Soglia"/>
                 <Button onAction="#handleAddStock" styleClass="primary-button" text="Aggiungi"/>
             </HBox>
 
             <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                <Label fx:id="feedbackLabel" HBox.hgrow="ALWAYS" styleClass="feedback-label" text="" />
                 <Button onAction="#handleDeleteStock" styleClass="danger-button" text="Rimuovi selezionato"/>
             </HBox>
         </VBox>

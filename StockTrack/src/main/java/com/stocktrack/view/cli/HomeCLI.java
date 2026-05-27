@@ -33,7 +33,7 @@ public class HomeCLI {
         InputHelper.print("Benvenuto, " + currentUser.getUsername() + " [" + currentUser.getRole() + "]");
 
         // Gestione Gruppo
-        if (!currentUser.hasGroup()) {
+        if (currentUser.hasGroup()) {
             handleGroupAssignment();
             currentUser = sessionController.getCurrentUserProfile();
         }

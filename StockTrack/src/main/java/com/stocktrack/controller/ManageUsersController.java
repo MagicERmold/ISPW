@@ -10,10 +10,19 @@ import com.stocktrack.model.User;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Controller applicativo per la gestione degli utenti appartenenti al gruppo corrente.
+ * Le operazioni sono riservate agli amministratori e restituiscono bean alla Boundary.
+ */
 public class ManageUsersController {
     private final ActivityLogController activityLogController = new ActivityLogController();
 
-    // Recupera la lista di utenti che si trovano nello stesso gruppo dell'ADMIN
+    /**
+     * Recupera gli utenti appartenenti allo stesso gruppo dell'amministratore autenticato.
+     *
+     * @return lista dei profili utente del gruppo
+     * @throws StorageException se la sessione non e valida o la persistenza non e disponibile
+     */
     public List<UserProfileBean> getMyGroupUsers() throws StorageException {
         // Recupero l'ADMIN e il suo gruppo associato
         User currentUser = SessionGuard.requireAdminWithGroup();
@@ -36,7 +45,12 @@ public class ManageUsersController {
         return groupUsers;
     }
 
-    // ADMIN: elimina gli utenti dal gruppo dell'ADMIN
+    /**
+     * Rimuove dal gruppo un utente gestito dall'amministratore corrente.
+     *
+     * @param usernameToRemove username dell'utente da rimuovere
+     * @throws StorageException se la sessione non e valida o l'aggiornamento fallisce
+     */
     public void removeUserFromMyGroup(String usernameToRemove) throws StorageException{
         // Recupero l'ADMIN
         User currentUser = SessionGuard.requireAdminWithGroup();

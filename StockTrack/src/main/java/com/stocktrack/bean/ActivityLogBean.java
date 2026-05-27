@@ -1,6 +1,8 @@
 package com.stocktrack.bean;
 
-// Test
+/**
+ * Bean usato dalla Boundary per visualizzare un'attivita gia formattata.
+ */
 public class ActivityLogBean {
     private final String username;
     private final String actionType;

@@ -73,8 +73,10 @@
 
             <HBox alignment="CENTER_LEFT" spacing="10.0">
                 <TextField fx:id="txtName" HBox.hgrow="ALWAYS" promptText="Nome prodotto"/>
-                <ComboBox fx:id="cmbProductCategory" HBox.hgrow="ALWAYS" promptText="Categoria"/>
-                <Button onAction="#handleAddCategory" styleClass="secondary-button" text="+ Categoria"/>
+                <VBox minWidth="220" prefWidth="220" maxWidth="220" spacing="6.0">
+                    <ComboBox fx:id="cmbProductCategory" maxWidth="Infinity" promptText="Categoria"/>
+                    <Button maxWidth="Infinity" onAction="#handleAddCategory" styleClass="secondary-button" text="+ Categoria"/>
+                </VBox>
                 <TextField fx:id="txtQuantity" prefWidth="100" promptText="Quantita"/>
                 <TextField fx:id="txtThreshold" prefWidth="100" promptText="Soglia"/>
                 <Button onAction="#handleAddStock" styleClass="primary-button" text="Aggiungi"/>

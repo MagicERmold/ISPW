@@ -18,6 +18,7 @@
         <Region HBox.hgrow="ALWAYS" />
         <Label styleClass="field-label" text="Categoria" />
         <ComboBox fx:id="cmbFilterCategory" prefWidth="180" promptText="Tutte le Categorie" />
+        <Button onAction="#handleSimulatePurchase" styleClass="primary-button" text="Simula acquisto" />
     </HBox>
 
 

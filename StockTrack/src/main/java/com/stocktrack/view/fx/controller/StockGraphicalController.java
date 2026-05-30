@@ -10,6 +10,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.UnaryOperator;
 
 public class StockGraphicalController {
@@ -69,6 +70,8 @@ public class StockGraphicalController {
 
         applyNumericFormatter(txtQuantity);
         applyNumericFormatter(txtThreshold);
+        applyUppercaseFormatter(txtName);
+        applyUppercaseFormatter(txtSearch);
         cmbProductCategory.setEditable(false);
         cmbFilterStatus.setItems(FXCollections.observableArrayList(ALL, STATUS_AVAILABLE, STATUS_LOW, STATUS_EMPTY));
         cmbFilterStatus.setValue(ALL);
@@ -95,7 +98,12 @@ public class StockGraphicalController {
 
     private void loadCategories() {
         try {
-            List<String> categories = controller.getCategories();
+            List<String> categories = controller.getCategories().stream()
+                    .filter(category -> category != null && !category.isBlank())
+                    .map(category -> category.trim().toUpperCase(Locale.ROOT))
+                    .distinct()
+                    .sorted()
+                    .toList();
             // Aggiungiamo un'opzione per vedere tutto
             List<String> filterOptions = new ArrayList<>();
             filterOptions.add(ALL);
@@ -186,12 +194,12 @@ public class StockGraphicalController {
     @FXML
     private void handleAddStock() {
         try {
-            String name = txtName.getText().trim();
+            String name = txtName.getText().trim().toUpperCase(Locale.ROOT);
             String cat = cmbProductCategory.getValue();
             int qty = Integer.parseInt(txtQuantity.getText());
             int thr = Integer.parseInt(txtThreshold.getText());
 
-            cat = cat == null ? "" : cat.trim();
+            cat = cat == null ? "" : cat.trim().toUpperCase(Locale.ROOT);
             if (name.isEmpty() || cat.isEmpty()) {
                 showAlert(Alert.AlertType.WARNING, "Attenzione", "Nome e Categoria sono obbligatori.");
                 return;
@@ -227,9 +235,11 @@ public class StockGraphicalController {
         dialog.setTitle("Nuova categoria");
         dialog.setHeaderText(null);
         dialog.setContentText("Nome categoria:");
+        applyUppercaseFormatter(dialog.getEditor());
 
         dialog.showAndWait()
                 .map(String::trim)
+                .map(category -> category.toUpperCase(Locale.ROOT))
                 .filter(category -> !category.isEmpty())
                 .ifPresent(this::addCategoryOption);
     }
@@ -292,5 +302,13 @@ public class StockGraphicalController {
             return newText.matches("\\d*") ? change : null;
         };
         field.setTextFormatter(new TextFormatter<>(integerFilter));
+    }
+
+    private void applyUppercaseFormatter(TextInputControl field) {
+        UnaryOperator<TextFormatter.Change> uppercaseFilter = change -> {
+            change.setText(change.getText().toUpperCase(Locale.ROOT));
+            return change;
+        };
+        field.setTextFormatter(new TextFormatter<>(uppercaseFilter));
     }
 }

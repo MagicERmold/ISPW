@@ -90,6 +90,15 @@ public class ShoppingListGraphicalController {
         }
     }
 
+    @FXML
+    private void handleSimulatePurchase() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Acquisto prodotti");
+        alert.setHeaderText(null);
+        alert.setContentText("Collegamento con i fornitori in corso...\nFunzione ancora da implementare.");
+        alert.showAndWait();
+    }
+
     private void populateCategoryCombo(List<StockBean> list) {
         // Estraiamo le categorie uniche
         List<String> categories = list.stream()

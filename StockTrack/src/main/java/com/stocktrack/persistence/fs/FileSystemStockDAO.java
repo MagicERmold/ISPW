@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 
 public class FileSystemStockDAO implements StockDAO {
     private static final String CSV_FILE_NAME = "stocks.csv";
+    private static final String GENERICO = "generico";
     private static final Logger logger = Logger.getLogger(FileSystemStockDAO.class.getName());
     private final File file = new File(System.getProperty("stocktrack.fs.stock.file", CSV_FILE_NAME));
 
@@ -64,7 +65,7 @@ public class FileSystemStockDAO implements StockDAO {
             while ((line = reader.readLine()) != null) {
                 String[] parts = CsvCodec.split(line);
                 if (parts.length >= 4 && parts[0].equalsIgnoreCase(stockName) && parts[3].equals(groupId)) {
-                    String category = parts.length > 4 ? parts[4] : "Generico";
+                    String category = parts.length > 4 ? parts[4] : GENERICO;
                     lines.add(CsvCodec.join(parts[0], String.valueOf(newQuantity), parts[2], parts[3], category));
                     found = true;
                 } else {
@@ -92,7 +93,7 @@ public class FileSystemStockDAO implements StockDAO {
             while ((line = reader.readLine()) != null) {
                 String[] parts = CsvCodec.split(line);
                 if (parts.length >= 4 && parts[0].equalsIgnoreCase(stockName) && parts[3].equals(groupId)) {
-                    String category = parts.length > 4 ? parts[4] : "Generico";
+                    String category = parts.length > 4 ? parts[4] : GENERICO;
                     lines.add(CsvCodec.join(parts[0], parts[1], String.valueOf(newThreshold), parts[3], category));
                     found = true;
                 } else {
@@ -174,7 +175,7 @@ public class FileSystemStockDAO implements StockDAO {
                 }
                 String[] parts = CsvCodec.split(line);
                 if (parts.length >= 4 && parts[3].equals(groupUid)) {
-                    String category = parts.length > 4 ? parts[4] : "Generico";
+                    String category = parts.length > 4 ? parts[4] : GENERICO;
                     try {
                         list.add(new Stock(parts[0], Integer.parseInt(parts[1]), Integer.parseInt(parts[2]), parts[3], category));
                     } catch (NumberFormatException e) {

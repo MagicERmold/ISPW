@@ -17,7 +17,7 @@
             </padding>
             <Label styleClass="brand-title" text="StockTrack" />
             <Label styleClass="brand-subtitle" text="Inventario, gruppi e lista spesa in un unico spazio." wrapText="true" />
-            <Label styleClass="brand-chip" text="DEMO / FULL / DBMS" />
+            <Label fx:id="persistenceTypeLabel" styleClass="brand-chip" />
         </VBox>
 
         <VBox alignment="CENTER_LEFT" prefWidth="430.0" spacing="16.0" styleClass="auth-card">

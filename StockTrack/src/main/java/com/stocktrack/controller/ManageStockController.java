@@ -15,7 +15,7 @@ import java.util.List;
  * Controller applicativo per la gestione del magazzino del gruppo corrente.
  * Valida i dati ricevuti dalla Boundary, coordina i DAO e registra le attivita principali.
  */
-public class ManageStockController {
+public class ManageStockController {    
     private static final String ACTIVITY_TYPE_WAREHOUSE = "MAGAZZINO";
     private final ActivityLogController activityLogController = new ActivityLogController();
 

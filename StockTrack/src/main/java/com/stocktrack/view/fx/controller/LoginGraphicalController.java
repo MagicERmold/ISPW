@@ -5,9 +5,11 @@ import com.stocktrack.bean.UserProfileBean;
 import com.stocktrack.controller.LoginController;
 import com.stocktrack.controller.SessionController;
 import com.stocktrack.engineering.exception.StorageException;
+import com.stocktrack.engineering.factory.DAOFactory;
 import com.stocktrack.view.fx.JavaFXApp;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
@@ -17,9 +19,15 @@ public class LoginGraphicalController {
 
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
+    @FXML private Label persistenceTypeLabel;
 
     private final LoginController loginLogic = new LoginController();
     private final SessionController sessionController = new SessionController();
+
+    @FXML
+    private void initialize() {
+        persistenceTypeLabel.setText(DAOFactory.getPersistenceType());
+    }
 
     @FXML
     private void handleLogin() {

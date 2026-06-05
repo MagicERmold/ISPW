@@ -39,6 +39,10 @@ public class DAOFactory {
 
     private DAOFactory() {}
 
+    public static String getPersistenceType() {
+        return readPersistenceTypeFromConfig();
+    }
+
     /**
      * Crea il DAO responsabile della persistenza dei prodotti.
      */

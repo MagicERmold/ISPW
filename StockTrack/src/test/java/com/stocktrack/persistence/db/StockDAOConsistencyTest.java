@@ -22,6 +22,7 @@ import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -91,9 +92,9 @@ class StockDAOConsistencyTest {
     @Test
     void allActivityLogDaosReturnRecentActivitiesInDescendingOrder() throws Exception {
         for (ActivityLogDAO dao : createActivityLogDaos()) {
-            dao.saveActivity(new ActivityLog("user1", GROUP_ID, "TEST", "first", LocalDateTime.of(2026, 1, 1, 10, 0)));
-            dao.saveActivity(new ActivityLog("user2", GROUP_ID, "TEST", "second", LocalDateTime.of(2026, 1, 1, 11, 0)));
-            dao.saveActivity(new ActivityLog("user3", "OTHER_GROUP", "TEST", "ignored", LocalDateTime.of(2026, 1, 1, 12, 0)));
+            dao.saveActivity(new ActivityLog("user1", GROUP_ID, "TEST", "first", LocalDateTime.of(2026, Month.JANUARY, 1, 10, 0)));
+            dao.saveActivity(new ActivityLog("user2", GROUP_ID, "TEST", "second", LocalDateTime.of(2026, Month.JANUARY, 1, 11, 0)));
+            dao.saveActivity(new ActivityLog("user3", "OTHER_GROUP", "TEST", "ignored", LocalDateTime.of(2026, Month.JANUARY, 1, 12, 0)));
 
             List<ActivityLog> activities = dao.getRecentActivities(GROUP_ID, 1);
 
@@ -107,7 +108,7 @@ class StockDAOConsistencyTest {
         System.setProperty("stocktrack.fs.activity.file", tempDir.resolve("activities.csv").toString());
         ActivityLogDAO dao = new FileSystemActivityLogDAO();
 
-        dao.saveActivity(new ActivityLog("user,one", GROUP_ID, "TEST", "descrizione, con virgola", LocalDateTime.of(2026, 1, 1, 10, 0)));
+        dao.saveActivity(new ActivityLog("user,one", GROUP_ID, "TEST", "descrizione, con virgola", LocalDateTime.of(2026, Month.JANUARY, 1, 10, 0)));
 
         List<ActivityLog> activities = dao.getRecentActivities(GROUP_ID, 10);
 
@@ -119,7 +120,7 @@ class StockDAOConsistencyTest {
     @Test
     void allActivityLogDaosReturnEmptyListForInvalidLimit() throws Exception {
         for (ActivityLogDAO dao : createActivityLogDaos()) {
-            dao.saveActivity(new ActivityLog("user1", GROUP_ID, "TEST", "stored", LocalDateTime.of(2026, 1, 1, 10, 0)));
+            dao.saveActivity(new ActivityLog("user1", GROUP_ID, "TEST", "stored", LocalDateTime.of(2026, Month.JANUARY, 1, 10, 0)));
 
             assertTrue(dao.getRecentActivities(GROUP_ID, 0).isEmpty(), dao.getClass().getSimpleName() + " deve rispettare limit non positivo.");
             assertTrue(dao.getRecentActivities(null, 10).isEmpty(), dao.getClass().getSimpleName() + " deve ignorare groupId nullo.");

@@ -7,6 +7,7 @@ import com.stocktrack.model.ActivityLog;
 import com.stocktrack.model.User;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.List;
  */
 public class ActivityLogController {
     private static final int DEFAULT_LIMIT = 30;
+    private static final ZoneId DEFAULT_ZONE = ZoneId.systemDefault();
     private static final DateTimeFormatter DISPLAY_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     /**
@@ -41,7 +43,7 @@ public class ActivityLogController {
                 currentUser.getGroupId(),
                 actionType,
                 description,
-                LocalDateTime.now()
+                LocalDateTime.now(DEFAULT_ZONE)
         );
         DAOFactory.getActivityLogDAO().saveActivity(activityLog);
     }

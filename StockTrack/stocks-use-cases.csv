@@ -1,27 +1,6 @@
-LATTE INTERO,12,5,GROUP_admin,ALIMENTARI
-PANE BAULETTO,0,3,GROUP_admin,ALIMENTARI
-PASTA BARILLA,4,10,GROUP_admin,ALIMENTARI
-OLIO D'OLIVA,0,2,GROUP_admin,ALIMENTARI
-SAPONE MANI,1,4,GROUP_admin,IGIENE
-CARTA IGIENICA,2,6,GROUP_admin,IGIENE
-PENNE A SFERA,5,20,GROUP_admin,CANCELLERIA
-RISO CARNAROLI,2,5,GROUP_admin,ALIMENTARI
-SALE FINO,10,2,GROUP_admin,ALIMENTARI
-ZUCCHERO,5,5,GROUP_admin,ALIMENTARI
-CAFFÈ IN GRANI,8,3,GROUP_admin,ALIMENTARI
-FARINA 00,12,10,GROUP_admin,ALIMENTARI
-DETERSIVO PIATTI,3,2,GROUP_admin,PULIZIA
-SPUGNE CUCINA,10,5,GROUP_admin,PULIZIA
-QUADERNI A4,15,10,GROUP_admin,CANCELLERIA
-GRAFFETTE,100,50,GROUP_admin,CANCELLERIA
-LAMPADINE LED,6,4,GROUP_admin,MANUTENZIONE
-PILE AA,20,10,GROUP_admin,ELETTRONICA
-TONNO IN SCATOLA,15,10,GROUP_admin,ALIMENTARI
-ACQUA NATURALE,24,12,GROUP_admin,ALIMENTARISALMONE,5,0,GROUP_admin,ALIMENTARI
-IPHONE 18,5,20,GROUP_admin,ELETTRONICA
-iPhone 15 128GB,12,5,GROUP_EURONICS,Smartphone
+﻿iPhone 15 128GB,12,5,GROUP_EURONICS,Smartphone
 iPhone 15 Pro 256GB,19,8,GROUP_EURONICS,Smartphone
-Samsung Galaxy S24,26,10,GROUP_EURONICS,Smartphone
+Samsung Galaxy S24,26,2,GROUP_EURONICS,Smartphone
 Samsung Galaxy A55,33,5,GROUP_EURONICS,Smartphone
 Xiaomi Redmi Note 13,40,8,GROUP_EURONICS,Smartphone
 Motorola Edge 50,47,2,GROUP_EURONICS,Smartphone
@@ -259,23 +238,23 @@ Auricolari ricondizionati,8,2,GROUP_EURONICS,Ricondizionati
 Router ricondizionato,15,5,GROUP_EURONICS,Ricondizionati
 Fotocamera ricondizionata,22,8,GROUP_EURONICS,Ricondizionati
 Telefono base ricondizionato,29,2,GROUP_EURONICS,Ricondizionati
-Farina 00 sacco 25kg,0,6,GROUP_PANIFICIO,Materie prime
-Farina manitoba sacco 25kg,2,4,GROUP_PANIFICIO,Materie prime
+Farina 00 sacco 25kg,18,6,GROUP_PANIFICIO,Materie prime
+Farina manitoba sacco 25kg,10,4,GROUP_PANIFICIO,Materie prime
 Farina integrale sacco 25kg,7,3,GROUP_PANIFICIO,Materie prime
 Semola rimacinata sacco 25kg,5,2,GROUP_PANIFICIO,Materie prime
-Lievito fresco panetti,10,20,GROUP_PANIFICIO,Lieviti
+Lievito fresco panetti,60,20,GROUP_PANIFICIO,Lieviti
 Lievito madre rinfresco,8,2,GROUP_PANIFICIO,Lieviti
 Sale fino sacco 10kg,9,3,GROUP_PANIFICIO,Materie prime
 Zucchero sacco 10kg,6,2,GROUP_PANIFICIO,Materie prime
 Olio extravergine lattina 5L,5,2,GROUP_PANIFICIO,Condimenti
-Burro panetto 1kg,0,4,GROUP_PANIFICIO,Latticini
+Burro panetto 1kg,12,4,GROUP_PANIFICIO,Latticini
 Latte intero 1L,24,8,GROUP_PANIFICIO,Latticini
 Uova confezione 30,10,3,GROUP_PANIFICIO,Freschi
 Gocce cioccolato 5kg,4,2,GROUP_PANIFICIO,Pasticceria
 Marmellata albicocca secchio,3,1,GROUP_PANIFICIO,Pasticceria
 Crema nocciola secchio,3,1,GROUP_PANIFICIO,Pasticceria
 Sesamo sacco 5kg,4,1,GROUP_PANIFICIO,Semi
-Sacchetti carta pane,100,150,GROUP_PANIFICIO,Confezionamento
+Sacchetti carta pane,500,150,GROUP_PANIFICIO,Confezionamento
 Vassoi cartone dolci,120,40,GROUP_PANIFICIO,Confezionamento
-Guanti monouso,50,80,GROUP_PANIFICIO,Igiene
+Guanti monouso,200,80,GROUP_PANIFICIO,Igiene
 Detergente superfici alimentari,8,3,GROUP_PANIFICIO,Pulizia

@@ -64,6 +64,20 @@ class StockDAOConsistencyTest {
     }
 
     @Test
+    void allStockDaosUpdateThresholdKeepingOtherFields() throws Exception {
+        for (StockDAO dao : createStockDaos()) {
+            dao.saveStock(new Stock("Farina", 12, 4, GROUP_ID, "ALIMENTARI"));
+
+            dao.updateStockThreshold("Farina", 8, GROUP_ID);
+
+            Stock updated = dao.getAllStocks(GROUP_ID).getFirst();
+            assertEquals(12, updated.getQuantity(), dao.getClass().getSimpleName() + " non deve cambiare la quantita.");
+            assertEquals(8, updated.getThreshold(), dao.getClass().getSimpleName() + " deve aggiornare la soglia.");
+            assertEquals("ALIMENTARI", updated.getCategory(), dao.getClass().getSimpleName() + " non deve cambiare categoria.");
+        }
+    }
+
+    @Test
     void fileSystemStockDaoKeepsCommaSeparatedFields() throws Exception {
         System.setProperty("stocktrack.fs.stock.file", tempDir.resolve("stocks.csv").toString());
         StockDAO dao = new FileSystemStockDAO();

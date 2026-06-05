@@ -83,6 +83,34 @@ public class FileSystemStockDAO implements StockDAO {
     }
 
     @Override
+    public void updateStockThreshold(String stockName, int newThreshold, String groupId) throws StorageException {
+        List<String> lines = new ArrayList<>();
+        boolean found = false;
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = CsvCodec.split(line);
+                if (parts.length >= 4 && parts[0].equalsIgnoreCase(stockName) && parts[3].equals(groupId)) {
+                    String category = parts.length > 4 ? parts[4] : "Generico";
+                    lines.add(CsvCodec.join(parts[0], parts[1], String.valueOf(newThreshold), parts[3], category));
+                    found = true;
+                } else {
+                    lines.add(line);
+                }
+            }
+        } catch (IOException e) {
+            throw new StorageException("Errore lettura file durante aggiornamento soglia", e);
+        }
+
+        if (!found) {
+            throw new StorageException("Prodotto non trovato nel file system");
+        }
+
+        rewriteFile(lines);
+    }
+
+    @Override
     public void deleteStock(String stockName, String groupId) throws StorageException {
         List<String> linesToKeep = new ArrayList<>();
         boolean removed = false;

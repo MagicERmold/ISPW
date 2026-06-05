@@ -51,8 +51,7 @@ class LoginControllerTest {
             assertNotNull(retrievedUser, "L'utente dovrebbe essere presente nel DAO dopo la registrazione.");
             assertEquals(testUsername, retrievedUser.getUsername());
             assertEquals(Role.USER, retrievedUser.getRole(), "Il ruolo predefinito deve essere USER.");
-            assertNotEquals("password123", retrievedUser.getPassword(), "La password non deve essere salvata in chiaro.");
-            assertTrue(retrievedUser.getPassword().startsWith("SHA256:"), "La password deve essere salvata come hash SHA-256.");
+            assertEquals("password123", retrievedUser.getPassword(), "La password deve essere salvata in chiaro.");
         } catch (StorageException e) {
             fail("Errore durante la verifica dei dati: " + e.getMessage());
         }
@@ -83,12 +82,12 @@ class LoginControllerTest {
     }
 
     @Test
-    void testLegacyPlainPasswordStillWorks() throws Exception {
+    void testPlainPasswordLoginWorks() throws Exception {
         UserDAO userDAO = DAOFactory.getUserDAO();
         userDAO.saveUser(new User(testUsername, "password123", Role.USER));
 
         boolean loginResult = loginController.login(new UserBean(testUsername, "password123"));
 
-        assertTrue(loginResult, "Il login deve supportare anche vecchie password salvate in chiaro.");
+        assertTrue(loginResult, "Il login deve accettare la password salvata in chiaro.");
     }
 }

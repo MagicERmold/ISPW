@@ -255,6 +255,39 @@ public class StockGraphicalController {
     }
 
     @FXML
+    private void handleEditThreshold() {
+        StockBean selected = stockTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            showAlert(Alert.AlertType.WARNING, "Selezione mancante", "Seleziona un prodotto da modificare.");
+            return;
+        }
+
+        TextInputDialog dialog = new TextInputDialog(String.valueOf(selected.getThreshold()));
+        dialog.setTitle("Modifica soglia");
+        dialog.setHeaderText(selected.getNome());
+        dialog.setContentText("Nuova soglia minima:");
+        applyNumericFormatter(dialog.getEditor());
+
+        dialog.showAndWait()
+                .map(String::trim)
+                .filter(value -> !value.isEmpty())
+                .ifPresent(value -> updateSelectedThreshold(selected, value));
+    }
+
+    private void updateSelectedThreshold(StockBean selected, String thresholdText) {
+        try {
+            int newThreshold = Integer.parseInt(thresholdText);
+            controller.modifyThreshold(selected.getNome(), newThreshold);
+            loadStocks();
+            showFeedback("Soglia aggiornata correttamente.");
+        } catch (NumberFormatException e) {
+            showAlert(Alert.AlertType.ERROR, "Errore Input", "La soglia deve essere un numero intero.");
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Errore modifica soglia", e.getMessage());
+        }
+    }
+
+    @FXML
     private void handleDeleteStock() {
         StockBean selected = stockTable.getSelectionModel().getSelectedItem();
         if (selected == null) {

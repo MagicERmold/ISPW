@@ -11,7 +11,7 @@ public class Stock implements Serializable {
     private static final long serialVersionUID = 1L;
     private final String name;
     private int quantity;
-    private final int threshold;
+    private int threshold;
     private final String groupId;
     private final String category;
 
@@ -40,6 +40,10 @@ public class Stock implements Serializable {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+    public void setThreshold(int threshold) {
+        this.threshold = threshold;
     }
 
     public String getCategory() { return category; }

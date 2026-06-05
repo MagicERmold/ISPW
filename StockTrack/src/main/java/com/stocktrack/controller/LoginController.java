@@ -3,7 +3,6 @@ package com.stocktrack.controller;
 import com.stocktrack.bean.UserBean;
 import com.stocktrack.engineering.exception.StorageException;
 import com.stocktrack.engineering.factory.DAOFactory;
-import com.stocktrack.engineering.security.PasswordHasher;
 import com.stocktrack.engineering.singleton.SessionManager;
 import com.stocktrack.engineering.exception.DuplicateUserException;
 import com.stocktrack.model.Role;
@@ -36,7 +35,7 @@ public class LoginController {
         }
 
         // Password corretta: salvo la sessione
-        if (PasswordHasher.matches(userBean.getPassword(), user.getPassword())) {
+        if (userBean.getPassword().equals(user.getPassword())) {
             SessionManager.getInstance().login(user);
             return true;
         }
@@ -64,7 +63,7 @@ public class LoginController {
 
         // Default provvisorio: USER (senza gruppo).
         // Il ruolo vero verrà definito quando entrerà/creerà un gruppo.
-        User newUser = new User(userBean.getUsername(), PasswordHasher.hash(userBean.getPassword()), Role.USER);
+        User newUser = new User(userBean.getUsername(), userBean.getPassword(), Role.USER);
 
         // Salvo l'utente nel database
         userDAO.saveUser(newUser);

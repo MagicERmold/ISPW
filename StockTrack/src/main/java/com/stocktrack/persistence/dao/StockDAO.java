@@ -26,6 +26,11 @@ public interface StockDAO {
     void updateStockQuantity(String stockName, int newQuantity, String groupUid) throws StorageException;
 
     /**
+     * Aggiorna la soglia minima di un prodotto del gruppo indicato.
+     */
+    void updateStockThreshold(String stockName, int newThreshold, String groupUid) throws StorageException;
+
+    /**
      * Elimina un prodotto del gruppo indicato.
      */
     void deleteStock(String stockName, String groupUid) throws StorageException;

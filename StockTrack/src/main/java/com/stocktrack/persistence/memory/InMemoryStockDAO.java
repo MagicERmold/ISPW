@@ -39,6 +39,17 @@ public class InMemoryStockDAO implements StockDAO {
     }
 
     @Override
+    public void updateStockThreshold(String stockName, int newThreshold, String groupUid) throws StorageException {
+        for (Stock s : warehouse) {
+            if (s.getName().equalsIgnoreCase(stockName) && groupUid.equals(s.getGroupId())) {
+                s.setThreshold(newThreshold);
+                return;
+            }
+        }
+        throw new StorageException("Errore durante l'aggiornamento della soglia");
+    }
+
+    @Override
     public void deleteStock(String stockName, String groupUid) throws StorageException {
         boolean removed = warehouse.removeIf(s -> s.getName().equalsIgnoreCase(stockName) && groupUid.equals(s.getGroupId()));
         if (!removed) {

@@ -74,6 +74,23 @@ public class DatabaseStockDAO implements StockDAO {
     }
 
     @Override
+    public void updateStockThreshold(String stockName, int newThreshold, String groupUid) throws StorageException {
+        String sql = "UPDATE stocks SET threshold_value = ? WHERE LOWER(name) = LOWER(?) AND group_id = ?";
+        try (Connection connection = DatabaseConnectionManager.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, newThreshold);
+            statement.setString(2, stockName);
+            statement.setString(3, groupUid);
+            int updatedRows = statement.executeUpdate();
+            if (updatedRows == 0) {
+                throw new StorageException("Prodotto non trovato nel DBMS");
+            }
+        } catch (SQLException e) {
+            throw new StorageException("Errore aggiornamento soglia su DBMS", e);
+        }
+    }
+
+    @Override
     public void deleteStock(String stockName, String groupUid) throws StorageException {
         String sql = "DELETE FROM stocks WHERE LOWER(name) = LOWER(?) AND group_id = ?";
         try (Connection connection = DatabaseConnectionManager.getConnection();

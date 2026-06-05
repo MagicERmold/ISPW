@@ -72,6 +72,23 @@ public class SerializableStockDAO implements StockDAO {
     }
 
     @Override
+    public void updateStockThreshold(String stockName, int newThreshold, String groupUid) throws StorageException {
+        List<Stock> stocks = loadAll();
+        boolean found = false;
+        for (Stock s : stocks) {
+            if (s.getName().equalsIgnoreCase(stockName) && groupUid.equals(s.getGroupId())) {
+                s.setThreshold(newThreshold);
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            throw new StorageException("Prodotto non trovato nel file serializzato");
+        }
+        saveAll(stocks);
+    }
+
+    @Override
     public void deleteStock(String stockName, String groupUid) throws StorageException {
         List<Stock> stocks = loadAll();
         boolean removed = stocks.removeIf(s -> s.getName().equalsIgnoreCase(stockName) && groupUid.equals(s.getGroupId()));

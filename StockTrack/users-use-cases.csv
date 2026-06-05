@@ -1,6 +1,4 @@
-admin,admin123,ADMIN,GROUP_admin
-user,user1234,USER,GROUP_admin
-euronics_admin,admin123,ADMIN,GROUP_EURONICS
+﻿euronics_admin,admin123,ADMIN,GROUP_EURONICS
 euronics_commesso01,commesso01,USER,GROUP_EURONICS
 euronics_commesso02,commesso02,USER,GROUP_EURONICS
 euronics_commesso03,commesso03,USER,GROUP_EURONICS

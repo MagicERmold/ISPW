@@ -84,6 +84,7 @@
 
             <HBox alignment="CENTER_RIGHT" spacing="10.0">
                 <Label fx:id="feedbackLabel" HBox.hgrow="ALWAYS" styleClass="feedback-label" text="" />
+                <Button onAction="#handleEditThreshold" styleClass="secondary-button" text="Modifica soglia"/>
                 <Button onAction="#handleDeleteStock" styleClass="danger-button" text="Rimuovi selezionato"/>
             </HBox>
         </VBox>

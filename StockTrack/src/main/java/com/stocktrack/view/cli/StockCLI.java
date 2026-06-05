@@ -18,6 +18,7 @@ public class StockCLI {
             InputHelper.print("3. Registra Consumo (-)");
             InputHelper.print("4. Registra Acquisto (+)");
             InputHelper.print("5. Elimina Prodotto (Rimuovi scheda)");
+            InputHelper.print("6. Modifica soglia minima");
             InputHelper.print("0. Torna al menu principale");
 
             int input = InputHelper.readInt("Scegli un'opzione: ");
@@ -38,6 +39,9 @@ public class StockCLI {
                 case 5:
                     deleteStock();
                     break;
+                case 6:
+                    modifyStockThreshold();
+                    break;
                 case 0:
                     running = false;
                     break;
@@ -55,6 +59,17 @@ public class StockCLI {
             InputHelper.print("Operazione completata!");
         } catch (Exception e) {
             InputHelper.print("Errore durante la modifica della Stock: " + e.getMessage());
+        }
+    }
+
+    private void modifyStockThreshold() {
+        String name = InputHelper.readString("Nome prodotto: ");
+        int threshold = InputHelper.readInt("Nuova soglia minima: ");
+        try {
+            controller.modifyThreshold(name, threshold);
+            InputHelper.print("Soglia aggiornata con successo!");
+        } catch (Exception e) {
+            InputHelper.print("Errore durante la modifica della soglia: " + e.getMessage());
         }
     }
 

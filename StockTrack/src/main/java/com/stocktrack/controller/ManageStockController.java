@@ -122,6 +122,40 @@ public class ManageStockController {
     }
 
     /**
+     * Modifica la soglia minima di un prodotto del gruppo corrente.
+     *
+     * @param productName nome del prodotto da aggiornare
+     * @param newThreshold nuova soglia minima
+     * @throws StorageException se il prodotto non esiste o la persistenza non e disponibile
+     * @throws InvalidProductDataException se la soglia e negativa
+     */
+    public void modifyThreshold(String productName, int newThreshold) throws StorageException, InvalidProductDataException {
+        User user = SessionGuard.requireUserWithGroup();
+        StockDAO dao = DAOFactory.getStockDAO();
+
+        if (newThreshold < 0) {
+            throw new InvalidProductDataException("La soglia non puo essere negativa.");
+        }
+
+        List<Stock> stocks = dao.getAllStocks(user.getGroupId());
+        Stock target = null;
+        for (Stock s : stocks) {
+            if (s.getName().equalsIgnoreCase(productName)) {
+                target = s;
+                break;
+            }
+        }
+
+        if (target == null) {
+            throw new StorageException("Prodotto non trovato!");
+        }
+
+        dao.updateStockThreshold(target.getName(), newThreshold, user.getGroupId());
+        activityLogController.recordActivity(ACTIVITY_TYPE_WAREHOUSE,
+                "ha impostato la soglia di " + target.getName() + " a " + newThreshold);
+    }
+
+    /**
      * Restituisce tutti i prodotti del magazzino associato al gruppo corrente.
      */
     public List<StockBean> showAllStocks() throws StorageException {

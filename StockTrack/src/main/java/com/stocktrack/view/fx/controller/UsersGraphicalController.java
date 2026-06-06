@@ -17,9 +17,6 @@ public class UsersGraphicalController {
     @FXML private TableColumn<UserProfileBean, String> usernameCol;
     @FXML private TableColumn<UserProfileBean, String> roleCol;
 
-    private final ManageUsersController controller = new ManageUsersController();
-    private final SessionController sessionController = new SessionController();
-
     @FXML
     public void initialize() {
         usernameCol.setCellValueFactory(new PropertyValueFactory<>("username"));
@@ -42,6 +39,7 @@ public class UsersGraphicalController {
             return;
         }
 
+        ManageUsersController controller = new ManageUsersController();
         try {
             usersTable.setItems(FXCollections.observableArrayList(controller.getMyGroupUsers()));
         } catch (Exception e) {
@@ -57,6 +55,7 @@ public class UsersGraphicalController {
             return;
         }
 
+        ManageUsersController controller = new ManageUsersController();
         try {
             controller.removeUserFromMyGroup(selected.getUsername());
             loadData(); // Ricarica la tabella
@@ -74,6 +73,7 @@ public class UsersGraphicalController {
     }
 
     private boolean isAdminSession() {
+        SessionController sessionController = new SessionController();
         UserProfileBean currentUser = sessionController.getCurrentUserProfile();
         return currentUser != null && currentUser.isAdmin();
     }

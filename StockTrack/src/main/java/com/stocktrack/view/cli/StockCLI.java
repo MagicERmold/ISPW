@@ -6,8 +6,6 @@ import com.stocktrack.controller.ManageStockController;
 import java.util.List;
 
 public class StockCLI {
-    private final ManageStockController controller = new ManageStockController();
-
     public void start() {
         boolean running = true;
 
@@ -52,6 +50,7 @@ public class StockCLI {
     }
 
     private void modifyStockQuantity(int sign) {
+        ManageStockController controller = new ManageStockController();
         String name = InputHelper.readString("Nome prodotto: ");
         int qty = InputHelper.readInt("Quantità da " + (sign > 0 ? "aggiungere" : "rimuovere") + ": ");
         try {
@@ -63,6 +62,7 @@ public class StockCLI {
     }
 
     private void modifyStockThreshold() {
+        ManageStockController controller = new ManageStockController();
         String name = InputHelper.readString("Nome prodotto: ");
         int threshold = InputHelper.readInt("Nuova soglia minima: ");
         try {
@@ -74,6 +74,7 @@ public class StockCLI {
     }
 
     private void addStock() {
+        ManageStockController controller = new ManageStockController();
         String name = InputHelper.readString("Inserisci nome prodotto: ");
         int quantity = InputHelper.readInt("Inserisci quantità iniziale: ");
         int threshold = InputHelper.readInt("Inserisci soglia minima: ");
@@ -89,6 +90,7 @@ public class StockCLI {
     }
 
     private void showAllStocks() {
+        ManageStockController controller = new ManageStockController();
         try {
             String choice = InputHelper.readString("Vuoi filtrare per categoria? (y/n): ");
             List<StockBean> list;
@@ -135,6 +137,7 @@ public class StockCLI {
     }
 
     private void deleteStock() {
+        ManageStockController controller = new ManageStockController();
         InputHelper.print("\n--- ELIMINAZIONE PRODOTTO ---");
         String name = InputHelper.readString("Nome del prodotto da eliminare: ");
         String confirm = InputHelper.readString("Sei sicuro? (s/n): ");

@@ -27,8 +27,6 @@ public class ShoppingListGraphicalController {
 
     @FXML private ComboBox<String> cmbFilterCategory;
 
-    private final ManageStockController controller = new ManageStockController();
-
     // Lista osservabile che contiene tutti i dati originali
     private ObservableList<StockBean> masterData = FXCollections.observableArrayList();
     // Lista filtrata collegata alla tabella
@@ -41,16 +39,14 @@ public class ShoppingListGraphicalController {
         thresholdCol.setCellValueFactory(new PropertyValueFactory<>("threshold")); // Nota: nel Bean il metodo è getThreshold(), verifica che non sia getSoglia()
 
         // Calcolo "Da Ordinare" = Soglia - Quantità
-        missingCol.setCellValueFactory(data ->
-                new SimpleIntegerProperty(data.getValue().getMissingQuantity()).asObject()
-        );
+        missingCol.setCellValueFactory(data -> new SimpleIntegerProperty(getMissingQuantity(data.getValue())).asObject());
         shoppingTable.setRowFactory(table -> new TableRow<>() {
             @Override
             protected void updateItem(StockBean item, boolean empty) {
                 super.updateItem(item, empty);
                 getStyleClass().removeAll("low-stock-row", "empty-stock-row");
                 if (!empty && item != null) {
-                    getStyleClass().add(item.isEmpty() ? "empty-stock-row" : "low-stock-row");
+                    getStyleClass().add(isEmptyStock(item) ? "empty-stock-row" : "low-stock-row");
                 }
             }
         });
@@ -78,6 +74,7 @@ public class ShoppingListGraphicalController {
     }
 
     public void loadData() {
+        ManageStockController controller = new ManageStockController();
         try {
             List<StockBean> list = controller.getShoppingList();
             masterData.setAll(list);
@@ -122,5 +119,13 @@ public class ShoppingListGraphicalController {
         alert.setHeaderText(null);
         alert.setContentText(content);
         alert.showAndWait();
+    }
+
+    private int getMissingQuantity(StockBean stock) {
+        return Math.max(stock.getThreshold() - stock.getQuantity(), 0);
+    }
+
+    private boolean isEmptyStock(StockBean stock) {
+        return stock.getQuantity() == 0;
     }
 }

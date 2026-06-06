@@ -7,9 +7,6 @@ import com.stocktrack.engineering.exception.StorageException;
 
 
 public class LoginCLI {
-
-    private final LoginController loginController = new LoginController();
-
     public void start() {
         boolean running = true;
         InputHelper.print("=== BENVENUTO IN STOCKTRACK ===");
@@ -45,12 +42,12 @@ public class LoginCLI {
     }
 
     private boolean performLogin() {
+        LoginController loginController = new LoginController();
         String username = InputHelper.readUsername("Username: ");
         String password = InputHelper.readPassword("Password: ");
 
-        UserBean userBean = new UserBean(username, password);
-
         try {
+            UserBean userBean = new UserBean(username, password);
             boolean success = loginController.login(userBean);
             if (success) {
                 InputHelper.print("Login effettuato con successo!");
@@ -59,6 +56,9 @@ public class LoginCLI {
                 InputHelper.print("Errore: Credenziali non valide.");
                 return false;
             }
+        } catch (IllegalArgumentException e) {
+            InputHelper.print("Errore input: " + e.getMessage());
+            return false;
         } catch (StorageException e) {
             InputHelper.print("Errore di sistema durante il login: " + e.getMessage());
             return false;
@@ -66,16 +66,18 @@ public class LoginCLI {
     }
 
     private boolean performRegister( ) {
+        LoginController loginController = new LoginController();
         InputHelper.print("\n--- REGISTRAZIONE ---");
         String username = InputHelper.readUsername("Username: ");
         String password = InputHelper.readPassword("Password: ");
 
-        UserBean bean = new UserBean(username, password);
-
         try {
+            UserBean bean = new UserBean(username, password);
             loginController.register(bean);
             InputHelper.print("Registrazione avvenuta con successo! Ora puoi effettuare il login.");
             return true;
+        } catch (IllegalArgumentException e) {
+            InputHelper.print("Errore input: " + e.getMessage());
         } catch (DuplicateUserException e) {
             InputHelper.print("Errore di Registrazione: " + e.getMessage());
         } catch (StorageException e) {

@@ -10,6 +10,7 @@ import com.stocktrack.persistence.dao.StockDAO;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Controller applicativo per la gestione del magazzino del gruppo corrente.
@@ -71,7 +72,8 @@ public class ManageStockController {
      */
     public List<StockBean> getStocksByCategory(String category) throws StorageException {
         User user = SessionGuard.requireUserWithGroup();
-        List<Stock> stocks = DAOFactory.getStockDAO().getStocksByCategory(user.getGroupId(), category);
+        String normalizedCategory = category == null ? null : category.trim().toUpperCase(Locale.ROOT);
+        List<Stock> stocks = DAOFactory.getStockDAO().getStocksByCategory(user.getGroupId(), normalizedCategory);
 
         List<StockBean> beans = new ArrayList<>();
         for (Stock s : stocks) {
@@ -93,21 +95,8 @@ public class ManageStockController {
         StockDAO dao = DAOFactory.getStockDAO();
 
         // Cerco il prodotto attuale per sapere la quantità corrente
-        List<Stock> stocks = dao.getAllStocks(user.getGroupId());
-        Stock target = null;
-        for(Stock s : stocks) {
-            if(s.getName().equalsIgnoreCase(productName)) {
-                target = s;
-                break;
-            }
-        }
+        Stock target = findStockByName(dao, user.getGroupId(), productName, "Prodotto non trovato!");
 
-        // Il prodotto non è stato trovato
-        if(target == null) {
-            throw new StorageException("Prodotto non trovato!");
-        }
-
-        // Il prodotto è stato trovato
         int newQty = target.getQuantity() + amountChange;
         // VALIDAZIONE
         if (newQty < 0) {
@@ -137,18 +126,7 @@ public class ManageStockController {
             throw new InvalidProductDataException("La soglia non puo essere negativa.");
         }
 
-        List<Stock> stocks = dao.getAllStocks(user.getGroupId());
-        Stock target = null;
-        for (Stock s : stocks) {
-            if (s.getName().equalsIgnoreCase(productName)) {
-                target = s;
-                break;
-            }
-        }
-
-        if (target == null) {
-            throw new StorageException("Prodotto non trovato!");
-        }
+        Stock target = findStockByName(dao, user.getGroupId(), productName, "Prodotto non trovato!");
 
         dao.updateStockThreshold(target.getName(), newThreshold, user.getGroupId());
         activityLogController.recordActivity(ACTIVITY_TYPE_WAREHOUSE,
@@ -203,22 +181,21 @@ public class ManageStockController {
         StockDAO dao = DAOFactory.getStockDAO();
 
         // Verifica che il prodotto esista prima di cancellarlo
-        List<Stock> stocks = dao.getAllStocks(user.getGroupId());
-        boolean exists = false;
-        for (Stock s : stocks) {
-            if (s.getName().equalsIgnoreCase(productName)) {
-                exists = true;
-                break;
-            }
-        }
-
-        // Il prodotto non esiste
-        if (!exists) {
-            throw new StorageException("Prodotto non trovato nel tuo magazzino.");
-        }
+        Stock target = findStockByName(dao, user.getGroupId(), productName, "Prodotto non trovato nel tuo magazzino.");
 
         // La dao si occuperà di cancellare la STOCK
-        dao.deleteStock(productName, user.getGroupId());
-        activityLogController.recordActivity(ACTIVITY_TYPE_WAREHOUSE, "ha eliminato il prodotto " + productName);
+        dao.deleteStock(target.getName(), user.getGroupId());
+        activityLogController.recordActivity(ACTIVITY_TYPE_WAREHOUSE, "ha eliminato il prodotto " + target.getName());
+    }
+
+    private Stock findStockByName(StockDAO dao, String groupId, String productName, String notFoundMessage)
+            throws StorageException {
+        List<Stock> stocks = dao.getAllStocks(groupId);
+        for (Stock stock : stocks) {
+            if (stock.getName().equalsIgnoreCase(productName)) {
+                return stock;
+            }
+        }
+        throw new StorageException(notFoundMessage);
     }
 }

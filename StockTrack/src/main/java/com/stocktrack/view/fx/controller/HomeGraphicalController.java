@@ -21,18 +21,15 @@ public class HomeGraphicalController {
     @FXML private Tab usersTab;
     @FXML private TabPane mainTabPane;
 
-    // INIEZIONE AUTOMATICA DEI SOTTO-CONTROLLER
-    // Il nome deve essere: fx:id dell'include + "Controller"
+    // Controller Grafici e non Applicativi
     @FXML private StockGraphicalController stockViewController;
     @FXML private ShoppingListGraphicalController shoppingViewController;
     @FXML private ActivityLogGraphicalController activityViewController;
     @FXML private UsersGraphicalController usersViewController;
 
-    private final ManageStockController stockController = new ManageStockController();
-    private final SessionController sessionController = new SessionController();
-
     @FXML
     public void initialize() {
+        SessionController sessionController = new SessionController();
         UserProfileBean user = sessionController.getCurrentUserProfile();
         if (user != null) {
             welcomeLabel.setText("Ciao, " + user.getUsername());
@@ -61,6 +58,7 @@ public class HomeGraphicalController {
 
     @FXML
     private void handleLogout() throws IOException {
+        SessionController sessionController = new SessionController();
         sessionController.logout();
         JavaFXApp.setRoot("login");
     }
@@ -100,6 +98,7 @@ public class HomeGraphicalController {
 
                 // 3. Chiama la logica di business
 
+                ManageStockController stockController = new ManageStockController();
                 stockController.modifyQuantity(selectedItem.getNome(), quantity*sign);
 
 

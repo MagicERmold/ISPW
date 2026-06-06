@@ -21,9 +21,6 @@ public class LoginGraphicalController {
     @FXML private PasswordField passwordField;
     @FXML private Label persistenceTypeLabel;
 
-    private final LoginController loginLogic = new LoginController();
-    private final SessionController sessionController = new SessionController();
-
     @FXML
     private void initialize() {
         persistenceTypeLabel.setText(DAOFactory.getPersistenceType());
@@ -31,6 +28,8 @@ public class LoginGraphicalController {
 
     @FXML
     private void handleLogin() {
+        LoginController loginLogic = new LoginController();
+        SessionController sessionController = new SessionController();
         String username = usernameField.getText();
         String password = passwordField.getText();
 
@@ -43,14 +42,14 @@ public class LoginGraphicalController {
             return;
         }
 
-        UserBean bean = new UserBean(username, password);
         try {
+            UserBean bean = new UserBean(username, password);
             boolean success = loginLogic.login(bean);
             if (success) {
                 // Recuperiamo l'utente loggato per controllare il gruppo
                 UserProfileBean currentUser = sessionController.getCurrentUserProfile();
 
-                if (currentUser == null || currentUser.hasGroup()) {
+                if (hasNoGroup(currentUser)) {
                     // Se non ha un gruppo, lo mandiamo alla schermata di selezione
                     JavaFXApp.setRoot("group_selection");
                 } else {
@@ -63,6 +62,12 @@ public class LoginGraphicalController {
                 alert.setHeaderText("CREDENZIALI NON VALIDE!");
                 alert.showAndWait();
             }
+        } catch (IllegalArgumentException e) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("ERRORE");
+            alert.setHeaderText("DATI NON VALIDI");
+            alert.setContentText(e.getMessage());
+            alert.showAndWait();
         } catch (IOException e) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("ERRORE  ");
@@ -81,5 +86,9 @@ public class LoginGraphicalController {
     @FXML
     private void switchToRegister() throws IOException {
         JavaFXApp.setRoot("register");
+    }
+
+    private boolean hasNoGroup(UserProfileBean user) {
+        return user == null || user.getGroupId() == null || user.getGroupId().isBlank();
     }
 }

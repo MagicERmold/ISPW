@@ -60,3 +60,13 @@
 2026-06-05T11:05:37.591079,panificio_capo,GROUP_PANIFICIO,MAGAZZINO,ha usato 8 unita di Farina manitoba sacco 25kg
 2026-06-05T11:05:55.088930400,panificio_capo,GROUP_PANIFICIO,MAGAZZINO,ha usato 400 unita di Sacchetti carta pane
 2026-06-05T11:05:58.713181800,panificio_capo,GROUP_PANIFICIO,MAGAZZINO,ha usato 150 unita di Guanti monouso
+2026-06-15T22:19:16.733146200,admin,GROUP_admin,MAGAZZINO,ha comprato 5 unita di LATTE INTERO
+2026-06-15T22:20:00.076404100,admin,GROUP_admin,MAGAZZINO,ha usato 5 unita di LATTE INTERO
+2026-06-15T22:46:15.474867100,admin,GROUP_admin,UTENTI,ha rimosso user dal gruppo
+2026-06-15T22:46:35.663895400,admin,GROUP_admin,MAGAZZINO,ha aggiunto 5 unita di BAMBOLA
+2026-06-15T22:46:49.112859400,admin,GROUP_admin,MAGAZZINO,ha eliminato il prodotto BAMBOLA
+2026-06-15T22:46:54.734892800,admin,GROUP_admin,MAGAZZINO,ha aggiunto 1 unita di S
+2026-06-15T22:46:57.642722500,admin,GROUP_admin,MAGAZZINO,ha eliminato il prodotto S
+2026-06-15T22:47:21.153884300,user,GROUP_admin,GRUPPO,si e unito al gruppo GROUP_admin
+2026-06-15T22:47:43.240571100,user,GROUP_admin,MAGAZZINO,ha comprato 1 unita di LATTE INTERO
+2026-06-15T22:47:51.852637,user,GROUP_admin,MAGAZZINO,ha usato 10 unita di GRAFFETTE

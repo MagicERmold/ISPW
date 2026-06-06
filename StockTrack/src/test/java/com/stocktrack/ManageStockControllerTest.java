@@ -50,28 +50,28 @@ class ManageStockControllerTest {
         List<StockBean> products = stockController.showAllStocks();
 
         StockBean result = products.stream()
-                .filter(p -> p.getNome().equals("Pasta"))
+                .filter(p -> p.getNome().equals("PASTA"))
                 .findFirst()
                 .orElse(null);
 
-        assertNotNull(result, "Il prodotto 'Pasta' dovrebbe essere presente.");
+        assertNotNull(result, "Il prodotto 'PASTA' dovrebbe essere presente.");
         assertEquals(10, result.getQuantity());
-        assertEquals("Cibo", result.getCategory());
+        assertEquals("CIBO", result.getCategory());
     }
 
     @Test
     void testAddStockValidationErrors() {
-        StockBean emptyName = new StockBean("", 10, 5);
-        assertThrows(InvalidProductDataException.class, () -> stockController.addStock(emptyName),
-                "Dovrebbe lanciare eccezione per nome vuoto.");
+        assertThrows(IllegalArgumentException.class, () -> new StockBean("", 10, 5),
+                "Il Bean non deve accettare un nome vuoto.");
 
-        StockBean negativeQty = new StockBean("Latte", -1, 5);
-        assertThrows(InvalidProductDataException.class, () -> stockController.addStock(negativeQty),
-                "Dovrebbe lanciare eccezione per quantità negativa.");
+        assertThrows(IllegalArgumentException.class, () -> new StockBean("Latte", -1, 5),
+                "Il Bean non deve accettare una quantita negativa.");
 
-        StockBean negativeThreshold = new StockBean("Pane", 10, -5);
-        assertThrows(InvalidProductDataException.class, () -> stockController.addStock(negativeThreshold),
-                "Dovrebbe lanciare eccezione per soglia negativa.");
+        assertThrows(IllegalArgumentException.class, () -> new StockBean("Pane", 10, -5),
+                "Il Bean non deve accettare una soglia negativa.");
+
+        assertThrows(IllegalArgumentException.class, () -> new StockBean("Pane", 10, 5, " "),
+                "Il Bean non deve accettare una categoria vuota.");
     }
 
     @Test
@@ -112,13 +112,13 @@ class ManageStockControllerTest {
         stockController.modifyQuantity("Biscotti", 5);
 
         StockBean updated = stockController.showAllStocks().stream()
-                .filter(p -> p.getNome().equals("Biscotti")).findFirst().orElseThrow();
+                .filter(p -> p.getNome().equals("BISCOTTI")).findFirst().orElseThrow();
         assertEquals(15, updated.getQuantity(), "10 + 5 dovrebbe fare 15.");
 
         stockController.modifyQuantity("Biscotti", -3);
 
         updated = stockController.showAllStocks().stream()
-                .filter(p -> p.getNome().equals("Biscotti")).findFirst().orElseThrow();
+                .filter(p -> p.getNome().equals("BISCOTTI")).findFirst().orElseThrow();
         assertEquals(12, updated.getQuantity(), "15 - 3 dovrebbe fare 12.");
     }
 
@@ -148,8 +148,8 @@ class ManageStockControllerTest {
 
         assertEquals(1, shoppingList.size(), "Solo l'Acqua dovrebbe essere in lista.");
         StockBean item = shoppingList.getFirst();
-        assertEquals("Acqua", item.getNome());
-        assertEquals("Bevande", item.getCategory(), "La lista della spesa deve mantenere le categorie.");
+        assertEquals("ACQUA", item.getNome());
+        assertEquals("BEVANDE", item.getCategory(), "La lista della spesa deve mantenere le categorie.");
     }
 
     @Test
@@ -159,7 +159,7 @@ class ManageStockControllerTest {
         stockController.deleteStock("DaCancellare");
 
         List<StockBean> list = stockController.showAllStocks();
-        boolean exists = list.stream().anyMatch(p -> p.getNome().equals("DaCancellare"));
+        boolean exists = list.stream().anyMatch(p -> p.getNome().equals("DACANCELLARE"));
         assertFalse(exists, "Il prodotto dovrebbe essere stato rimosso.");
 
         assertThrows(StorageException.class, () -> stockController.deleteStock("NonEsiste"));
@@ -172,12 +172,12 @@ class ManageStockControllerTest {
         stockController.addStock(new StockBean("Carota", 5, 2, "Verdura"));
 
         List<String> categories = stockController.getCategories();
-        assertTrue(categories.contains("Frutta"));
-        assertTrue(categories.contains("Verdura"));
+        assertTrue(categories.contains("FRUTTA"));
+        assertTrue(categories.contains("VERDURA"));
 
-        List<StockBean> fruitOnly = stockController.getStocksByCategory("Frutta");
+        List<StockBean> fruitOnly = stockController.getStocksByCategory("FRUTTA");
         assertEquals(2, fruitOnly.size(), "Dovrebbero esserci 2 frutti.");
-        assertTrue(fruitOnly.stream().anyMatch(p -> p.getNome().equals("Mela")));
-        assertFalse(fruitOnly.stream().anyMatch(p -> p.getNome().equals("Carota")));
+        assertTrue(fruitOnly.stream().anyMatch(p -> p.getNome().equals("MELA")));
+        assertFalse(fruitOnly.stream().anyMatch(p -> p.getNome().equals("CAROTA")));
     }
 }

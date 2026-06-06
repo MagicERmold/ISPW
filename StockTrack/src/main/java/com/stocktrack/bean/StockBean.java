@@ -1,75 +1,69 @@
 package com.stocktrack.bean;
 
+import java.util.Locale;
+
 /**
  * Bean usato dalla Boundary per mostrare e inviare dati relativi ai prodotti.
  */
 public class StockBean {
-    private final String nome;
-    private final int quantity;
-    private final int threshold;
-    private final String category;
+    private String nome;
+    private int quantity;
+    private int threshold;
+    private String category;
 
     public StockBean(String nome, int quantity, int threshold) {
-        this.nome = nome;
-        this.quantity = quantity;
-        this.threshold = threshold;
-        this.category = "Generico";
+        this(nome, quantity, threshold, "Generico");
     }
 
     public StockBean(String nome, int quantity, int threshold, String category) {
-        this.nome = nome;
-        this.quantity = quantity;
-        this.threshold = threshold;
-        this.category = category;
+        setNome(nome);
+        setQuantity(quantity);
+        setThreshold(threshold);
+        setCategory(category);
     }
 
     public String getNome() {
         return nome;
     }
 
+    public void setNome(String nome) {
+        this.nome = normalizeRequiredText(nome, "Il nome del prodotto non puo essere vuoto.");
+    }
+
     public int getQuantity() {
         return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        if (quantity < 0) {
+            throw new IllegalArgumentException("La quantita non puo essere negativa.");
+        }
+        this.quantity = quantity;
     }
 
     public int getThreshold() {
         return threshold;
     }
 
+    public void setThreshold(int threshold) {
+        if (threshold < 0) {
+            throw new IllegalArgumentException("La soglia non puo essere negativa.");
+        }
+        this.threshold = threshold;
+    }
+
     public String getCategory() {
         return category;
     }
 
-    /**
-     * Indica se il prodotto e sotto la soglia minima configurata.
-     */
-    public boolean isBelowThreshold() {
-        return quantity < threshold;
+    public void setCategory(String category) {
+        this.category = normalizeRequiredText(category, "La categoria non puo essere vuota.");
     }
 
-    /**
-     * Indica se la quantita disponibile e pari a zero.
-     */
-    public boolean isEmpty() {
-        return quantity == 0;
-    }
-
-    /**
-     * Calcola quante unita mancano per raggiungere la soglia minima.
-     */
-    public int getMissingQuantity() {
-        return Math.max(threshold - quantity, 0);
-    }
-
-    /**
-     * Restituisce lo stato sintetico del prodotto per la visualizzazione in tabella.
-     */
-    public String getStatus() {
-        if (isEmpty()) {
-            return "Esaurito";
+    private String normalizeRequiredText(String value, String errorMessage) {
+        if (value == null || value.trim().isEmpty()) {
+            throw new IllegalArgumentException(errorMessage);
         }
-        if (isBelowThreshold()) {
-            return "Sotto soglia";
-        }
-        return "Disponibile";
+        return value.trim().toUpperCase(Locale.ROOT);
     }
 }

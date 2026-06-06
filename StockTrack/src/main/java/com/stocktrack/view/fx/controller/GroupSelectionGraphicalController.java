@@ -15,8 +15,6 @@ public class GroupSelectionGraphicalController {
     @FXML private RadioButton joinRadio;
     @FXML private TextField groupIdField;
 
-    private final GroupController groupController = new GroupController();
-
     @FXML
     public void initialize() {
         // Mostra il campo di testo solo se "Unisciti" è selezionato
@@ -25,6 +23,7 @@ public class GroupSelectionGraphicalController {
 
     @FXML
     private void handleContinue() {
+        GroupController groupController = new GroupController();
         try {
             if (joinRadio.isSelected()) {
                 String id = groupIdField.getText();

@@ -90,4 +90,14 @@ class LoginControllerTest {
 
         assertTrue(loginResult, "Il login deve accettare la password salvata in chiaro.");
     }
+
+    @Test
+    void testUserBeanValidationAndNormalization() {
+        UserBean userBean = new UserBean("  " + testUsername + "  ", "password123");
+
+        assertEquals(testUsername, userBean.getUsername());
+        assertEquals("password123", userBean.getPassword());
+        assertThrows(IllegalArgumentException.class, () -> new UserBean(" ", "password123"));
+        assertThrows(IllegalArgumentException.class, () -> new UserBean(testUsername, " "));
+    }
 }

@@ -18,11 +18,10 @@ public class RegisterGraphicalController {
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
 
-    private final LoginController loginController = new LoginController();
-    private final SessionController sessionController = new SessionController();
-
     @FXML
     private void handleRegister() {
+        LoginController loginController = new LoginController();
+        SessionController sessionController = new SessionController();
         String user = usernameField.getText();
         String pass = passwordField.getText();
 
@@ -36,17 +35,18 @@ public class RegisterGraphicalController {
             return;
         }
 
-        UserBean bean = new UserBean(user, pass);
-
         try {
+            UserBean bean = new UserBean(user, pass);
             loginController.register(bean);
             showInfo("Registrazione completata", "Accesso in corso...");
             UserProfileBean currentUser = sessionController.getCurrentUserProfile();
-            if (currentUser == null || currentUser.hasGroup()) {
+            if (hasNoGroup(currentUser)) {
                 JavaFXApp.setRoot("group_selection");
             } else {
                 JavaFXApp.setRoot("home");
             }
+        } catch (IllegalArgumentException e) {
+            showWarning("Dati non validi", e.getMessage());
         } catch (StorageException e) {
             showWarning("Errore nel salvataggio dati", e.getMessage());
         } catch (IOException e) {
@@ -82,5 +82,9 @@ public class RegisterGraphicalController {
         alert.setHeaderText(header);
         alert.setContentText(content);
         alert.showAndWait();
+    }
+
+    private boolean hasNoGroup(UserProfileBean user) {
+        return user == null || user.getGroupId() == null || user.getGroupId().isBlank();
     }
 }

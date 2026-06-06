@@ -16,8 +16,6 @@ public class ActivityLogGraphicalController {
     @FXML private TableColumn<ActivityLogBean, String> actionCol;
     @FXML private TableColumn<ActivityLogBean, String> descriptionCol;
 
-    private final ActivityLogController controller = new ActivityLogController();
-
     @FXML
     public void initialize() {
         timestampCol.setCellValueFactory(new PropertyValueFactory<>("timestamp"));
@@ -28,10 +26,11 @@ public class ActivityLogGraphicalController {
     }
 
     public void loadData() {
+        ActivityLogController controller = new ActivityLogController();
         try {
             activityTable.setItems(FXCollections.observableArrayList(controller.getRecentActivities()));
         } catch (Exception e) {
-            showAlert("Errore caricamento attivita", e.getMessage());
+            showAlert(e.getMessage());
         }
     }
 
@@ -40,9 +39,9 @@ public class ActivityLogGraphicalController {
         loadData();
     }
 
-    private void showAlert(String title, String content) {
+    private void showAlert(String content) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
+        alert.setTitle("Errore caricamento attivita");
         alert.setHeaderText(null);
         alert.setContentText(content);
         alert.showAndWait();

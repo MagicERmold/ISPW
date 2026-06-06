@@ -13,13 +13,8 @@ import com.stocktrack.bean.UserProfileBean;
 import java.util.List;
 
 public class HomeCLI {
-
-    // Istanzio il controller
-    private final GroupController groupController = new GroupController();
-    private final ActivityLogController activityLogController = new ActivityLogController();
-    private final SessionController sessionController = new SessionController();
-
     public void start() {
+        SessionController sessionController = new SessionController();
         // Recupero l'utente corrente
         UserProfileBean currentUser = sessionController.getCurrentUserProfile();
 
@@ -33,7 +28,7 @@ public class HomeCLI {
         InputHelper.print("Benvenuto, " + currentUser.getUsername() + " [" + currentUser.getRole() + "]");
 
         // Gestione Gruppo
-        if (currentUser.hasGroup()) {
+        if (hasNoGroup(currentUser)) {
             handleGroupAssignment();
             currentUser = sessionController.getCurrentUserProfile();
         }
@@ -57,6 +52,7 @@ public class HomeCLI {
     }
 
     private void handleGroupAssignment() {
+        GroupController groupController = new GroupController();
         InputHelper.print("\nATTENZIONE: Non appartieni a nessun gruppo.");
         InputHelper.print("1. Crea un nuovo gruppo famigliare/personale");
         InputHelper.print("2. Unisciti a un gruppo esistente (serve ID)");
@@ -155,6 +151,7 @@ public class HomeCLI {
     }
 
     private void showRecentActivities() {
+        ActivityLogController activityLogController = new ActivityLogController();
         InputHelper.print("\n--- ATTIVITA RECENTI ---");
         try {
             List<ActivityLogBean> activities = activityLogController.getRecentActivities();
@@ -190,6 +187,7 @@ public class HomeCLI {
                 return handleOptionFour(admin);
             case "0":
                 InputHelper.print("Logout effettuato.");
+                SessionController sessionController = new SessionController();
                 sessionController.logout();
                 return false; // Ferma il ciclo while
             default:
@@ -223,5 +221,9 @@ public class HomeCLI {
             InputHelper.print("Opzione non valida.");
         }
         return true;
+    }
+
+    private boolean hasNoGroup(UserProfileBean user) {
+        return user == null || user.getGroupId() == null || user.getGroupId().isBlank();
     }
 }

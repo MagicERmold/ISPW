@@ -2,6 +2,7 @@ package com.stocktrack.view.fx.controller;
 
 import com.stocktrack.bean.StockBean;
 import com.stocktrack.controller.ManageStockController;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -35,7 +36,6 @@ public class StockGraphicalController {
     @FXML private ComboBox<String> cmbFilterCategory;
     @FXML private ComboBox<String> cmbFilterStatus;
 
-    private final ManageStockController controller = new ManageStockController();
     private final ObservableList<StockBean> allStockData = FXCollections.observableArrayList();
     private final ObservableList<StockBean> tableData = FXCollections.observableArrayList();
     private static final String ALL = "Tutte";
@@ -50,7 +50,7 @@ public class StockGraphicalController {
         colCategory.setCellValueFactory(new PropertyValueFactory<>("category")); // Assicurati che StockBean abbia getCategory()
         colQuantity.setCellValueFactory(new PropertyValueFactory<>("quantity"));
         colThreshold.setCellValueFactory(new PropertyValueFactory<>("threshold"));
-        colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
+        colStatus.setCellValueFactory(data -> new SimpleStringProperty(getStockStatus(data.getValue())));
 
         stockTable.setItems(tableData);
         stockTable.setRowFactory(table -> new TableRow<>() {
@@ -59,9 +59,9 @@ public class StockGraphicalController {
                 super.updateItem(item, empty);
                 getStyleClass().removeAll("low-stock-row", "empty-stock-row");
                 if (!empty && item != null) {
-                    if (item.isEmpty()) {
+                    if (isEmptyStock(item)) {
                         getStyleClass().add("empty-stock-row");
-                    } else if (item.isBelowThreshold()) {
+                    } else if (isBelowThreshold(item)) {
                         getStyleClass().add("low-stock-row");
                     }
                 }
@@ -81,8 +81,7 @@ public class StockGraphicalController {
         cmbFilterCategory.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> applyFilters());
         cmbFilterStatus.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> applyFilters());
 
-        loadCategories(); // Carica le categorie nel menu a tendina
-        loadStocks();     // Carica i dati iniziali
+        loadData(); // Carica categorie e dati iniziali
     }
 
     @FXML
@@ -92,37 +91,38 @@ public class StockGraphicalController {
 
     // Metodo pubblico richiamato dal HomeGraphicalController quando si cambia tab
     public void loadData() {
-        loadCategories(); // Ricarica le categorie (nel caso ne siano state aggiunte altrove)
-        loadStocks();     // Ricarica la tabella
+        ManageStockController controller = new ManageStockController();
+        try {
+            loadCategories(controller.getCategories());
+            loadStocks(controller.showAllStocks());
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Errore caricamento", e.getMessage());
+        }
     }
 
-    private void loadCategories() {
-        try {
-            List<String> categories = controller.getCategories().stream()
-                    .filter(category -> category != null && !category.isBlank())
-                    .map(category -> category.trim().toUpperCase(Locale.ROOT))
-                    .distinct()
-                    .sorted()
-                    .toList();
-            // Aggiungiamo un'opzione per vedere tutto
-            List<String> filterOptions = new ArrayList<>();
-            filterOptions.add(ALL);
-            filterOptions.addAll(categories);
+    private void loadCategories(List<String> rawCategories) {
+        List<String> categories = rawCategories.stream()
+                .filter(category -> category != null && !category.isBlank())
+                .map(category -> category.trim().toUpperCase(Locale.ROOT))
+                .distinct()
+                .sorted()
+                .toList();
+        // Aggiungiamo un'opzione per vedere tutto
+        List<String> filterOptions = new ArrayList<>();
+        filterOptions.add(ALL);
+        filterOptions.addAll(categories);
 
-            // Salviamo la selezione corrente per non resettarla
-            String currentSelection = cmbFilterCategory.getValue();
+        // Salviamo la selezione corrente per non resettarla
+        String currentSelection = cmbFilterCategory.getValue();
 
-            cmbFilterCategory.setItems(FXCollections.observableArrayList(filterOptions));
+        cmbFilterCategory.setItems(FXCollections.observableArrayList(filterOptions));
 
-            if (currentSelection != null && filterOptions.contains(currentSelection)) {
-                cmbFilterCategory.setValue(currentSelection);
-            } else {
-                cmbFilterCategory.setValue(ALL);
-            }
-            refreshProductCategories(categories);
-        } catch (Exception e) {
-            showAlert(Alert.AlertType.ERROR, "Errore", "Impossibile caricare categorie: " + e.getMessage());
+        if (currentSelection != null && filterOptions.contains(currentSelection)) {
+            cmbFilterCategory.setValue(currentSelection);
+        } else {
+            cmbFilterCategory.setValue(ALL);
         }
+        refreshProductCategories(categories);
     }
 
     private void refreshProductCategories(List<String> categories) {
@@ -133,14 +133,10 @@ public class StockGraphicalController {
         }
     }
 
-    private void loadStocks() {
-        try {
-            allStockData.setAll(controller.showAllStocks());
-            updateDashboard();
-            applyFilters();
-        } catch (Exception e) {
-            showAlert(Alert.AlertType.ERROR, "Errore caricamento", e.getMessage());
-        }
+    private void loadStocks(List<StockBean> stocks) {
+        allStockData.setAll(stocks);
+        updateDashboard();
+        applyFilters();
     }
 
     private void applyFilters() {
@@ -170,9 +166,9 @@ public class StockGraphicalController {
             return true;
         }
         return switch (selectedStatus) {
-            case STATUS_AVAILABLE -> !stock.isBelowThreshold() && !stock.isEmpty();
-            case STATUS_LOW -> stock.isBelowThreshold() && !stock.isEmpty();
-            case STATUS_EMPTY -> stock.isEmpty();
+            case STATUS_AVAILABLE -> !isBelowThreshold(stock) && !isEmptyStock(stock);
+            case STATUS_LOW -> isBelowThreshold(stock) && !isEmptyStock(stock);
+            case STATUS_EMPTY -> isEmptyStock(stock);
             default -> true;
         };
     }
@@ -180,10 +176,10 @@ public class StockGraphicalController {
     private void updateDashboard() {
         int total = allStockData.size();
         long lowStock = allStockData.stream()
-                .filter(stock -> stock.isBelowThreshold() && !stock.isEmpty())
+                .filter(stock -> isBelowThreshold(stock) && !isEmptyStock(stock))
                 .count();
         long empty = allStockData.stream()
-                .filter(StockBean::isEmpty)
+                .filter(this::isEmptyStock)
                 .count();
 
         totalProductsLabel.setText(String.valueOf(total));
@@ -193,6 +189,7 @@ public class StockGraphicalController {
 
     @FXML
     private void handleAddStock() {
+        ManageStockController controller = new ManageStockController();
         try {
             String name = txtName.getText().trim().toUpperCase(Locale.ROOT);
             String cat = cmbProductCategory.getValue();
@@ -216,10 +213,10 @@ public class StockGraphicalController {
             txtThreshold.clear();
 
             // Aggiorna categorie e tabella
-            loadCategories();
+            loadCategories(controller.getCategories());
             // Seleziona la nuova categoria o "Tutte" per mostrare l'inserimento
             cmbFilterCategory.setValue(ALL);
-            loadStocks();
+            loadStocks(controller.showAllStocks());
             showFeedback("Prodotto aggiunto correttamente.");
 
         } catch (NumberFormatException e) {
@@ -275,10 +272,11 @@ public class StockGraphicalController {
     }
 
     private void updateSelectedThreshold(StockBean selected, String thresholdText) {
+        ManageStockController controller = new ManageStockController();
         try {
             int newThreshold = Integer.parseInt(thresholdText);
             controller.modifyThreshold(selected.getNome(), newThreshold);
-            loadStocks();
+            loadStocks(controller.showAllStocks());
             showFeedback("Soglia aggiornata correttamente.");
         } catch (NumberFormatException e) {
             showAlert(Alert.AlertType.ERROR, "Errore Input", "La soglia deve essere un numero intero.");
@@ -298,10 +296,11 @@ public class StockGraphicalController {
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Sei sicuro di voler eliminare " + selected.getNome() + "?", ButtonType.YES, ButtonType.NO);
         confirm.showAndWait().ifPresent(response -> {
             if (response == ButtonType.YES) {
+                ManageStockController controller = new ManageStockController();
                 try {
                     controller.deleteStock(selected.getNome());
-                    loadStocks(); // Ricarica tabella
-                    loadCategories(); // Potrebbe essere sparita una categoria
+                    loadStocks(controller.showAllStocks()); // Ricarica tabella
+                    loadCategories(controller.getCategories()); // Potrebbe essere sparita una categoria
                     showFeedback("Prodotto rimosso correttamente.");
                 } catch (Exception e) {
                     showAlert(Alert.AlertType.ERROR, "Errore  ", e.getMessage());
@@ -320,6 +319,24 @@ public class StockGraphicalController {
 
     private void showFeedback(String message) {
         feedbackLabel.setText(message);
+    }
+
+    private boolean isBelowThreshold(StockBean stock) {
+        return stock.getQuantity() < stock.getThreshold();
+    }
+
+    private boolean isEmptyStock(StockBean stock) {
+        return stock.getQuantity() == 0;
+    }
+
+    private String getStockStatus(StockBean stock) {
+        if (isEmptyStock(stock)) {
+            return "Esaurito";
+        }
+        if (isBelowThreshold(stock)) {
+            return "Sotto soglia";
+        }
+        return "Disponibile";
     }
 
     public StockBean getSelectedStock() {

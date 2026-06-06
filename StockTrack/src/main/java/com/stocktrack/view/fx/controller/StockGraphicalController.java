@@ -334,7 +334,7 @@ public class StockGraphicalController {
             return "Esaurito";
         }
         if (isBelowThreshold(stock)) {
-            return "Sotto soglia";
+            return STATUS_LOW;
         }
         return "Disponibile";
     }

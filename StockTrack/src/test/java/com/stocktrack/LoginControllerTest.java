@@ -3,7 +3,6 @@ package com.stocktrack;
 import com.stocktrack.bean.UserBean;
 import com.stocktrack.controller.LoginController;
 import com.stocktrack.engineering.exception.DuplicateUserException;
-import com.stocktrack.engineering.exception.StorageException;
 import com.stocktrack.engineering.factory.DAOFactory;
 import com.stocktrack.engineering.singleton.SessionManager;
 import com.stocktrack.model.Role;
@@ -44,7 +43,7 @@ class LoginControllerTest {
 
         assertDoesNotThrow(() -> loginController.register(newUser), "La registrazione non dovrebbe lanciare eccezioni.");
 
-        try {
+        assertDoesNotThrow(() -> {
             UserDAO userDAO = DAOFactory.getUserDAO();
             User retrievedUser = userDAO.findUserByUsername(testUsername);
 
@@ -52,9 +51,7 @@ class LoginControllerTest {
             assertEquals(testUsername, retrievedUser.getUsername());
             assertEquals(Role.USER, retrievedUser.getRole(), "Il ruolo predefinito deve essere USER.");
             assertEquals("password123", retrievedUser.getPassword(), "La password deve essere salvata in chiaro.");
-        } catch (StorageException e) {
-            fail("Errore durante la verifica dei dati: " + e.getMessage());
-        }
+        });
     }
 
     @Test

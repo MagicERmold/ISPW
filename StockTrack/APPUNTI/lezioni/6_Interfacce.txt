@@ -1,0 +1,88 @@
+INTERFACCE
+l'ereditarietà, sebbene potente, crea un accoppiamento fortissimo tra superclasse e sottoclasse. 
+Questo può portare al "Fragile Base-Class Problem" (FBCP).
+
+
+DEFINIZIONE FBCP:
+
+Si verifica quando una modifica all'implementazione di una superclasse (la base-class) può causare un comportamento inaspettato o un errore in una sottoclasse (la sub-class), anche se la sottoclasse non è stata modificata.
+
+ESEMPIO (vedere slide per capire meglio):
+1.  Abbiamo una classe dualModeSensor che estende Sensor.
+2.  DualModeSensor sovrascrive (override) il metodo setSamplingFrequency(f): se f <= 0, chiama il metodo standbyMode() (ereditato da Sensor).
+3.  Modifica: Successivamente, uno sviluppatore modifica la classe base Sensor. 
+    Decide che standbyMode() debba, per sicurezza, impostare la frequenza a -1, quindi aggiunge al suo interno una chiamata a setSamplingFrequency(-1).
+4.  Risultato: Questa modifica, apparentemente innocua, rompe la sottoclasse. 
+    Ora, quando si chiama setSamplingFrequency(0) su un DualModeSensor, si crea una ricorsione infinita
+
+Come possiamo creare delle soluzioni che mitigano (non risolvono) questi problemi? Usando le interfacce.
+
+DEFINIZIONE:
+Un'interfaccia è una collezione di operazioni che specifica un servizio o un contratto che una classe può offrire.
+    -   Definisce solo la segnatura delle operazione [es. void fly()], ovvero cosa deve essere fatto ma non la implementa.
+    -   Non può essere istanziata direttamente. [non puoi fare new flyer()]
+    -   In UML, si indica con lo stereotipo <<interface>> o con un'icona "lollipop".
+    -   In Java, si dichiara usando la keyword public interface ...
+
+
+INTERFACCE VS CLASSI ASTRATTE
+Entrambi sono meccanismi per definire contratti e non possono essere istanziati.
+SCOPO:
+    .   CLASSE ASTRATTA: modella un'identità
+    .   INTERFACCIA: modella un ruolo/comportamento
+
+IMPLEMENTAZIONE:
+    .   CLASSE ASTRATTA: può contenere metodi concreti e metodi astratti
+    .   INTERFACCIA: tutte le operazioni sono astratte
+
+STATO(ATTRIBUTI):
+    .   CLASSE ASTRATTA: può definire attributi
+    .   INTERFACCIA: non può definire attributi
+
+EREDITARIETA:
+    .   CLASSE ASTRATTA: una classe può extend una sola classe
+    .   INTERFACCIA: una classe può "implementare" più interfacce
+
+MORALE: 
+    -   Usa una classe astratta per una relazione "is-a-kind-of" (è un tipo di), 
+        quando vuoi condividere uno stato e un'implementazione comune tra sottoclassi (es. TempSensor è un tipo di Sensor).
+    -   Usa un'interfaccia per una relazione "can-do" (può fare), quando vuoi definire un ruolo o un comportamento 
+        che diverse classi non correlate possono adottare (es. Shuttle e Dragon possono Fly).
+
+
+REALIZZAZIONE E POLIMORFISMO
+
+L'atto di fornire l'implementazione per un'interfaccia si chiama realizzazione.
+Questo permette un'altra forma di polimorfismo, più flessibile.
+
+
+EREDITARIETA VS REALIZZAZIONE
+
+-   EREDITARIETA (extends): Si ereditano sia la specifica (il contratto) sia l'implementazione (il codice e gli attributi). 
+                            È una relazione forte e rigida, che può portare al FBCP.
+-   REALIZZAZIONE (implements): Si "eredita" solo la specifica (il contratto), ma si è obbligati a fornire la propria implementazione. 
+                                È più flessibile e robusta.
+
+Java sfrutta questa differenza:
+    -   NIENTE EREDITARIETA MULTIPLA: Una classe Java non può "extend" due classi, perché questo creerebbe ambiguità.
+    -   SI IMPLEMENTAZIONI MULTIPLE: Una classe Java può implements più interfacce. 
+        Questo ha senso perché un oggetto può avere una sola identità ("is-a-kind-of"), ma può avere molteplici ruoli.
+        ES. public class SuperHero implements Flyer, Fighter, Swimmer
+
+ESEMPIO FINALE LA BIBLIOTECA:
+
+PROBLEMA: 
+Abbiamo Libro, CD (prestabili) e Rivista (non prestabile).
+
+SOLUZIONE ERRATA: 
+Creare due gerarchie separate (Elemento Prestabile e Elemento Non Prestabile). 
+È sbagliato perché Biblioteca non può trattarli in modo uniforme (es. per fare un inventario di tutti gli Elemento Biblioteca).
+
+SOLUZIONE CORRETTA:
+1.  Tutti gli oggetti (Libro, CD, Rivista) estendono la classe astratta Elemento Biblioteca (la loro identità comune).
+2.  Solo Libro e CD implementano l'interfaccia Prestabile (il loro ruolo specifico).
+
+VANTAGGIO: 
+La classe Biblioteca può ora:
+    -   Gestire un ArrayList<ElementoBiblioteca> per l'inventario generale.
+    -   Gestire un ArrayList<Prestabile> per la gestione dei prestiti.

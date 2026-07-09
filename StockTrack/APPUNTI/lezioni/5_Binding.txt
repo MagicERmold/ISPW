@@ -1,0 +1,59 @@
+JAVA COME LINGUAGGIO DINAMICO
+
+A differenza del c++ Java è stato pensato per risolvere due problemi:
+    -   "CONSTANT RECOMPILATION PROBLEM": In C++, se modifichi una classe base, spesso devi ricompilare tutte le classi che la usano, anche se la modifica è interna.
+    -   "FRAGILE BASE-CLASS PROBLEM": Modifiche alla classe base possono "rompere" le sottoclassi.
+
+Java mitiga questi problemi perché il compilatore non usa indirizzi di memoria fissi, ma usa riferimenti simbolici (essenzialmente, dei "nomi"). 
+Sarà poi l'interprete Java (la JVM) a risolvere questi nomi e collegarli ai metodi corretti a run-time.
+
+
+BINDING: DEFINIZIONE
+
+Il binding è l'atto di associare l'invocazione di un'operazione con l'effettivo metodo (il codice) da eseguire.
+Esistono due tipi di binding:
+    1.  EARLY BINDING (STATICO): L'associazione viene decisa a tempo di compilazione (compile-time). Il compilatore sa esattamente quale metodo deve essere eseguito.
+    2.  LATE BINDING (DINAMICO): L'associazione viene decisa a tempo di esecuzione (run-time). La scelta del metodo dipende dall'effettivo tipo dell'oggetto in quel momento.
+
+IL POLIMORFISMO è L'IMPLEMENTAZIONE DEL LATE BINDING.
+
+BINDING IN JAVA
+
+Java usa principalmente il LATE BINDING, tuttavia ci sono 3 eccezioni in cui usa l'EARLY BINDING:
+    1.  Metodi "Static": 
+    2.  Metodi "Final": impedisce l'overriding, quindi sa con precisione quale metodo chiamare se non c'è sovrascrittura.
+    3.  Metodi "Private": Essendo visibili solo da chi li dichiara non può essere modificato da sottoclassi.
+
+
+MEMORIA DELLA JVM (JAVA VIRTUAL MACHINE)
+
+Per capire come la JVM sceglie quale metodo eseguire dobbiamo approfondire la memoria, che si divide in STACK e HEAP:
+STACK (pila)
+    -   Area di memoria usata per l'esecuzione dei metodi.
+    -   Ogni thread in esecuzione ha il suo stack personale.
+    -   Quando un nuovo metodo viene chiamato, un nuovo blocco (chiamato stack-frame) viene messo in cima alla pila.
+    -   Questo frame contiene le variabili locali, i parametri del metodo e il valore di ritorno.
+    -   Quando il metodo termina, il suo frame viene rimosso dalla pila (gestione LIFO).
+    -   Area di memoria molto veloce e gestita automaticamente.
+
+HEAP (cumulo)
+    -   Area di memoria usata per l'allocazione dinamica.
+    -   Condivisa da tutti i thread della JVM.
+    -   Qui vengono memorizzati gli oggetti (le istanze create con new) e gli array.
+    -   I dati nella heap sopravvivono finchè c'è almeno un riferimento ad essi, la pulizia è gestita dal garbage collector.
+
+// Da qui in poi sono tutti esempi o approfondimenti non necessari (almeno credo) per l'esame
+
+ESEMPIO PER CAPIRE LA MEMORIA:
+Pensa allo STACK come a una serie di scrivanie, una per ogni impiegato (Thread). Quando un impiegato inizia un nuovo compito (metodo),
+prende un foglio nuovo (stack frame) e ci scrive sopra i dati che gli servono solo per quel compito (variabili locali). 
+Quando finisce, appallottola il foglio e lo butta. Pensa allo HEAP come a un grande magazzino (memoria condivisa). 
+Quando serve un "pezzo" grande e duraturo (un oggetto), l'impiegato fa una richiesta (new). Il magazzino costruisce l'oggetto e dà 
+all'impiegato solo un biglietto con l'indirizzo (la reference). L'impiegato tiene questo piccolo biglietto sul suo 
+foglio (nello Stack), ma l'oggetto vero e proprio resta nel magazzino (Heap).
+
+LE ISTRUZIONI INVOKE (SLIDE 15-24)
+Quando chiami un metodo il bytecode di java usa una di queste istruzioni:
+1.  invokestatic: Usata per i metodi static.
+2.  invokevirtual: Questa è l'istruzione che implementa il polimorfismo. Viene usata per i metodi (public, protected) su un'istanza.
+3.  invokespecial: Usata per i metodi che non sono polimorfi (binding statico), come i metodi private, i costruttori e le chiamate super.metodo().

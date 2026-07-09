@@ -1,0 +1,59 @@
+PATTERN STRUTTURALI
+I pattern strutturali descrivono come comporre classi e oggetti per formare strutture più complesse.
+Si dividono in due tipi:
+    1.  Basati su Classi: Usano l'ereditarietà per comporre interfacce o implementazioni.
+    2.  Basati su Oggetti: Usano la composizione di oggetti. Sono più flessibili perché la composizione può cambiare run-time.
+
+ADAPTER (Wrapper)
+-   SCOPO: Convertire l'interfaccia di una classe in un'altra interfaccia attesa dai client. Permette a classi con interfacce incompatibili di lavorare insieme.
+-   MOTIVAZIONE: Spesso si vuole riusare una classe esistente (es. una libreria di terze parti), ma la sua interfaccia non corrisponde a quella richiesta dal nostro sistema (es. nomi dei metodi diversi).
+-   STRUTTURA:
+    .   Target: Definisce l'interfaccia che il Client si aspetta e usa.
+    .   Client: Collabora con oggetti conformi all'interfaccia Target.
+    .   Adaptee: La classe esistente che ha l'interfaccia incompatibile (quella da adattare).
+    .   Adapter: La classe che implementa Target e mantiene un riferimento a Adaptee. Traduce le chiamate da target a Adaptee.
+-   COLLABORAZIONE: Il Client chiama request() sull'Adapter. L'Adapter chiama specificeRequest() sull'Adaptee.
+-   CONSEGUENZE: L'uso dell'adapter potrebbe non essere trasparente se le interfacce sono molto diverse.
+
+DECORATOR (Wrapper)
+-   SCOPO: Aggiungere dinamicamente responsabilità (funzionalità) a un singolo oggetto, senza alterare le altre istanze della stessa classe. È un'alternativa flessibile all'ereditarietà.
+-   MOTIVAZIONE: Immagina un toolkit grafico. Vuoi aggiungere un bordo o una scrollbar a una finestra di testo. Usare l'ereditarietà (BorderedTextView, ScrollableTextView, BorderedScrollableTextView) porterebbe a un'esplosione di sottoclassi.
+-   SOLUZIONE: Racchiudi il componente in un altro oggetto (Il Decorator) che aggiunge la funzionalità.
+-   STRUTTURA:
+    .   Component: L'interfaccia comune per oggetti e decoratori.
+    .   ConcreteComponent: L'oggetto base a cui aggiungere responsabilità (TextView).
+    .   Decorator: Mantiene un riferimento a un Component e implementa la stessa interfaccia. Inolta le richieste al componente.
+    .   ConcreteDecorator: Aggiunge la funzionalità specifica (es. BorderDecorator) prima o dopo aver chiamato il componente.
+-   CONSEGUENZE:
+    (+) Maggior flessibilità rispetto all'ereditarietà statica.
+    (+) Puoi aggiungere/rimuovere responsabilità a run-time collegando/scollegando i decoratori.
+    (+) Evita classi complesse cariche di funzionalità non sempre necessarie.
+
+FAÇADE (Facciata)
+-   SCOPO: Fornire un'interfaccia unificata e semplificata a un insieme di interfacce di un sottosistema complesso.
+-   MOTIVAZIONE: Un sistema è diviso in sottosistemi. Per minimizzare le dipendenze e la complessità, si intoduce un oggetto Façade che funge da un unico punto di ingresso per il sottosistema.
+-   APPLICABILITÀ: Quando s ivuole fornire un in'interfaccia semplice a un sistema complesso, o stratificare il sistema.
+-   STRUTTURA:
+    .   Façade: Conosce le classi del sottosistema e delega loro le richieste del client.
+    .   SubSystem Classes: Implementano le funzionalità reali. Non conoscono il Façade.
+-   CONSEGUENZE:
+    (+) Riduce l'accoppiamento tra client e sottosistema (Low Coupling).
+    (+) Nasconde i dettagli implementativi del sottosistema. Se il sottosistema cambia, cambia solo il Façade, non i client.
+
+
+PATTERN COMPORTAMENTALI
+I Pattern Comportamentali definiscono algoritmi e modi di comunicazione tra oggetti.
+
+OBSERVER (Deoendents, Publish-Subscribe)
+-   SCOPO: Definire una dipendenza uno-a-molti tra oggetti, in modo che quando un oggetto cambia stato, tutti i suoi dipendenti vengano notificati e aggiornati automaticamente.
+-   MOTIVAZIONE: Separare la logica dei dati (Model) dalla visualizzazione (View). Se i dati cambiano (es. in un foglio di calcolo), tutti i grafici che dipendono da quei dati (torta, barre) devono aggiornarsi, senza che il modello debba conoscere i dettagli dei grafici.
+-   STRUTTURA:
+    .   Subject: L'oggetto che viene osservato. Mantiene una lista di osservatori e fornisce metodi per aggiungerli/rimuoverli (attach,detach) e notificarli (notify).
+    .   Observer: L'interfaccia per gli oggetti che devono essere notificati. Definisce il metodo update().
+    .   ConcreteSubject: Lo stato concreto. Quando cambia, chiama notify() (che chiama update() su tutti gli osservatori).
+    .   ConcreteObserver: Mantiene un riferimento al Subject e implementa update() per sincronizzare il proprio stato con quello del Subject.
+-   CONSEGUENZE:
+    (+) Accoppiamento astratto e minimale. Il Subject sa solo che ha una lista di Observer, non sa di che classe concreta siano.
+    (+) Supporto per comunicazioni "broadcast" (notifiva a tutti gli interessati).
+    (-) Aggiornamenti inattesi. Una piccola modifica nel Subject potrebbe scatenare una cascata di aggiornamenti costosi negli osservatori.
+    (-) Il protocollo di notifica base (update()) spesso non dice cosa è cambiato, costringendo l'osservatore a dover interrogare il Subject per scoprirlo.

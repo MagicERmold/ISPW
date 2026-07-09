@@ -1,0 +1,41 @@
+09/10/2025
+
+Se un attributo è private un figlio può ereditare un attributo ma per usarlo deve usare le operazioni del padre.
+
+Se ho due classi: A, B e sia C un figlio di B. Se A interagisce con B interagisce anche con C?
+Durante la generalizzazione il figlio eredita tutte le caratteristiche del padre, quindi eredita anche tutte le interazioni del padre con altre classi.
+Quindi si, anche C interagisce con A.
+
+Super serve per costruire tutto quello che c'è nel padre, perché come fai a fare un figlio se il padre non esiste?
+
+EREDITARIETA MULTIPLA
+    -   Una classe può avere 2 o più super-classi dirette
+    -   La sottoclasse eredita da tutte le super-classi
+
+Java non consente l'ereditarietà multipla. 
+
+VANTAGGI:
+    -   Più facile rappresentare oggetti molto complessi.
+    -   Possibile aggregare funzionalità differenti.
+    -   Soluzione elegante effettivamente utile in molti casi pratici.
+
+SVANTAGGI:
+    -   Se c'è un sistema di gestione run-time, il sistema si complica.
+    -   Può essere complesso o poco chiaro.
+    -   Rischio elevato di name clash, ovvero non capisco a chi mi sto riferendo con i nomi.
+
+QUANDO USARE LA GENERALIZZAZIONE?
+Prima dobbiamo capire il problema e a cosa serve il modello.
+
+Ipotiziamo di voler creare una finestra di testo con due scrollbar. Una orizzontale e una verticale.
+
+L'operazione di generalizzazione eredita le caratteristiche, una e una sola volta, quindi (dall'esempio delle slide) posso creare una e una sola scrollbar.
+Non va bene l'esempio perché ScrolltextWindow può ereditare le caratteristiche di una ScrollBar ma a noi ce ne servono due.
+
+Se faccio riferimento al figlio faccio sempre riferimento al padre. Ma se faccio riferimento al padre non posso prendere qualcosa del figlio.
+
+PRINCIPIO DI SOSTITUIBILITA
+Se q(x) è una proprietà che si può dimostrare essere valida per oggetti x di tipo T, allora q(y) deve essere valida per oggetti y di tipo S dove S è un sottotipo di T.
+In poche parole se posso fare qualcosa con il padre posso fare la stessa cosa con il figlio.
+
+Il figlio "is a kind of", ovvero che se io sostituisco i padri con i figli devo poter fare la stessa cosa.

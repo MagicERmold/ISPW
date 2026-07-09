@@ -1,76 +1,92 @@
 package com.stocktrack.controller;
 
-import com.stocktrack.bean.UserBean;
-import com.stocktrack.engineering.exception.StorageException;
-import com.stocktrack.engineering.factory.DAOFactory;
-import com.stocktrack.engineering.singleton.SessionManager;
-import com.stocktrack.engineering.exception.DuplicateUserException;
-import com.stocktrack.model.Role;
-import com.stocktrack.model.User;
-import com.stocktrack.persistence.dao.UserDAO;
+import com.stocktrack.bean.EsitoOperazioneBean;
+import com.stocktrack.bean.LoginBean;
+import com.stocktrack.bean.ProfiloUtenteBean;
+import com.stocktrack.bean.RegistrazioneBean;
+import com.stocktrack.bean.RuoloUtente;
+import com.stocktrack.entity.Commesso;
+import com.stocktrack.entity.Titolare;
+import com.stocktrack.exceptions.AutenticazioneException;
+import com.stocktrack.exceptions.InvalidInputException;
+import com.stocktrack.exceptions.PersistenceException;
+import com.stocktrack.pattern.factory.DAOFactory;
+import com.stocktrack.pattern.factory.DAOFactoryProvider;
+import com.stocktrack.pattern.singleton.Session;
+import com.stocktrack.pattern.singleton.SessionManagerSingleton;
+import com.stocktrack.security.PasswordHasher;
 
-/**
- * Controller applicativo per autenticazione e registrazione utenti.
- * Coordina Boundary, DAO e SessionManager mantenendo la logica di login fuori dalla UI.
- */
+import java.util.Optional;
+import java.util.UUID;
+
 public class LoginController {
 
-    /**
-     * Autentica un utente e apre la sessione se le credenziali sono corrette.
-     *
-     * @param userBean dati inseriti dalla Boundary
-     * @return true se il login riesce, false se username o password non sono validi
-     * @throws StorageException se la persistenza non e disponibile
-     */
-    public boolean login(UserBean userBean) throws StorageException {
-        // Recupero la modalità di persistenza
-        UserDAO userDAO = DAOFactory.getUserDAO();
+    public ProfiloUtenteBean login(LoginBean loginBean)
+            throws InvalidInputException, AutenticazioneException, PersistenceException {
+        loginBean.validate();
 
-        // Recupero l'utente dal DATABASE
-        User user = userDAO.findUserByUsername(userBean.getUsername());
-
-        // Utente non trovato
-        if (user == null) {
-            return false;
+        DAOFactory daoFactory = DAOFactoryProvider.getFactory();
+        Optional<Titolare> titolare = daoFactory.getTitolareDAO().findByEmail(loginBean.getUsername());
+        if (titolare.isPresent()) {
+            verificaPassword(loginBean.getPassword(), titolare.get().getPasswordHash());
+            return creaProfiloTitolare(titolare.get());
         }
 
-        // Password corretta: salvo la sessione
-        if (userBean.getPassword().equals(user.getPassword())) {
-            SessionManager.getInstance().login(user);
-            return true;
+        Optional<Commesso> commesso = daoFactory.getCommessoDAO().findByEmail(loginBean.getUsername());
+        if (commesso.isPresent()) {
+            verificaPassword(loginBean.getPassword(), commesso.get().getPasswordHash());
+            return creaProfiloCommesso(commesso.get());
         }
 
-        // Password errata: errore
-        return false;
+        throw new AutenticazioneException("Credenziali non valide");
     }
 
-    /**
-     * Registra un nuovo utente con ruolo base e apre la sessione dopo il salvataggio.
-     *
-     * @param userBean dati di registrazione ricevuti dalla Boundary
-     * @return true se la registrazione viene completata
-     * @throws DuplicateUserException se lo username e gia presente
-     * @throws StorageException se la persistenza non e disponibile
-     */
-    public boolean register(UserBean userBean) throws DuplicateUserException, StorageException {
-        // Recupero la modalità di persistenza
-        UserDAO userDAO = DAOFactory.getUserDAO();
+    public ProfiloUtenteBean registra(RegistrazioneBean registrazioneBean)
+            throws InvalidInputException, AutenticazioneException, PersistenceException {
+        registrazioneBean.validate();
 
-        // Controllo se l'utente è già presente nel database
-        if (userDAO.findUserByUsername(userBean.getUsername()) != null) {
-            throw new DuplicateUserException("L'utente '" + userBean.getUsername() + "' è già registrato.");
+        DAOFactory daoFactory = DAOFactoryProvider.getFactory();
+        if (daoFactory.getTitolareDAO().findByEmail(registrazioneBean.getEmail()).isPresent()
+                || daoFactory.getCommessoDAO().findByEmail(registrazioneBean.getEmail()).isPresent()) {
+            throw new AutenticazioneException("Email gia registrata");
         }
 
-        // Default provvisorio: USER (senza gruppo).
-        // Il ruolo vero verrà definito quando entrerà/creerà un gruppo.
-        User newUser = new User(userBean.getUsername(), userBean.getPassword(), Role.USER);
+        if (RuoloUtente.COMMESSO.equals(registrazioneBean.getRuolo())) {
+            Commesso commesso = new Commesso("COM-" + UUID.randomUUID(), registrazioneBean.getNome(),
+                    registrazioneBean.getCognome(), registrazioneBean.getEmail(),
+                    PasswordHasher.hash(registrazioneBean.getPassword()));
+            daoFactory.getCommessoDAO().save(commesso);
+            return creaProfiloCommesso(commesso);
+        }
 
-        // Salvo l'utente nel database
-        userDAO.saveUser(newUser);
+        Titolare titolare = new Titolare("TIT-" + UUID.randomUUID(), registrazioneBean.getNome(),
+                registrazioneBean.getCognome(), registrazioneBean.getEmail(),
+                PasswordHasher.hash(registrazioneBean.getPassword()));
+        daoFactory.getTitolareDAO().save(titolare);
+        return creaProfiloTitolare(titolare);
+    }
 
-        // Apro la sessione solo dopo il salvataggio riuscito
-        SessionManager.getInstance().login(newUser);
+    public EsitoOperazioneBean logout() {
+        SessionManagerSingleton.getInstance().logoutCurrentSession();
+        return new EsitoOperazioneBean(true, "Logout effettuato");
+    }
 
-        return true;
+    private ProfiloUtenteBean creaProfiloTitolare(Titolare titolare) {
+        Session session = SessionManagerSingleton.getInstance().createSession(titolare.getId(), RuoloUtente.TITOLARE);
+        return new ProfiloUtenteBean(titolare.getId(), titolare.getNome(), RuoloUtente.TITOLARE,
+                session.getDataLogin());
+    }
+
+    private ProfiloUtenteBean creaProfiloCommesso(Commesso commesso) {
+        Session session = SessionManagerSingleton.getInstance().createSession(commesso.getId(), RuoloUtente.COMMESSO);
+        return new ProfiloUtenteBean(commesso.getId(), commesso.getNome(), RuoloUtente.COMMESSO,
+                session.getDataLogin());
+    }
+
+    private void verificaPassword(String password, String expectedHash) throws AutenticazioneException {
+        if (expectedHash == null || expectedHash.isBlank()
+                || !PasswordHasher.hash(password).equals(expectedHash)) {
+            throw new AutenticazioneException("Credenziali non valide");
+        }
     }
 }

@@ -1,0 +1,116 @@
+Una classe è caratterizzata dagli attributi.
+ATTRIBUTI: elementi che definiscono le caratteristiche o lo stato degli oggetti che verranno creati da quella classe.
+ES: gli attributi di una classe persona possono essere: Nome, Cognome, Età ecc...
+
+COSTRUTTORI:
+Operazioni speciali la cui responsabilità è quella di creare e configurare nuove istanze.
+Ha il compito di inizializzare l'oggetto e impostare il valore iniziale degli attributi.
+Una classe può avere più costruttori, hanno tutti lo stesso nome e si distinguono per la loro segnatura (per il tipo e numero dei parametri che io gli passo).
+
+ESEMPIO:
+Considera una classe Persona:
+    -   Un costruttore senza parametri
+    -   Un costruttore Persona(String nome, int eta)
+    -   Un costruttore Persona(String nome)
+Segnatura = nome + lista di attributi
+
+Un costruttore non può essere istanziato, ma può essere associato ad un metodo costruttore.
+
+Come specifico un costruttore in Java?
+public class Sensor{
+    // Costruttore senza parametri
+    public Sensor(){
+        // Codice 1
+    }
+    // Costruttore con parametri
+    public Sensor(int samplingFrequency){
+        // Codice 2
+    }
+}
+Il nome del costruttore è Sensor.
+Il tipo di ritorno è una classe Sensor.
+
+DISTRUTTORI
+Sono operazioni speciali che hanno il compito di pulire una parte di ambiente run-time. Ovvero di cancellare i costruttori.
+In Java esiste una dichiarazione implicita e anche la distruzione è implicita(Ovvero che non è il programmatore che decide quando accade, il garbage collector si sveglia e sceglie chi distruggere)
+
+Costruttori e distruttori non sono modellati in UML.
+
+THIS
+public class Sensor{
+    int samplingFrequency;
+
+    public Sensor(){
+        // Quando invochi il costruttore di default, invoca il costruttore con valore 5000
+        this(5000);
+    }
+
+    public Sensor(int samplingFrequency){
+        this.samplingFrequency = samplingFrequency;
+    }
+}
+
+Come faccio a tenere traccia del numero di istanze che ho creato?
+Ogni istanza ha la sua memoria che contiene i vari dati. Posso associare una variabile che è condivisa da qualsiasi istanza della classe.
+
+Java crea uno spazio di memoria condiviso tra le istanze.
+Operazione di classe: NON richiede una istanza.
+
+ESEMPIO:
+public class Sensor(){
+
+    private static int numberOfInstances;
+
+    public static int getInstances(){
+
+    }
+
+    // Static è un attributo che si comporta come una classe
+
+}
+
+COME ACCEDERE?
+int n1 = Sensor.getInstances();
+
+Sensor s = new Sensor(); // Crea memoria sulla heap
+int n2 = s.getInstances();
+
+
+INCAPSULAMENTO -> Robustezza
+
+Modificatori di visibilità:
+PUBLIC (+): Accessibile ovunque, posso invocare qualsiasi metodo di una classe public
+PRIVATE (-): Accessibile solo dalla classe che lo definisce.
+PROTECTED (#): Accessibile dalla sua classe e dalle sue sottoclassi, a volte anche dai package.
+
+Private e Protected sembrano essere la stessa cosa.
+REGOLA PRATICA:
+    -   Gli attributi sono sempre privati
+    -   Le operazioni possono essere publiche
+
+
+CLASS DIAGRAMS
+STRUTTURA: nodi + relazioni
+RELAZIONI:
+1. Generalizzazione: relazione tra una classe più generale (padre o superclasse) ed una più specifica (figlio o sotto-classe)
+Una sottoclasse eredita tutte le caratteristiche della superclasse una ed una sola volta.
+Il figlio è esattamente dello stesso tipo del padre. Ma contiene più informazioni (è più definita).
+
+In UML la generalizzazione è rappresentata con una freccia che parte dal figlio e punta il padre.
+
+GENERALIZZAZIONE VS SPECIALIZZAZIONE
+GENERALIZZAZIONE: Quando più classi hanno cose in comune e quindi creo una superclasse comune (padre).
+SPECIALIZZAZIONE: Quando una classe è troppo specifica e quindi la divido in più sottoclassi.
+
+EXTENDS: non ci azzecca nulla, zero, niente, non ci sta di casa, con lo stereotipo extens che troverete negli use case diagram.
+
+ORDINE DI ESECUZIONE DEI COSTRUTTORI:
+    1.  Costruttore del padre
+    2.  Costruttore del figlio
+Questo perché prima costruiamo la parte del padre e poi quella del figlio.
+
+super(); Invoca in modo esplicito il costruttore padre.
+Va messa come prima istruzione di un costruttore!!!
+
+Se non ho nessun costruttore di default, viene inizializzato un costruttore di default che non fa niente.
+Se ho dei costruttori che hanno bisogno dei parametri ma non ho un costruttore di default, devo specificare il costruttore non di default che voglio chiamare.

@@ -1,0 +1,67 @@
+ARCHITETTURE MVC/MVP E SISTEMI DISTRIBUITI
+Questa lezione si concentra su come raffinare il modello di analisi BCE in un modello di progettazione concreto, introducendo le architetture MVC e MVP e affrontando le sfide dei sistemi distribuiti.
+
+DAL BCE AL DESIGN: MVC E MVP
+PROBLEMA: Il pattern BCE è ottimo per l'analisi (dominio del problema), ma per la progettazione (dominio della soluzione) abbiamo bisogno di qualcosa di più tecnico che consideri l'interfaccia utente e l'architettura.
+SOLUZIONE: Raffinare BCE usando pattern architetturali come MVC o MVP.
+    -   Entity -> Model
+    -   Boundary -> View
+    -   Control -> Controller (o Presenter)
+
+MODEL-VIEW-CONTROLLER (MVC)
+L'MVC divide l'applicazione in tre componenti interconnessi:
+MODEL (Modello): 
+    -   RUOLO: Incapsula lo stato dell'applicazione e la logica di business. Corrisponde alle Entity.
+    -   RESPONSABILITA: Rispondere alle interrogazioni di stato, esporre le funzionalità applicative e notificare le View dei cambiamenti (spesso usando il pattern Observer).
+    -   INDIPENDENZA: Il Model non deve dipendere dalla View o dal Controller.
+VIEW (Vista):
+    -   RUOLO: Gestisce la presentazione dei dati e l'interfaccia utente (GUI). Corrisponde alle Boundary.
+    -   RESPONSABILITA: Rendering del modello, invio dei gesti dell'utente al Controller.
+    -   ACCESSO AI DATI: Può leggere i dati dal Model (in sola lettura) per visualizzarli.
+    -   AGGIORNAMENTO:
+        .   Push Model: Riceve notifiche "in tempo reale" dal Model (Observer). (Il Model ci invia i dati alla View)
+        .   Pull Model: Chiede i dati al Model quando serve. (La View chiede i dati al Model)
+CONTROLLER (Controllore):
+    -   RUOLO: Definisce il comportamento dell'applicazione. Corrisponde al Control.
+    -   RESPONSABILITA: Mappa le azioni dell'utente (dalla View) in aggiornamenti del Model. Seleziona la View da mostrare.
+    -   CONTROLLER GRAFICO vs APPLICATIVO:
+        -   Grafico: Gestisce l'interazione UI (es. click del bottone).
+        -   Applicativo: Implementa la logica del caso d'uso. Nel corso prediligiamo disaccoppiarli: il controller grafico (parte della View) delega al controller applicativo.
+
+MODEL-VIEW-PRESENTER (MVP)
+È una variante dell'MVC, usata spesso per le GUI moderne.
+DIFFERENZA CHIAVE: la View è passiva.
+    -   In MVC, la View può leggere direttamente dal Model.
+    -   In MVP, la View non tocca mai il Model. Tutto passa attraverso il Presenter (che sostituisce il Controller).
+PRESENTER: Fa da intermediario totale. Prende i dati dal Model, li formatta e li passa alla View.
+
+
+ARCHITETTURE: STAND-ALONE VS. DISTRIBUITE
+Come cambia l'MVC/BCE quando passiamo da un PC singolo (Stand-alone) al Web (Distribuito)?
+1.  ARCHITETTURA STAND-ALONE (Centralizzata)
+    -   Tutto gira nella stessa JVM (stesso spazio di memoria).
+    -   Le interazioni avvengono tramite riferimenti in memoria (puntatori).
+    -   È facile condividere oggetti tra View, Control e Model.
+2.  ARCHITETTURA DISTRIBUITA (Web)
+    -   SCENARIO: Web Browser (Client) <--> Web Server (Server).
+    -   PROBLEMA: View e Controller/Model sono su macchine diverse. Non condividono la memoria! Non posso passare un puntatore a un oggetto Studente dal Server al Browser.
+    -   SOLUZIONE: Scambio di Dati (Copie). Si scambiano copie dei dati (es. serializzati in JSON, XML o oggetti Java serializzati).
+
+LE CLASSI "BEAN" (o DTO)
+Per gestire questo scambio di dati nelle architetture distribuite (e per disaccoppiare i livelli in quelle stand-alone), introduciamo le classi Bean.
+    -   COSA SONO: Semplici contenitori di dati (POJO - Plain Old Java Object) con attributi privati e metodi getter/setter. Nessuna logica di business.
+    -   RUOLO: Fanno da "cuscinetto" (buffer) tra Boundary ed Entity/Control.
+    -   ESEMPIO: Invece di passare l'oggetto Studente (Entity) alla GUI, il Controller crea uno StudenteBean con solo i dati da visualizzare (nome, matricola) e lo passa alla View.
+
+ESEMPIO DI ERRORE: IL SINGLETON E LA SESSIONE (Slide 32-41)
+Il professore mostra un errore comune nel design di applicazioni web distribuite.
+    -   SCENARIO: Un Controller implementato come Singleton (una sola istanza per tutta l'applicazione).
+    -   PROBLEMA (Stateful vs Stateless):
+        .   Se il Controller mantiene lo stato dell'utente (es. "l'utente corrente è Mario") in un suo attributo, e c'è una sola istanza condivisa da tutti gli utenti web...
+        .   DISASTRO: Se Luigi si collega, sovrascrive "Mario" con "Luigi". Mario, al click successivo, si ritroverà a operare sui dati di Luigi!
+    -   SOLUZIONE CORRETTA:
+        1.  Il Controller deve essere Stateless (senza memoria dell'utente tra una chiamata e l'altra).
+        2.  Lo stato dell'utente (chi è loggato, cosa sta facendo) va mantenuto in un oggetto dedicato: la Sessione.
+        3.  La Sessione è specifica per ogni utente.
+        4.  C'è un SessionManager (lui sì che può essere Singleton) che gestisce la mappa delle sessioni attive.
+Nota: Nelle moderne tecnologie web (come le Servlet Java o Spring), la gestione della sessione è spesso fornita dal framework, ma è vitale capire il concetto architetturale.

@@ -1,0 +1,55 @@
+PERSISTENZA E JAVA I/O (LEZIONI 41-42)
+Questa lezione esplora come Java gestisce il flusso di dati (I/O) verso dispositivi esterni (file, rete, memoria) e come garantire che lo stato degli oggetti sopravviva alla terminazione del programma (persistenza).
+
+
+IL CONCETTO DI STREAM
+Java astrae la complessità dei dispositivi di I/O (file, console, sensori) attraverso il concetto di Stream.
+    -   DEFINIZIONE: Uno stream modella il flusso sequenziale di informazioni con qualsiasi dispositivo capace di produrre o ricevere dati.
+    -   SCHEMA DI UTILIZZO: Sia per la lettura che per la scrittura, il pattern è sempre:
+        1.  open(stream)
+        2.  while(more information) -> read() / write()
+        3.  close(stream)
+
+
+TASSONOMIA DI JAVA.IO
+Il package java.io divide le classi in due macro-famiglie basate sul tipo di dato trattato.
+    1.  BYTE-ORIENTED (Binario)
+        -   L'unità atomica è il byte. Usato per immagini, audio, video, ecc. .
+        -   Classi base: InputStream (input) e OutputStream (output).
+    2.  CHAR ORIENTED (testuale)
+        -   L'unità atomica è il carattere. Usato per file di testo.
+        -   Classi base: Reader (input) e Writer (output).
+
+
+IL PATTERN DECORATOR IN JAVA.IO
+L'organizzazione delle librerie di I/O di Java è un classico esempio di applicazione del Design Pattern Decorator (GoF).
+    -   COMPONENTI CONCRETI: Classi che leggono/scrivono su una sorgente specifica (es. FileInputStream, ByteArrayInputStream).
+    -   DECORATORI: Classi che "avvolgono" uno stream per aggiungere funzionalità (es. buffering, gestione tipi primitivi). Esempi: BufferedInputStream, DataInputStream.
+
+
+ACCESSO CASUALE
+A differenza degli stream che sono sequenziali, Java offre la classe RandomAccessFile per leggere/scrivere in qualsiasi punto di un file.
+    -   Non fa parte della gerarchia Stream.
+    -   Usa il metodo seek() per spostare il puntatore all'interno del file.
+    -   Modalità di apertura: "r" (read) o "rw" (read-write).
+
+
+PERSISTENZA DEGLI OGGETTI E DAO
+Il ciclo di vita "canonico" di un oggetto termina con la chiusura dell'applicazione. La persistenza serve a mantenere lo stato dell'oggetto anche dopo.
+
+IL PATTERN DAO
+    -   RESPONSABILITA: Mediare tra la rappresentazione O.O. in memoria (Model) e il sistema di persistenza (File, DB).
+    -   RUOLO: Riveste il ruolo di Creator e Information Expert per il salvataggio/recupero dei dati.
+    -   INTEGRAZIONE MVC:
+        .   Il Control chiede al DAO di recuperare o salvare un'Entity.
+        .   In architetture distribuite (Web), il DAO risiede sul server, "sotto" il livello del Model/Entity.
+
+
+SERIALIZZAZIONE
+Java fornisce un meccanismo nativo per trasformare un oggetto (e tutto il grafo di oggetti a cui è collegato) in una sequenza di byte (stream) per salvarlo o trasmetterlo in rete.
+    -   SERIALIZZAZIONE: Salvataggio dello stato (ObjectOutputStream).
+    -   DESERIALIZZAZIONE: Ripristino dello stato (ObjectInputStream).
+REGOLE DELLA SERIALIZZAZIONE:
+    1.  INTERFACCIA Serializable: Una classe può essere serializzata se e solo se implementa questa interfaccia. È una tagging interface (non ha metodi).
+    2.  EREDITARIETA: Se una superclasse è serializzabile, lo sono anche i figli. Se la superclasse non lo è, deve avere un costruttore senza argomenti accessibile per permettere la deserializzazione del figlio.
+    3.  VARIABILI STATIC: Le variabili static NON vengono serializzate, perché appartengono alla classe e non all'istanza.

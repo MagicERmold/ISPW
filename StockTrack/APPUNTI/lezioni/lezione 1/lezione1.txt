@@ -1,0 +1,106 @@
+NON TOGLIERE I PACKAGE!!!
+
+- classpath: java conoscerà tutte le classi che fanno riferimento a questo insieme di directory
+
+javac -classpath . -sourcepath src src/it/uniroma2/dicii/ispw/myfirstclass/*java
+Vado a compilare tutti i file java all'interno di questa cartela
+
+java -classpath src it.uniroma2.dicii.ispw.myfirsttest.HelloWorld
+Vado ad eseguire il file Java dalla cartella indicata
+
+
+LINGUAGGI DI MODELLAZIONE E UML
+
+Cosa sono i modelli? E come vengono utilizzati nella pratica?
+DEF: è una rappresentazione del sistema costruito per adempiere ad un determinato obiettivo.
+
+    1. SEMPLIFICAZIONE DEL SISTEMA
+
+Perché fare tutto questo?
+L'ingegneria del software ci permette di creare modelli in modo che essi siano automatizzabili e prodotti su larga scala.
+
+L'idea non è quella di pensare a dei programmi ma a dei "sistemi". Non è fatto di linee di codice, ma anche di:
+    -   Formati di dati
+    -   Regole di accesso ai dati
+    -   Ruoli ed operazioni associate
+    -   Database
+    -   Processi di business
+
+Come scelgo il modello da usare? Ovviamente dipende da:
+    -   Dal problema che si vuole risolvere
+    -   Da cosa è richiesto
+
+UML(Unified Modelling Language)
+Riunisce concetti di approcci esistenti e consente di rappresentare qualcosa di bello
+
+
+CLASSI E OGGETTI
+
+Concetti fondamentali del object-oriented:
+    -   Classe
+    -   Istanza
+    -   Metodo
+    -   Operazione
+    -   Messaggio 
+    -   Incapsulamento
+
+Concetti necessari:
+    -   Ereditarietà
+    -   Polimorfismo
+
+WARNING: con il termine oggetto si identifica sia l'idea di classe che di istanza, sarebbe più opportuno usarlo solo per l'istanza
+
+CLASSE: 
+Rappresenta un concetto all'interno dell'applicazione oppure qualcosa che non fa' parte del dominio di applicazione
+è un tipo di dato che include la definizione di:
+        1.  Proprietà (attributi)
+        2.  Comportamento (operazioni)
+
+COESIONE: deve rappresentare qualcosa relazionato alla classe
+
+ISTANZA: 
+Indica la manifestazione di uno specifico concetto.
+Ha un'identità ben definita (dalla classe di afferenza)
+Incapsula uno specifico stato (i valori degli attributi) e uno specifico comportamento (le operazioni eseguite)
+
+Un oggetto si relaziona ad una classe allo stesso modo di come un dato si relaziona ad un tipo.
+
+Tutti gli oggetti afferenti ad una classe, condividono:
+    -   Bo
+
+
+CLASSI VS ISTANZE
+Esempio: devo creare un commercio online
+CLASSI: e-shop, e-buyer
+    -   e-shop: può essere usato da un e-buyer.
+    -   e-buyer: può usare un e-shop.
+
+ISTANZE: Mr. Bob (istanza di e-buyer), eBay (istanza di e-shop)
+    -   Mr. Bob: avrà le proprietà di e-buyer
+    -   eBay: avrà le proprietà di e-shop
+
+Mr. Bob potrà usare l'istanza eBay e sono in relazione.
+
+Per far si che Mr. bob usi eBay devo prevedere questa relazione. E devo gestirla all'inizio.
+Dunque se io non ho previsto che e-buyer sia relazionato con e-shop allora non posso relazionare le due istanze (Mr. Bob con eBay).
+
+Se creo un'altra istanza:
+    -   Amazon
+
+Posso relazionare Mr. Bob sia con Amazon che con eBay.
+
+In un approccio procedurale è il main che gesisce e coordina il sistema.
+In un approccio object oriented ogni oggetto ha i suoi dati:
+    -   Gli attributi sono allocati e inizializzati alla creazione dell'oggetto
+    -   L'istanza li mantiene anche dopo che i metodi sono stati eseguiti
+    -   Tutti i dati sono mantenuti fino alla distruzione dell'istanza
+
+Più oggetti interagiscono tra loro per "generare il comportamento" del sistema.
+L'interazione comporta lo scambio di messaggi tra di loro.
+
+MESSAGGIO: richiesta run-time da parte di un oggetto A ad un oggetto B.
+ES: Mr. Bob chiede di comprare su ebay. Richiede di effettuare l'operazione "COMPRA" prevista dal tipo di dato e-shop.
+
+METODO: implementazione vera e propria dell'operazione (come se fosse l'invocazione di una funzione)
+OPERAZIONE: specifica di una segnatura che un oggetto mette a disposizione di altri oggetti (come se fosse l'inizializzazione di una funzione)
+

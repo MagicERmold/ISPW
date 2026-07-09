@@ -1,0 +1,60 @@
+Questa lezione è la naturale continuazione della precedente: dopo aver visto i principi per assegnare le responsabilità (GRASP), ora vediamo un metodo pratico per identificare le classi a cui assegnarle.
+
+
+BCE
+
+Questa lezione introduce un metodo per rispondere alla domanda: "Come individuiamo le classi di analisi?".
+La risposta è che non tutte le classi di analisi hanno la stessa funzione e possiamo classificarle.
+
+Il RUP (Rational Unified Process), ad esempio, suggerisce di dividere le classi di analisi in 3 macro-categorie:
+    -   BOUNDARY (confine)
+    -   CONTROL (controllo)
+    -   ENTITY (entity)
+Questo approccio è noto come pattern di analisi BCE.
+
+PARENTESI: PERCHÉ USARE CATEGORIE COME BCE? GLI STEREOTIPI
+L'UML è un linguaggio, ma a volte abbiamo bisogno di "personalizzarlo" per esprimere concetti specifici del nostro dominio o del nostro processo di sviluppo. Il meccanismo principale per farlo è lo Stereotipo.
+DEFINIZIONE: Uno stereotipo estende il significato di un elemento UML (come una classe) per dargli un'interpretazione più specifica.
+COME SI USA: In UML, si scrive tra doppie virgolette acute: <<nome_stereotipo>>.
+BCE: Per il pattern BCE, usiamo tre stereotipi per classificare le nostre classi di analisi:
+    -   <<boundary>>
+    -   <<control>>
+    -   <<entity>>
+
+
+LE RESPONSABILITÀ DI BCE
+
+Ogni stereotipo ha una responsabilità chiara:
+
+<<boundary>> (Boundary - Confine)
+    -   Responsabilità: Mediare l'interazione tra il sistema e l'ambiente esterno (attori umani o altri sistemi).
+    -   Dove si trova: Sul "confine" del sistema.
+    -   Cosa fa: Regola l'interazione con gli attori.
+    -   Esempio: Una form di login (RegisterForCoursesForm), un'interfaccia verso un sistema esterno (CourseCatalogSystem).
+    -   Nota: In questa fase, ci si concentra sulle informazioni necessarie per l'interazione, NON sui dettagli della GUI (es. "che bottone usare").
+
+<<control>> (Control - Controllo)
+    -   Responsabilità: Coordinare il comportamento di un caso d'uso. Incapsula la logica di business (la "business logic") di uno scenario.
+    -   Cosa fa: Rappresenta la logica del caso d'uso (es. i passaggi: "prima controlla questo, poi salva quello, infine notifica l'utente").
+    -   Importante: È indipendente da come l'interazione viene attivata (non è la GUI).
+    -   Esempio: Una classe RegisterForCourses che contiene il metodo eseguiIscrizione().
+
+<<entity>> (Entity - Entità)
+    -   Responsabilità: Rappresentare le astrazioni chiave del sistema, i dati, gli elementi reali del dominio.
+    -   Cosa fa: Modella il comportamento e i dati di un'entità (es. Course, Student).
+    -   Importante: È indipendente dall'ambiente e dai casi d'uso. È il "cuore" del sistema, spesso destinato a essere persistente (es. salvato su un database).
+    -   Da dove viene: Dall'analisi del dominio, dal glossario, ecc...
+    -   Esempio: Course, StudentProfile.
+
+
+FLUSSO DI ANALISI E CONCLUSIONE
+
+Il pattern BCE ci aiuta a tradurre gli Use Cases (Casi d'Uso) in Analysis Classes (Classi di Analisi).
+Come mostra lo schema:
+    -   Le classi Entity (<<entity>>) rappresentano le informazioni del sistema (System information).
+    -   Le classi Boundary (<<boundary>>) rappresentano il confine del sistema (System boundary).
+    -   Le classi Control (<<control>> - [errata nel diagramma] ) coordinano il comportamento del caso d'uso (Use-case behavior coordination).
+
+
+Questo approccio risponde alla domanda: "Quali classi partecipano ad un caso d'uso?".
+Il modello che ne risulta è chiamato VOPC: View of Participating Classes (Vista delle Classi Partecipanti).

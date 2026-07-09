@@ -1,0 +1,12 @@
+package com.stocktrack.exceptions;
+
+public class AutenticazioneException extends Exception {
+
+    public AutenticazioneException(String message) {
+        super(message);
+    }
+
+    public AutenticazioneException(String message, Throwable cause) {
+        super(message, cause);
+    }
+}

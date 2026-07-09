@@ -5,33 +5,24 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
 
-<StackPane styleClass="auth-screen" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.stocktrack.view.fx.controller.LoginGraphicalController">
-    <HBox alignment="CENTER" maxHeight="500.0" maxWidth="860.0" styleClass="auth-shell">
-        <VBox alignment="CENTER_LEFT" prefWidth="380.0" spacing="18.0" styleClass="brand-panel">
+<BorderPane styleClass="page" xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.stocktrack.view.fx.controller.LoginFXController">
+    <center>
+        <VBox alignment="CENTER_LEFT" maxWidth="420" spacing="14" styleClass="panel">
             <padding>
-                <Insets bottom="42.0" left="42.0" right="42.0" top="42.0" />
+                <Insets top="28" right="28" bottom="28" left="28"/>
             </padding>
-            <Label styleClass="brand-title" text="StockTrack" />
-            <Label styleClass="brand-subtitle" text="Inventario, gruppi e lista spesa in un unico spazio." wrapText="true" />
-            <Label fx:id="persistenceTypeLabel" styleClass="brand-chip" />
+            <Label styleClass="title" text="StockTrack"/>
+            <Label styleClass="subtitle" text="Accesso operatore"/>
+            <TextField fx:id="emailField" promptText="Email utente"/>
+            <PasswordField fx:id="passwordField" promptText="Password"/>
+            <Button maxWidth="Infinity" onAction="#onLogin" text="Accedi"/>
+            <Button maxWidth="Infinity" onAction="#onOpenRegistration" text="Crea account"/>
+            <Label fx:id="messageLabel" styleClass="error"/>
         </VBox>
-
-        <VBox alignment="CENTER_LEFT" prefWidth="430.0" spacing="16.0" styleClass="auth-card">
-            <padding>
-                <Insets bottom="42.0" left="42.0" right="42.0" top="42.0" />
-            </padding>
-            <Label styleClass="title-label" text="Accedi" />
-            <Label styleClass="text-secondary" text="Bentornato nel tuo magazzino." />
-
-            <TextField fx:id="usernameField" maxWidth="320.0" promptText="Username" />
-            <PasswordField fx:id="passwordField" maxWidth="320.0" promptText="Password" />
-
-            <Button defaultButton="true" maxWidth="320.0" onAction="#handleLogin" prefWidth="320.0" styleClass="primary-button" text="Accedi" />
-            <Button maxWidth="320.0" onAction="#switchToRegister" prefWidth="320.0" styleClass="link-button" text="Crea un account" />
-        </VBox>
-    </HBox>
-</StackPane>
+    </center>
+</BorderPane>

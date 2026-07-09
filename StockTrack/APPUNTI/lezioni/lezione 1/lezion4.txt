@@ -1,0 +1,105 @@
+Sensor t = new TempSensor();
+
+Ho dichiarato una variabile t di tipo Sensor(padre) e ho creato un'istanza di tipo TempSensor(figlio).
+
+Io posso usare tutti i metodi del padre ma non quelli del figlio. Perché?
+Java è un linguaggio compilato e interpretato. Ed è estremamente rigido con il type check.
+
+A tempo di compilazione quello che conta è il tipo della variabile.
+
+Per eseguire metodi delle classi specifiche dei figli devo dichiarare per forza una variabile del figlio.
+Quindi posso dichiarare variabili di tipo padre e assegnargli un'istanza del figlio.
+Ma non posso dichiarare variabili di tipo figlio e assegnargli un istanza padre.
+
+Io posso eseguire i metodi del padre ma il modo in cui si manifesta una specifica operazione sui figli,
+si comporta in modo diverso a seconda del figlio su cui eseguo la specifica operazione.
+
+CLASSE ASTRATTA
+    -   Sono classi parzialmente definite, in cui vale tutto quello che abbiamo detto fino ad ora.
+    -   Sono utili per modellare contesti in cui un insieme di classi include operazioni con la stessa semantica,
+        ma che saranno implementate da metodi differenti
+    -   In Java si usa abstract.
+    -   In UML non c'è una simbologia grafica univoca (si può scrivere in corsivo oppure scrivo abstract tra parentesi).
+
+In pratica è una classe dove per almeno un'operazione non definisco il metodo, ovvero lo vado a definire dopo.
+
+Non è mai possibile creare l'istanza di una classe astratta, si usano per mantenere riferimenti ad istanze concrete di sottoclassi.
+
+Quindi:
+    -   Sensor s = new Sensor(); // Errore
+    -   Sensor s = new TempSensor(); // Questa va sempre bene
+Adesso torna l'esempio di prima.
+Quindi quando vado a fare l.getMeasure() o t.getMeasure() sto chiamando due operazioni diversi.
+
+Una classe astratta impone la definizione del metodo non definito all'interno dei figli.
+
+POLIMORFISMO
+Capacità delle classi di comportarsi in modi differenti in base al contesto di esecuzioni run-time.
+CONDIZIONI NECESSARIE:
+    1.  Gerarchia di classi.
+    2.  Variabile (chiamiamo s) con tipo la super-classe astratta.
+    3.  Meccanismo di scelta che crea un'istanza per una sottoclasse e ne associa il riferimento ad s. ESSENZIALE
+    4.  Linguaggio con supporto di binding dinamico.
+Java consente il polimorfismo.
+
+Consente di realizzare sistemi che perfezionano il loro comportamento a tempo di esecuzione. (DA COMPLETARE LE SLIDE)
+
+OVERRIDING VS OVERLOADING
+OVERRIDING: sovrascrivo il comportamento di una operazione cambiando il metodo a cui essa è associata
+OVERLOADING: aggiunge funzionalità ad una classe fornendole una nuova operazione
+
+ESEMPIO:
+public class A{
+    public int test(int p){
+        return p;
+    }
+}
+
+public class B extends A{
+    // Override, bisogna specificare con @Override
+    @Override
+    public int test(int p){
+        return p+1;
+    }
+
+    // Overloading
+    public int test(float p){
+        return super.test(Math.round(p));
+    }
+}
+
+BINDING
+Quello che vogliamo capire è: come il codice può comportarsi in modo diverso in base alle varie condizioni di utilizzo.
+Il binding è l'associazione tra l'invocazione di una operazione con l'effettivo metodo da eseguire.
+
+Esistono due tipi:
+EARLY BINDING: effettuato a tempo di compilazione prima dell'esecuzione del programma
+LATE BINDING: l'associazione viene effettuata a tempo di esecuzione basandosi sull'effettivo tipo dell'oggetto coinvolto nell'esecuzione.
+
+In java c'è il seguente comportamento:
+    -   Le operazioni in java vengono gestite mediante late binding
+    -   Fanno eccezione solo 3 scenari:
+        .   static
+        .   final
+        .   private
+
+STATIC: è un metodo che si riferisce ad una qualsiasi istanza di quella classe.
+FINAL: impedisce ad un qualsiasi altro sviluppatore di creare dei figli di quella classe. Quindi è una costante.
+
+STACK DI PROGRAMMA
+Area di memoria utilizzata per mantenere lo stato locale ad una computazione.
+A seguito della chiamata di una sotto-funzione, viene allocata una nuova area in STACK dove vengno salvati:
+    -   Parametri formali
+    -   Variabili locali
+    -   Valore di ritorno computato dalla sotto-funzione
+
+HEAP
+Memoria dinamica. Vengono mantenuti i dati di una applicazione.
+Ogni volta che faccio una new alloco memoria sulla heap.
+Caratteristiche:
+    -   Dati accessibile mediante puntatore di riferimento
+    -   La gestione è principalmente delegata al programmatore
+    -   Allocazione esplicita di memoria (new)
+    -   I dati rimangono finchè:
+        .   Non c'è una specifica deallocazione
+        .   Non viene avviata una politica implicita di deallocazione (garbage collector)

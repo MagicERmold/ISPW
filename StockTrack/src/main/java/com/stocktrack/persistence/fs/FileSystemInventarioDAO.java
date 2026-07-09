@@ -1,0 +1,23 @@
+package com.stocktrack.persistence.fs;
+
+import com.stocktrack.entity.Inventario;
+import com.stocktrack.exceptions.PersistenceException;
+import com.stocktrack.persistence.dao.InventarioDAO;
+
+public class FileSystemInventarioDAO implements InventarioDAO {
+
+    @Override
+    public Inventario findInventario() throws PersistenceException {
+        return FileSystemDataStore.loadInventario();
+    }
+
+    @Override
+    public void save(Inventario inventario) throws PersistenceException {
+        FileSystemDataStore.saveInventario(inventario);
+    }
+
+    @Override
+    public void update(Inventario inventario) throws PersistenceException {
+        FileSystemDataStore.saveInventario(inventario);
+    }
+}

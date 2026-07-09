@@ -1,0 +1,60 @@
+PERSISTENZA IN JAVA: JDBC E DAO (LEZIONE 50)
+Questa lezione affronta come rendere persistenti gli oggetti Java utilizzando database relazionali (DBMS), superando i limiti della gestione tramite file e introducendo lo standard JDBC.
+
+
+1. IL CICLO DI VITA E LA NECESSITÀ DI PERSISTENZA
+
+    CICLO "CANONICO": Normalmente, un oggetto nasce (new), vive in memoria e muore quando l'applicazione termina o il Garbage Collector lo rimuove.
+    ESIGENZA DI PERSISTENZA: Spesso è necessario che lo stato di un oggetto sopravviva alla chiusura dell'applicazione.
+    SCENARI: Salvataggio dati utente, ripristino configurazioni, o migrazione di oggetti tra nodi in sistemi distribuiti.
+    PROBLEMA DEL MISMATCH: Esiste una differenza strutturale tra come i dati sono rappresentati in oggetti (O.O.) e come vengono salvati nei Database Relazionali. Questo richiede un "adattatore".
+
+
+2. IL PATTERN DAO (Data Access Object)
+
+Il DAO è il componente architetturale chiave per gestire la persistenza in modo pulito, separando la logica di business dai dettagli del database.
+DEFINIZIONE: È una classe che media tra la rappresentazione Object-Oriented (Model) e il sistema di persistenza (DBMS, file, XML).
+RESPONSABILITA:
+    -   Agisce come Creator e Information Expert per il recupero e salvataggio dei dati.
+    -   Ad ogni classe Entity (Model) deve corrispondere un DAO specifico.
+
+INTERAZIONE NEL PATTERN MVC:
+    Il Controller non accede mai direttamente al DB.
+    Se un dato non è in memoria, il Controller chiede al DAO di recuperarlo.
+    Per salvare le modifiche, il Controller può chiedere esplicitamente al DAO di aggiornare il DB, oppure il DAO può osservare il Model (Pattern Observer) e salvarsi automaticamente quando lo stato cambia.
+
+
+3. JDBC (Java Database Connectivity)
+
+    JDBC è l'API standard della piattaforma Java per interagire con i database relazionali in modo indipendente dal produttore del database (MySQL, PostgreSQL, Oracle, ecc.).
+    ASTRAZIONE: Permette di scrivere codice che usa sempre le stesse interfacce Java (java.sql.*), delegando i dettagli specifici ai Driver JDBC forniti dai produttori dei database.
+    TIPI DI DRIVER: Esistono vari tipi, dai "ponte" verso ODBC (Tipo 1) ai driver "Pure Java" (Tipo 4) che sono i più comuni oggi perché non richiedono installazioni client native.
+
+
+4. IL FLUSSO DI LAVORO JDBC
+
+Un'interazione tipica con il database segue questi passi sequenziali:
+    Caricare il Driver specifico.
+    Aprire una Connessione con il DB.
+    Creare uno Statement (l'oggetto che porta la query).
+    Eseguire la Query.
+    Elaborare i risultati (ResultSet).
+    Chiudere la connessione.
+
+
+5. LE CLASSI FONDAMENTALI DI java.sql
+
+    DRIVERMANAGER: Gestisce i driver e crea le connessioni tramite il metodo getConnection(url, user, password).
+    CONNECTION: Rappresenta la sessione attiva col database.
+        best practice: Aprire le connessioni è costoso. Bisogna minimizzarne il numero (es. aprirne una sola e riusarla, o usare un pool) e chiuderle sempre alla fine.
+    STATEMENT: Incapsula la query SQL da inviare. Si crea a partire dalla connessione: connection.createStatement().
+        nota: Bisogna usare sintassi SQL standard.
+    RESULTSET: Contiene i dati restituiti dalla query in forma tabellare.
+        Si scorre con un cursore usando next().
+        Si leggono i dati delle colonne usando metodi come getString(1) o getInt("eta").
+
+
+6. ESERCIZIO PROPOSTO
+Il professore suggerisce di riprogettare i DAO visti a lezione per ottimizzare la gestione delle connessioni:
+    Evitare connessioni ripetute (apri/chiudi continuo).
+    Implementare un meccanismo (magari usando il pattern Singleton) per condividere l'accesso al DB.

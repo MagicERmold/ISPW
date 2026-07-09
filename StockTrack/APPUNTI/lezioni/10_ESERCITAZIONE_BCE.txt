@@ -1,0 +1,74 @@
+Questa lezione è fondamentale per vedere come i principi RDD e GRASP vengono applicati in uno scenario pratico.
+
+
+ESERCITAZIONE BCE E Q&A (LEZIONI 25-26)
+
+Questa lezione applica i concetti di RDD (Responsibility Driven Design) e del pattern di analisi BCE (Boundary, Control, Entity) a uno scenario pratico.
+
+RIEPILOGO: LE RESPONSABILITA BCE
+Il professore inizia con un ripasso delle definizioni della lezione precedente:
+    -   <<boundary>> (Confine): Mediano l'interazione tra il sistema e gli attori (umani o software). Sono il "confine" del sistema (es. interfacce utente, API).
+    -   <<control>> (Controllo): Coordinano il comportamento di un caso d'uso. Contengono la logica di business (la business logic) che non appartiene a una singola entità.
+    -   <<entity>> (Entità): Rappresentano i dati e le astrazioni chiave del dominio del problema (es. i concetti di Studente, Corso). Sono indipendenti dai casi d'uso.
+
+
+ESERCITAZIONE
+Viene presentato un testo che descrive i requisiti di un sistema di gestione universitaria (delphi). L'obiettivo è modellare questo sistema.
+    PASSO 1: Identificare Attori e Casi d'Uso (UC) Dall'analisi del testo, emergono 3 attori:
+        1.   Studente
+        2.   Segreteria
+        3.   Professore
+    Questi attori interagiscono con il sistema attraverso diversi casi d'uso.
+    Il diagramma UC (Use Case) mostrato nelle slide identifica i principali:
+        1.  Iscrizione corso di Laurea (Attori: Studente, Segreteria)
+        2.  Verbalizzazione Esame (Attori: Professore, Studente, Segreteria)
+        3.  Calcolo Statistiche (Attore: Segreteria)
+    
+    PASSO 2: Analisi del Caso d'Uso "Verbalizzazione Esame"
+    La lezione si concentra sull'analisi del caso d'uso Verbalizzazione Esame per creare la VOPC (View of Participating Classes, la vista delle classi partecipanti).
+    Entity (<<entity>>): Identifichiamo le classi che rappresentano i dati core del dominio menzionati nel testo:
+        -   Studente (con i suoi dati e corsi)
+        -   Corso (con codice, anno, ecc.)
+        -   Professore (con i suoi dati)
+        -   Voto (con valutazione e scala)
+        -   VerbaleEsame (l'oggetto che tiene traccia dell'evento)
+    Boundary (<<boundary>>): Identifichiamo i "punti di accesso" per gli attori coinvolti in questo caso d'uso:
+        -   ProfessoreVerbalizzazioneBoundary: L'interfaccia (es. una pagina web) che il professore usa per inserire i dati del verbale.
+        -   SegreteriaVerbalizzazioneBoundary: L'interfaccia che la segreteria usa per vidimare le registrazioni.
+        -   (Nota: Il testo implica anche un'interfaccia per lo Studente per "confermare o rigettare il voto", anche se non disegnata nel diagramma CD).
+    Control (<<control>>): Identifichiamo la classe che orchestra la logica del caso d'uso:
+        -   VerbalizzazioneEsameController: Questa classe ha la responsabilità "di fare" (Principio GRASP: Controller). Riceve l'input dalle Boundary e coordina le Entity per eseguire la verbalizzazione (es. compilaVerbale, notificaSegreteria, validazioneDefinitivaVerbale).
+    
+
+ERRORE E APPROFONDIMENTO: il problema dei "BEAN"
+Questa è la parte più importante della lezione. Il professore mostra un diagramma (slide 14-19) ed evidenzia un ERRORE intenzionale.
+ERRORE: Nel diagramma, il VerbalizzazioneEsameController ha un metodo come compilaVerbale(studente Studente, corso Corso, ...). La ProfessoreVerbalizzazioneBoundary passa direttamente le classi Entity (come Studente, Corso) al Controller.
+
+PERCHE E UN ERRORE?
+Viola il principio GRASP del "low coupling" (basso accoppiamento).
+    -   Se il Controller e la Boundary conoscono la struttura interna delle classi Entity (come Studente), qualsiasi modifica futura all'Entity (es. cambiare un attributo in Studente) costringerà a modificare anche il Controller e la Boundary.
+    -   L'obiettivo è che gli strati (Boundary, Control, Entity) siano il più possibile isolati e indipendenti.
+
+SOLUZIONE: le classi "BEAN"
+Il professore giustifica questo errore temporaneo dicendo: "SOLO perchè non sono state ancora introdotte le classi BEAN".
+
+
+APPROFONDIMENTO
+Cosa sono i BEAN/DTO: La soluzione corretta per mantenere il Low Coupling è usare DTO (Data Transfer Objects), spesso implementati come semplici classi "Bean" in Java.
+Un DTO (o Bean) è un oggetto "stupido", senza logica, che serve solo a trasportare dati tra gli strati (Boundary, Control, Entity).
+
+FLUSSO CORRETTO:
+    1.  L'attore (Professore) inserisce i dati (es. "Matricola: 123", "Codice Corso: A01", "Voto: 30") nella ProfessoreVerbalizzazioneBoundary.
+    2.  La Boundary non conosce l'Entity Studente. Crea un DTO, es. DatiVerbaleBEAN (un oggetto semplice) e ci inserisce le stringhe e i numeri.
+    3.  La Boundary passa questo DTO (DatiVerbaleBEAN) al Controller.
+    4.  Il Controller riceve il DTO, lo "spacchetta", e solo lui sa come usare quei dati per interagire con le Entity (es. Studente s = trovaStudente(matricola), Corso c = trovaCorso(codice), s.registraVoto(c, voto)).
+VANTAGGIO: La Boundary e il Controller dipendono solo dal DTO (un semplice contenitore), non dalle complesse classi Entity. Se l'Entity Studente cambia, il Controller (forse) cambierà, ma la Boundary no.
+
+
+CONSIGLI PER IL PROGETTO
+La lezione si conclude con consigli pratici fondamentali per la progettazione (applicabili anche al vostro progetto d'esame):
+    -   Evitare UC Banali: Non creare casi d'uso come "lo studente cerca la lista degli esami". Creare UC complessi che abbiano rilevanza applicativa (es. un intero processo di iscrizione o verbalizzazione).
+    -   UC con più Attori: Progettare UC che coinvolgano almeno due attori, specialmente con notifiche. Esempio: Attore A fa un'azione, e il sistema notifica attivamente l'Attore B (non è B che controlla passivamente).
+    -   Caricare Dati all'Inizio: Prevedere che l'interazione inizi con un'interrogazione che carica in memoria tutte le entità necessarie per quel caso d'uso.
+    -   Evitare Getter/Setter (Tell, Don't Ask): Questo è un principio O.O. fondamentale. Le classi dovrebbero offrire operazioni significative (comportamenti), non semplici set e get sui loro attributi privati.
+    -   Riferimenti vs. Foreign Key: In O.O. (in memoria), le associazioni tra entità (es. Studente e Corso) devono essere riferimenti a oggetti (puntatori), non "foreign key" (come ID_Corso nella classe Studente). Usare ID/chiavi esterne è un approccio da database (persistenza), non da modello O.O. (logica).

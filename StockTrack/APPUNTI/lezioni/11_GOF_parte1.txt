@@ -1,0 +1,85 @@
+DESIGN PATTERNS 1: INTRODUZIONE AI GOF
+
+Questa lezione introduce i "Design Patterns", un concetto fondamentale che si colloca tra i principi di alto livello (come i GRASP) e l'implementazione concreta.
+
+
+1 CONTESTO: DALL'ANALISI ALLA progettazione
+
+Come visto nelle lezioni precedenti, il processo di sviluppo software passa da due domini:
+    1.  DOMINIO DEL PROBLEMA (Analisi): L'obiettivo è capire il problema e i requisiti. Si usano modelli (come BCE, Use Case) per descrivere cosa si vuole ottenere, indipendentemente dalla tecnologia.
+    2.  DOMINIO DELLA SOLUZIONE (Progettazione): L'obiettivo è raffinare i modelli di analisi per descrivere come il sistema sarà costruito, tenendo conto delle tecnologie scelte (ma non ancota dei dettagli implementativi del codice).
+
+I DESIGN PATTERN sono lo strumento principale che usiamo per passare dall'Analisi alla progettazione.
+
+
+2. COSA SONO I PATTERN?
+    -   PROBLEMA: Come affrontiamo la progettazione in modo sistematico? Come possiamo identificare e risolvere problemi ricorrenti senza "reinventare la ruota?".
+    -   SOLUZIONE: Usare i Pattern.
+    -   DEF: Un pattern è l'accoppiata: problema ricorrente + schema di soluzione.
+        -   Abbiamo già visto i GRASP, che sono pattern per l'assegnazione delle responsabilità.
+
+
+3. I DESIGN PATTERNS GOF (GANG OF FOUR)
+    -   DEF: I Design Patterns sono un catalogo di soluzioni semplici ed eleganti a problemi specifici e ricorrenti nella progettazione O.O.
+    -   IMPORTANTE: I pattern NON sono idee nuove o invenzioni. Sono la formalizzazione di soluzioni consolidate che i bravi progettisti già usavano. Il loro scopo principale è fornire un VOCABOLARIO COMUNE per discutere le soluzioni progettuali.
+
+
+4. CLASSIFICAZIONE DEI PATTERN GOF
+I 23 pattern del GOF sono classificati secondo due criteri:
+    1.  SCOPO (Cosa fa il pattern?)
+        -   CREATIONAL (CREAZIONALI): Riguardano il processo di creazione e instanziazione degli oggetti.
+        -   STRUCTURAL (STRUTTURALI): Riguardano la composizione di classi e oggetti per formare strutture più complesse.
+        -   BEHAVIORAL (COMPORTAMENTALI): Riguardano come classi e oggetti interagiscono e si dividono le responsabilità.
+    2.  CONTESTO (Dove si applica?)
+        -   CLASS: Il pattern si applica alle relazioni tra classi (statico, basato sull'ereditarietà).
+        -   OBJECT: Il pattern si applica alle relazioni tra oggetti (dinamico, a run-time, basato sulla composizione).
+
+
+PATTERN CREAZIONALI
+I pattern creazionali astraggono il processo di creazione. Rendono il sistema indipendente da come gli oggetti vengono creati, composti e rappresentati.
+
+1.  FACTORY METHOD (Virtual Constructor)
+    -   SCOPO: Fornire un meccanismo per la creazione di oggetti simili (che implementano la stessa interfaccia) senza specificare quale sia la loro classe concreta. Si definisce un "metodo fabbrica" che viene  poi implementato (o sovrascritto) dalle sottoclassi per decidere quale oggetto concreto creare.
+    -   APPLICABILITÀ: Si usa quando un sistema deve essere indipendente da come i suoi "prodotti" vengono creati, o quando una classe vuole delegare la rasponsabilità dall'istanziazione alle proprie sottoclassi.
+    -   STRUTTURA E PARTECIPANTI:
+        .   AbstractProduct: L'interfaccia o la classe astratta del prodotto che si vuole creare.
+        .   ConcreteProduct: L'implementazione concreta del prodotto.
+        .   Factory( o Creator): La classe che contiene i factory method (es. createConcreteProductA()).
+        .   Client: Chiama la Factory per ottenere un nuovo oggetto, ma lo utilizza solo tramite l'interfaccia AbstractProduct.
+    -   CONSEGUENZE:
+        .   (+): Isola il client dalle classi concrete dei prodotti.
+
+2. ABSTRACT FACTORY (Kit)
+    -   SCOPO: Fornire un'interfaccia per creare famiglie di oggetti correlati o dipendenti senza specificare le loro classi concrete.
+    -   MOTIVAZIONE: L'esempio classico è un GUI toolkit. Si vuole supportare diversi "look-and-feel".
+        .   Si definisce una AbstractFactory che sa come creare tutti i widget: createWindow() e createScrollBar().
+        .   Si creano ConcreteFactory():
+            -   MotifWidgetFactory implementa createWindow() restituendo una MotifWindow e createScrollBar() restituendo una MotifScrollbar.
+            -   PMWidgetFactory implementa createWindow() restituendo una PMWindow e createScrollBar() restituendo una PMScrollBar.
+    -   APPLICABILITÀ: Quando il sistema deve essere configurato con una tra più famiglie di prodotti e deve essere indipendente dalla loro creazione.
+    -   STRUTTURA E PARTECIPANTI:
+        .   AbstractFactory (es. WidgetFactory): Dichiara l'interfaccia per creare i prodotti astratti.
+        .   ConcreteFactory (es. MotifWidgetFactory): Implementa l'interfaccia per creare i prodotti concreti di una famiglia.
+        .   AbstractProduct (es. Window, ScrollBar): Dichiarano l'interfaccia per un tipo di prodotto.
+        .   ConcreteProduct (es. MotifWindow): Implementano l'interfaccia del prodotto.
+        .   Client: Usa solo le interfacce AbstractFactory e AbstractProduct.
+    -   CONSEGUENZE:
+        (+) Isola completamente le classi concrete.
+        (+) Rende facile cambiare l'intera famiglia di prodotti (basta cambiare la ConcreteFactory usata).
+        (+) Promuove la coerenza (impedisce di mischiare prodotti di famiglie diverse, es. MotifWindow con PMScrollBar).
+        (-) Aggiungere un nuovo tipo di prodotto (es. createButton()) è molto difficile, perché richiede di modificare l'interfaccia AbstractFactory e, di conseguenza, tutte le ConcreteFactory che la implementano.
+
+3.  SINGLETON
+
+    -   SCOPO: Assicurare che una classe abbia una e una sola istanza nell'applicazione e fornire un punto di accesso globale a tale istanza.
+    -   MOTIVAZIONE: Utile per oggetti che devono essere unici per definizione: uno spooler di stampa, un window manager, o (spesso) le stesse classi Factory.
+    -   APPLICABILITÀ: Quando si deve garantire l'esistenza di un'unica istanza accessibile da tutti i client.
+    -   STRUTTURA E IMPLEMENTAZIONE:
+        .   La classe (SingletonClass) definisce un'operazione statica getSingletonInstance() per accedere all'unica istanza.
+        .   Mantiene un riferimento statico privato a sé stessa (-singletonInstance: SingletonClass).
+        .   Il costruttore è dichiarato private. Questo impedisce a chiunque altro di creare nuove istanze usando new.
+
+APPROFONDIMENTO : RELAZIONI TRA I PATTERN CREAZIONALI
+Come mostra la mappa delle relazioni, questi pattern sono spesso usati insieme:
+1.  AbstractFactory e Factory Method: Spesso le AbstractFactory sono implementate usando un insieme di Factory Method (uno per ogni prodotto della famiglia).
+2.  AbstractFactory e Singleton: Le concreteFactory (es. MotifWidgetFactory) sono quasi sempre implementate come Singleton, perché non ha senso avere più "fabbriche" che creano gli stessi oggetti.

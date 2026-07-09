@@ -1,0 +1,49 @@
+ALTRE RELAZIONI
+ASSOCIAZIONI, AGGREGAZIONI E COMPOSIZIONI
+
+Sappiamo che un class diagram è composto da nodi(classi e interfacce) e relazioni.
+Le relazioni indicano che una classe A è a conoscenza di una classe B e vi può interagire.
+
+ASSOCIAZIONE
+È la relazione strutturale più generica. Indica che oggetti di classi diverse sono collegati tra loro.
+DEF: Una relazione strutturale tra oggetti di classi differenti.
+RAPPRESENTAZIONE: Una linea continua tra le classi.
+Un'associazione può avere:
+    -   NOME: Descrive la natura della relazione.
+    -   RUOLO: Il nome con cui una classe "vede" l'altra.
+    -   CARDINALITA O MOLTEPLICITA: Quante istanze sono coinvolte. Si legge all'estremità opposta della relazione.
+        .   [1]: Esattamente uno.
+        .   [0..1]: Zero o uno.
+        .   [1..*]: Uno o molti.
+        .   [*] o [0..*]: Zero o molti.
+    -   NAVIGABILITA: Una freccia sulla linea indica la direzione in cui è possibile "navigare" la relazione. 
+                      Se non c'è freccia, è (di solito) bidirezionale.
+MAPPING IN JAVA: Un'associazione viene quasi sempre implementata come un attributo di istanza (campo).
+es. 
+public class NetworkAdapter { private Vector<Sink> gateway; }
+La cardinalità [1..*] viene tradotta in una collezione (come Vector, List o Array). 
+Se fosse stata [1], sarebbe stata un singolo riferimento: private Sink gateway;.
+
+AGGREGAZIONE
+L'aggregazione è un tipo specifico di associazione che modella una relazione gerarchica "tutto-parte" (whole-part).
+DEF: È una relazione debole "tutto-parte". La classe "parte" è autonoma e può esistere anche senza il "tutto".
+RAPPRESENTAZIONE: Una linea con un rombo bianco dal lato del "tutto" (l'aggregante).
+ESEMPIO: Cluster (tutto) aggrega Sensor (parte).
+REGOLA CHIAVE: L'aggregazione non impone vincoli sul ciclo di vita degli aggregati.
+Questo significa che se distruggi l'oggetto Cluster, gli oggetti Sensor che conteneva continuano a esistere. 
+Un sensore può essere rimosso da un cluster e continuare a funzionare, o essere spostato in un altro cluster.
+MAPPING IN JAVA: L'implementazione è identica a un'associazione (un Vector<Sensor> o List<Sensor>). 
+                 La differenza è semantica, sta nel modo in cui gestisci il ciclo di vita degli oggetti.
+
+COMPOSIZIONE
+La composizione è una forma di aggregazione forte.
+DEFINIZIONE: È una relazione "tutto-parte" forte, dove le "parti" dipendono vitalmente dal "tutto".
+RAPPRESENTAZIONE: Una linea con un rombo nero dal lato del "tutto" (il componente).
+ESEMPIO: Un'auto (tutto) è composta da un motore e 4 ruote (parti). Un Sensor (tutto) è composto da un NetworkAdapter (parte).
+REGOLA CHIAVE: La composizione impone vincoli sul ciclo di vita.
+    .   L'istanza "parte" (il NetworkAdapter) vive e muore con l'istanza "tutto" (il Sensor).
+    .   Se distruggi l'oggetto Sensor, anche il suo oggetto NetworkAdapter deve essere distrutto (o, in Java, diventa inaccessibile e viene eliminato dal Garbage Collector).
+    .   Un oggetto "parte" non può essere condiviso; appartiene a un solo oggetto "tutto" (come un NetworkAdapter non può essere in due Sensor contemporaneamente).
+MAPPING IN JAVA: L'implementazione riflette questa dipendenza. L'oggetto "tutto" è responsabile di creare e gestire l'oggetto "parte".
+public abstract class Sensor { private NetworkAdapter na; public Sensor() { this.na = new NetworkAdapter(); // Il 'tutto' crea la 'parte' } ... }
+Il riferimento alla "parte" (es. this.na) non viene mai passato all'esterno, per evitare che qualcun altro possa "rubare" la parte.

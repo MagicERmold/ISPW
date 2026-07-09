@@ -1,0 +1,33 @@
+LEZIONE 49: Dettagli Avanzati sulle Eccezioni
+Questi appunti approfondiscono come gestire la "catena" degli errori e le regole precise per l'ereditarietà.
+
+1. EXCEPTION CHAINING (Incapsulamento delle Eccezioni)
+Il professore introduce il concetto di "Chaining" (o Wrapping).
+
+    -   PROBLEMA: Spesso, quando catturiamo un'eccezione di basso livello (es. SQLException), non vogliamo propagarla direttamente al livello superiore (es. alla GUI), perché esporrebbe dettagli tecnici inutili o dannosi.
+    -   SOLUZIONE: Si cattura l'eccezione originale e se ne lancia una nuova di "alto livello" (es. DatabaseException o BusinessLogicException).
+    -   REGOLA FONDAMENTALE: Quando lanci la nuova eccezione, devi passare quella originale nel costruttore.
+        .   CODICE: throw new NuovaEccezione("Messaggio", eccezioneOriginale);
+        .   Perché: Questo preserva lo Stack Trace originale. Se non lo fai, perdi la causa reale dell'errore e il debugging diventa impossibile.
+
+
+2. REGOLE DI OVERRIDING vs COSTRUTTORI
+C'è una differenza fondamentale nel modo in cui le eccezioni gestite (checked) si comportano con l'ereditarietà.
+
+A. Per i METODI (Regola restrittiva) Quando fai l'override di un metodo:
+    La sottoclasse PUÒ lanciare meno eccezioni della superclasse (o nessuna).
+    La sottoclasse PUÒ lanciare eccezioni più specifiche (figlie di quelle originali).
+    La sottoclasse NON PUÒ lanciare eccezioni nuove o più generali.
+    MOTIVO: Il principio di sostituzione (Liskov). Chi usa la classe padre deve potersi fidare della firma del metodo.
+
+B. Per i COSTRUTTORI (Regola espansiva) Quando definisci il costruttore di una sottoclasse:
+    Il costruttore DEVE dichiarare (throws) almeno tutte le eccezioni lanciate dal costruttore della superclasse.
+    Può dichiararne anche di nuove o aggiuntive.
+    MOTIVO: Poiché il costruttore figlio chiama implicitamente super() come prima istruzione, se il padre fallisce lanciando un'eccezione, il figlio deve lasciarla passare. Non può "nasconderla" o gestirla internamente, perché l'oggetto non è ancora stato creato.
+
+
+3. LOGGING E GESTIONE ERRORI INTERNI
+COSA MOSTRARE ALL'UTENTE: Mai mostrare lo "stack trace" o messaggi tecnici ("NullPointerException at line 42") all'utente finale. È brutto e insicuro.
+COSA FARE:
+    Mostrare all'utente un messaggio generico ("Si è verificato un errore, riprova più tardi").
+    Loggare l'errore tecnico (usando logger come Log4j o Java Logging) su un file server per permettere agli sviluppatori di analizzarlo.

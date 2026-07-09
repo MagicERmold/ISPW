@@ -1,0 +1,104 @@
+RDD E GRASP
+
+Questa lezione introduce i principi per prendere decisioni di progettazione OBJECT-ORIENTED.
+
+
+UML: LINGUAGGIO, NON PROCESSO
+Ribadiamo i seguenti concetti chiavi:
+    -   L'UML è un linguaggio standard per visualizzare e documentare un sistema.
+    -   Conoscere la sintassi UML (come disegnare una freccia) non significa saper progettare in modo corretto (O.O.)
+    -   La progettazione O.O. non è "artigianato", basato solo sull'abilità personale, ma si basa su principi generali e soluzioni ricorrenti.
+
+
+RESPONSIBILITY DRIVEN DESIGN (RDD)
+RDD o "Progettazione guidata dalle responsabilità", è un modo di pensare alla progettazione O.O.
+
+DEF:
+L'idea è che gli oggetti software hanno "responsabilità".
+Una responsabilità è un obbligo che un oggetto ha riguardo al suo comportamento o alla sua struttura.
+
+TIPI DI RESPONSABILITÀ
+1.  Responsabilità di fare (doing):
+    -   Creare un altro oggetto (istanziare).
+    -   Eseguire un calcolo.
+    -   Coordinare e controllare altri oggetti.
+2.  Responsabilità di conoscere:
+    -   Conoscere i propri dati privati.
+    -   Conoscere gli oggetti correlati.
+    -   Conoscere informazioni che può calcolare o derivare.
+
+
+GRASP: I PRINCIPI GUIDA
+GRASP (General Responsibility Assignment Softwares Principles) è un insieme di principi che ci aiutano ad assegnare le responsabilità alle classi corrette.
+-   GRASP vs GOF:
+    *   GRASP: sono principi generali, delle linee guida che guidano le scelte progettuali (es. "L'accoppiamento deve essere basso").
+    *   GOF (gang of four): sono pattern (schemi), cioè soluzioni specifiche e ricorrenti a problemi noti.
+
+IMPORTANTE: 
+Non è quasi mai possibile applicare tutti i principi GRASP contemporaneamente.
+Spesso sono in conflitto (es. per avere alta coesione potresti dover aumentare l'accoppiamento).
+Il compito del progettista è valutare i trade-off e scegliere la soluzione migliore.
+
+
+I PRINCIPI GRASP FONDAMENTALI
+1. CREATOR
+    - PROBLEMA: Chi deve avere la responsabilità di creare un'istanza della classe A?
+    - SOLUZIONE: Assegna la responsabilità a una classe B se:
+        a.  B compone o aggrega A (la relazione più forte).
+        b.  B registra o contiene A.
+        c.  B usa in modo esclusivo A.
+        d.  B ha i dati necessari per inizializzare A.
+    - Più condizioni sono vere, migliore è la scelta.
+
+2. INFORMATION EXPERT:
+    - PROBLEMA: Chi deve avere la responsabilità di conoscere o fare qualcosa?
+    - SOLUZIONE: Assegna la responsabilità alla classe che ha le informazioni necessarie per adempierla. Questo è il principio più basilare di RDD.
+
+3. LOW COUPLING (Basso Accoppiamento):
+    - DEFINIZIONE: L'accoppiamento è la misura di quanto un elemento (classe A) dipende, conosce o è connesso a un altro elemento (classe B).
+    - PROBLEMA: Come si riduce l'impatto dei cambiamenti? (Se A cambia, non voglio che B, C, D, E, F si rompano).
+    - SOLUZIONE: Assegna le responsabilità in modo da mantenere l'accoppiamento (quello non necessario) più basso possibile.
+    - NOTA: L'Information Expert, se applicato correttamente, "sostiene" (aiuta a ottenere) il Low Coupling.
+
+4. HIGH COESION (Alta Coesione):
+    -   DEFINIZIONE: La coesione è la misura di quanto le responsabilità e le operazioni interne a una singola classe sono correlate e focalizzate su un unico compito.
+    -   PROBLEMA: Come si mantengono le classi comprensibili, focalizzate e gestibili (ed evitare il Low Coupling)?
+    -   SOLUZIONE: Assegna le responsabilità in modo da mantenere la coesione alta.
+    -   BASSA COESIONE (da evitare): La "God Class" (Classe Dio), una classe che fa troppe cose diverse e non correlate (es. GestoreUtentiOrdiniPagamentiEmail).
+    -   ALTA COESIONE (ideale): Una classe con responsabilità moderate in una singola area (es. GestorePagamenti) che collabora con altre classi.
+
+5. CONTROLLER:
+    -   PROBLEMA: Chi deve gestire e coordinare un insieme di attività o un intero caso d'uso? (es. l'utente clicca "Compra") .
+    -   SOLUZIONE: Assegna la responsabilità a un oggetto "Controller" che:
+        a.  Rappresenta il punto di accesso al sistema/sottosistema (vedi "Facade").
+        b.  Realizza lo scenario del caso d'uso (coordina gli altri oggetti).
+
+APPROFONDIMENTO: Il Pattern Façade
+Il principio Controller è spesso implementato usando il pattern GoF Façade (Facciata).
+
+Una Facade è un oggetto che fornisce un'interfaccia semplificata a un sottosistema complesso. 
+Nasconde la complessità interna (es. tutti i passaggi di verifica magazzino, creazione ordine, pagamento) dietro un unico metodo (es. controller.effettuaOrdine(...)).
+
+
+PRINCIPI CORRELATI (Conseguenze di GRASP)
+1. SINGLE RESPONSIBILITY PRINCIPLE (SRP):
+    -   NOTA: Non è un GRASP, ma una conseguenza diretta.
+    -   DEFINIZIONE: "Una classe dovrebbe avere uno, e un solo, motivo per cambiare" (Robert C. Martin).
+    -   È un altro modo per definire l'Alta Coesione.
+2. PRINCIPIO DELLA CONOSCENZA MINIMA (Legge di Demetra):
+    -   NOTA: Non è un GRASP, ma una linea guida di design.
+    -   DEFINIZIONE: "Una classe dovrebbe conoscere solo ciò che le è strettamente necessario". Dovrebbe parlare solo ai suoi "amici immediati" e non agli "amici degli amici".
+
+ESEMPIO DI VIOLAZIONE (Slide 23)
+this.p = context.getPassengers();  
+Questo codice viola la legge. La classe Car non dovrebbe sapere che context contiene dei passeggeri. 
+Sta "rovistando" dentro context per prendere ciò che le serve.
+
+PERCHE E UN PROBLEMA? 
+Viola il Low Coupling e l'Information Hiding. 
+Se domani la classe Context cambia il nome del metodo in getListaPasseggeri(), si rompe anche la classe Car, che non dovrebbe avere nulla a che fare con Context.
+
+SOLUZIONE (Slide 24)
+Invece di chiedere i dati, farseli passare (es. nel costruttore).
+public Car(Driver driver, Vector<Passengers> listOfPassengers){}
+Ora Car non sa nulla di Context. È compito di un terzo (magari un Controller) prendere i dati da Context e darli a Car.

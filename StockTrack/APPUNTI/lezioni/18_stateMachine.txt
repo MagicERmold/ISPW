@@ -1,0 +1,46 @@
+SINTESI DI COMPORTAMENTI DA UML STATE MACHINES (LEZIONI 53-54)
+Questi appunti affrontano il problema di come implementare (sintetizzare) nel codice una macchina a stati definita durante la fase di analisi. Esistono due approcci principali: strutturale e orientato agli oggetti.
+
+
+1. IL PROBLEMA
+Abbiamo modellato il comportamento dinamico di un oggetto con una UML State Machine (stati, eventi, transizioni). Ora, come scriviamo il codice Java corrispondente?
+
+
+2. APPROCCIO 1: STRUTTURALE (Switch-Case)
+È l'approccio più semplice e "grezzo", tipico della programmazione procedurale (C-style).
+
+IMPLEMENTAZIONE:
+    Si usa una variabile (es. int o enum) per memorizzare lo stato corrente.
+    Si crea un unico metodo "gigante" (es. processEvent) che gestisce tutti gli eventi.
+    All'interno, si usa un Nested Switch (switch annidato):
+        Il primo switch controlla lo Stato Corrente.
+        All'interno di ogni case (stato), un secondo switch (o if-else) controlla l'Evento ricevuto per decidere cosa fare e verso quale stato transitare.
+
+PROBLEMI (Code Smells):
+Violazione OCP (Open-Closed Principle): Se devi aggiungere un nuovo stato, devi modificare il codice esistente (il grande switch), rischiando di rompere tutto.
+MANUTENIBILITA: Il metodo diventa enorme e illeggibile.
+SWITCH STATEMENTS SMELL: Avere lunghe catene di switch è considerato un cattivo odore del codice nella OOP.
+
+
+3. APPROCCIO 2: OBJECT-ORIENTED (State Pattern)
+La soluzione corretta in Java è applicare il Design Pattern State (GoF), che trasforma gli stati in classi.
+STRUTTURA DEL PATTERN:
+    CONTEXT (Contesto): È la classe principale (es. Orologio) che ha un comportamento dipendente dallo stato. Mantiene un riferimento a un oggetto CurrentState.
+    STATE (Interfaccia/Classe Astratta): Definisce l'interfaccia comune per tutti gli stati (es. metodi come pressButton(), inc()).
+    CONCRETE STATES (Stati Concreti): Sottoclassi che implementano il comportamento specifico per quello stato (es. StateDisplay, StateSetHours).
+FUNZIONAMENTO:
+    Quando il Context riceve un evento, lo delega allo stato corrente (currentState.handleEvent()).
+    È lo stato stesso a decidere quale sarà il prossimo stato e a dire al Context di cambiare (context.setState(newState)).
+
+
+4. IMPLEMENTAZIONE AVANZATA (Abstract State)
+Per evitare duplicazione di codice, spesso si usa una classe intermedia AbstractState:
+    Fornisce un'implementazione di default per tutti gli eventi (solitamente "non fare nulla" o lanciare eccezione).
+    I Concrete States estendono questa classe e fanno l'Override solo degli eventi che hanno senso per loro .
+        Esempio: Se sono nello stato "Visualizza Ora", il tasto "Incrementa" non fa nulla. Quindi non faccio l'override di inc(). Se sono in "Set Ore", invece, implemento inc() per aumentare le ore.
+
+
+5. ESEMPIO: L'OROLOGIO DIGITALE
+Le slide chiudono con l'esempio pratico di un orologio con 2 pulsanti (Mode, Inc) e 3 stati (Display, SetHours, SetMinutes).
+    La classe Watch (Context) delega le pressioni dei tasti all'oggetto AbstractState.
+    Le classi DigitalDisplay, SetHours, SetMinutes gestiscono diversamente l'evento mode_button per passare allo stato successivo.

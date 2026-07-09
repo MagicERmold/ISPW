@@ -1,0 +1,73 @@
+POLIMORFISMO
+
+Concetti chiave da capire:
+    -   OPERAZIONE: è la specifica di una segnatura. Definisce cosa un oggetto può fare.
+    -   METODO: è l'implementazione concreta dell'operazione. Rappresentato dal codice vero e proprio che esegue l'operazione.
+    -   MESSAGGIO: è la richiesta di invocazione a run-time. Quando un oggetto A chiama un metodo su un oggetto B.
+
+Il polimorfismo riguarda come un singolo messaggio [es. s.getMeasure()] possa invocare diversi metodi a seconda di chi è "s" in quel momento.
+
+PROBLEMA: Generalizzazione delle classi astratte
+
+Immaginiamo di avere la classe Sensor e di voler creare una famiglia di sensori, ad esempio uno per la luce e uno per la temperatura.
+    1. GENERALIZZAZIONE: si crea una superclasse (padre) Sensor e due sottoclassi (figli) LightSensor, TempSensor. Le sottoclassi ereditano le caratteristiche comuni come ID e getMeasure(). (vedi esempio slide)
+    2. NUOVO PROBLEMA: l'operazione getMeasure() ha la stessa semantica per entrambi i figli, ma deve avere implementazioni diverse.
+    3. SOLUZIONE: CLASSI ASTRATTE: Quando una superclasse raggruppa operazioni comuni che devono essere implementate diversamente dalle sottoclassi, la superclasse diventa una classe astratta.
+        .   Una classe astratta è parzialmente definita.
+        .   Non può essere istanziata. (es. new Sensor() darebbe errore).
+        .   Può essere usata come tipo per una variabile che conterrà un'istanza di una sottoclasse concreta (es. Sensor t = new TempSensor();).
+
+
+(PROBABILE DOMANDA D'ESAME)
+DEFINIZIONE
+Il polimorfismo è la capacità di una classe di "comportarsi" in modi diversi in base al contesto di esecuzione run-time.
+Permette a istanze di classi differenti (come TempSensor e LightSensor) di rispondere allo stesso messaggio (la chiamata a getMeasure()) in modi differenti (eseguendo i loro metodi specifici).
+
+CONDIZIONI NECESSARIE PER IL POLIMORFISMO
+    1.  Gerarchia di classi (es. Sensor -> TempSensor).
+    2.  Una variabile con tipo la super-classe astratta (es. Sensor s;).
+    3.  Un meccanismo di scelta che crea un'istanza di una sottoclasse e la assegna alla variabile. (es. if(condition) {s = new TempSensor();} else {s = new LightSensor();}).
+    4.  Un linguaggio con supporto al binding dinamico.
+
+PERCHE SVILUPPARE UN SISTEMA POLIMORFICO?
+I sistemi polimorfici sono flessibili e facili da estendere: ad esempio per aggiungere un SoundSensor, basta creare la nuova classe che eredita da Sensor e implementa getMeasure(), senza modificare il codice che usa i sensori.
+
+
+OVERRIDING VS OVERLOADING
+OVERRIDING: sovrascrivo il comportamento di una operazione cambiando il metodo a cui essa è associata
+OVERLOADING: aggiunge funzionalità ad una classe fornendole una nuova operazione
+
+ESEMPIO:
+public class A{
+    public int test(int p){
+        return p;
+    }
+}
+
+public class B extends A{
+    // Override, bisogna specificare con @Override
+    @Override
+    public int test(int p){
+        return p+1;
+    }
+
+    // Overloading
+    public int test(float p){
+        return super.test(Math.round(p));
+    }
+}
+
+
+
+PRINCIPIO DI SOSTITUIBILITA DI LISKOV
+Il Principio di Sostituibilità di Liskov afferma che gli oggetti di una sottoclasse devono essere sostituibili con oggetti della loro superclasse senza alterare la correttezza o il comportamento atteso del programma.
+
+In parole povere se il codice funziona con un Sensor deve funzionare anche con un TempSensor o con un Lightsensor.
+
+ESEMPIO DI VIOLAZIONE:
+    .   Hai una classe Uccello con un metodo vola().
+    .   Crei una sottoclasse Pinguino che estende Uccello.
+    .   Un pinguino è un uccello, ma non può volare.
+    .   Se implementi Pinguino.vola() facendogli lanciare un'eccezione (UnsupportedOperationException) o semplicemente non facendo nulla, stai violando il PSL. Il tuo codice, che si aspetta di poter chiamare vola() su qualsiasi Uccello, si "romperebbe" inaspettatamente se ricevesse un Pinguino.
+
+Il PSL ci dice che l'ereditarietà non deve modellare solo una relazione "è un tipo di" strutturale, ma soprattutto una relazione "si comporta come" (is a kind of) comportamentale. È il "contratto" che le sottoclassi devono rispettare per garantire che il polimorfismo sia sicuro.

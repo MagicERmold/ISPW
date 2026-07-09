@@ -1,0 +1,39 @@
+PROGETTAZIONE DELLE ECCEZIONI E GESTIONE ERRORI (LEZIONE 49)
+1. IL PROBLEMA DELLA GESTIONE ERRORI
+CONTESTO: Non è possibile garantire l'assenza assoluta di errori (bug, problemi hardware, input errati) in un sistema software reale.
+VECCHIO APPROCCIO: Storicamente (es. in C), si usavano "codici di ritorno" (es. una funzione restituisce -1 se fallisce) o flag globali.
+    -   PROBLEMA: Questo mischia la logica "buona" (il business) con la logica di gestione dell'errore, rendendo il codice illeggibile ("spaghetti code").
+NUOVO APPROCCIO (Java): Usare le Eccezioni. Questo permette di separare nettamente il codice che fa il lavoro (il "happy path") dal codice che gestisce i problemi.
+
+2. COSA È UN'ECCEZIONE?
+DEFINIZIONE: Un evento che si verifica durante l'esecuzione di un programma e che interrompe il normale flusso delle istruzioni.
+MECCANISMO: Quando accade un errore, viene creato un Oggetto Eccezione (che contiene info sull'errore, come lo stack trace) e viene "lanciato" (throw) al sistema di runtime. Il sistema cerca qualcuno che possa "catturarlo" (catch).
+
+3. LA GERARCHIA THROWABLE IN JAVA
+Tutti gli errori in Java discendono dalla classe Throwable. Si dividono in 3 categorie principali:
+1) Error:
+    -   Problemi gravi a livello di JVM (es. OutOfMemoryError, StackOverflowError).
+    -   L'applicazione non può farci nulla. Di solito non si catturano.
+2) Exception (Checked Exceptions):
+    -   Problemi esterni o condizioni recuperabili (es. FileNotFoundException, IOException).
+    -   Il compilatore obbliga a gestirle (regola "Catch or Specify").
+3) RuntimeException (Unchecked Exceptions):
+    -   Errori di programmazione/logica (es. NullPointerException, IndexOutOfBoundsException).
+    -   Discendono da Exception ma sono speciali: il compilatore NON obbliga a gestirle (altrimenti dovremmo mettere try-catch ovunque!).
+
+4. IL PRINCIPIO "CATCH OR SPECIFY"
+Questa è la regola d'oro per le Checked Exceptions. Se un codice chiama un metodo che può lanciare un'eccezione Checked (es. leggere un file), deve fare una di queste due cose:
+    -   CATCH (Gestire): Avvolgere la chiamata in un blocco try-catch e gestire l'errore lì.
+    -   SPECIFY (Delegare): Dichiarare nel metodo corrente (con la clausola throws) che esso stesso può lanciare quell'eccezione, passando la responsabilità al chiamante.
+
+5. I BLOCCHI TRY, CATCH, FINALLY
+    -   try: Contiene il codice "a rischio".
+    -   catch: Intercetta un tipo specifico di eccezione e la gestisce. Si possono avere più catch (dal più specifico al più generale).
+    -   finally: Un blocco che viene eseguito sempre, sia se tutto va bene, sia se c'è un errore. È fondamentale per il cleanup delle risorse (es. chiudere file o connessioni DB per evitare memory leak).
+
+6. ECCEZIONI E OVERRIDING (Regola di Liskov)
+C'è una regola molto importante quando si fa l'override di un metodo in una sottoclasse:
+REGOLA: Un metodo della sottoclasse NON può dichiarare di lanciare eccezioni (Checked) nuove o più generali di quelle dichiarate nel metodo del padre.
+    -   Perché? Per il Polimorfismo. Se il codice client si aspetta un Sensor che lancia solo IOException, e tu gli passi un AdvancedSensor che lancia SQLException, il client si romperà perché non è pronto a gestire l'errore SQL.
+    -   La sottoclasse può però decidere di lanciare meno eccezioni o eccezioni più specifiche.
+ECCEZIONE PER I COSTRUTTORI: I costruttori delle sottoclassi, invece, DEVONO dichiarare almeno tutte le eccezioni del costruttore padre (perché lo chiamano implicitamente con super()). Possono aggiungerne anche di nuove.

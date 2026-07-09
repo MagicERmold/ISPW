@@ -19,13 +19,14 @@ final class InMemoryDataStore {
     static final Map<String, Fornitore> FORNITORI = new LinkedHashMap<>();
     static final Map<String, Prodotto> PRODOTTI = new LinkedHashMap<>();
     static final Map<String, Ordine> ORDINI = new LinkedHashMap<>();
+    private static final String DEFAULT_LOGIN_PASSWORD = "password123";
     static Inventario inventario;
 
     static {
         Titolare titolare = new Titolare("TIT-1", "Andrea", "Titolare", "titolare@stocktrack.local",
-                PasswordHasher.hash("password123"));
+                PasswordHasher.hash(DEFAULT_LOGIN_PASSWORD));
         Commesso commesso = new Commesso("COM-1", "Mario", "Commesso", "commesso@stocktrack.local",
-                PasswordHasher.hash("password123"));
+                PasswordHasher.hash(DEFAULT_LOGIN_PASSWORD));
         Fornitore fornitore = new Fornitore("FOR-1", "Forniture Demo", "fornitore@demo.local",
                 "simulated://fornitori/demo", true);
         Prodotto caffe = new Prodotto("PROD-1", "Caffe", "Alimentari", 8, 10, new BigDecimal("3.50"));

@@ -28,6 +28,7 @@ final class FileSystemDataStore {
     private static final Path FORNITORI_FILE = DATA_DIR.resolve("fornitori.csv");
     private static final Path PRODOTTI_FILE = DATA_DIR.resolve("prodotti.csv");
     private static final Path ORDINI_FILE = DATA_DIR.resolve("ordini.csv");
+    private static final String DEFAULT_LOGIN_PASSWORD = "password123";
 
     private FileSystemDataStore() {
     }
@@ -189,9 +190,9 @@ final class FileSystemDataStore {
         try {
             Files.createDirectories(DATA_DIR);
             writeIfMissing(TITOLARI_FILE, List.of("TIT-1;Andrea;Titolare;titolare@stocktrack.local;"
-                    + PasswordHasher.hash("password123")));
+                    + PasswordHasher.hash(DEFAULT_LOGIN_PASSWORD)));
             writeIfMissing(COMMESSI_FILE, List.of("COM-1;Mario;Commesso;commesso@stocktrack.local;"
-                    + PasswordHasher.hash("password123")));
+                    + PasswordHasher.hash(DEFAULT_LOGIN_PASSWORD)));
             writeIfMissing(FORNITORI_FILE, List.of(
                     "FOR-1;Forniture Demo;fornitore@demo.local;simulated://fornitori/demo;true"));
             writeIfMissing(PRODOTTI_FILE, List.of(
@@ -244,7 +245,7 @@ final class FileSystemDataStore {
         if (!value.isBlank()) {
             return value;
         }
-        return PasswordHasher.hash("password123");
+        return PasswordHasher.hash(DEFAULT_LOGIN_PASSWORD);
     }
 
     private static String safe(String value) {

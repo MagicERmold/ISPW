@@ -22,23 +22,40 @@ import java.util.Optional;
 
 final class JDBCDataStore {
 
-    private static final String URL = "jdbc:h2:file:./StockTrack/data/stocktrack-db";
-    private static final String USER = "sa";
-    private static final String PASSWORD = "";
+    private static final String URL = "jdbc:h2:file:./StockTrack/data/stocktrack-db-secure;CIPHER=AES";
+    private static final String USER = "stocktrack";
+    private static final String DB_FILE_PASSWORD_PROPERTY = "stocktrack.db.file.password";
+    private static final String DB_USER_PASSWORD_PROPERTY = "stocktrack.db.user.password";
+    private static final String DB_FILE_PASSWORD_ENV = "STOCKTRACK_DB_FILE_PASSWORD";
+    private static final String DB_USER_PASSWORD_ENV = "STOCKTRACK_DB_USER_PASSWORD";
+    private static final String PASSWORD = configuredSecret(DB_FILE_PASSWORD_PROPERTY, DB_FILE_PASSWORD_ENV)
+            + " " + configuredSecret(DB_USER_PASSWORD_PROPERTY, DB_USER_PASSWORD_ENV);
+    private static final String DEFAULT_LOGIN_PASSWORD = "password123";
+    private static final String PASSWORD_HASH_COLUMN = "password_hash";
+    private static final String USER_COLUMNS = "id, nome, cognome, email, password_hash";
+    private static final String SUPPLIER_COLUMNS = "id, nome, email, api_endpoint, disponibile";
+    private static final String PRODUCT_COLUMNS = "id, nome, categoria, quantita, soglia_minima, prezzo_unitario";
+    private static final String ORDER_COLUMNS = "id, totale, stato";
+    private static final String DUPLICATE_COLUMN_SQL_STATE = "42S21";
+    private static final String SELECT_TITOLARI = "select " + USER_COLUMNS + " from titolari";
+    private static final String SELECT_COMMESSI = "select " + USER_COLUMNS + " from commessi";
+    private static final String SELECT_FORNITORI = "select " + SUPPLIER_COLUMNS + " from fornitori";
+    private static final String SELECT_PRODOTTI = "select " + PRODUCT_COLUMNS + " from prodotti";
+    private static final String SELECT_ORDINI = "select " + ORDER_COLUMNS + " from ordini";
 
     private JDBCDataStore() {
     }
 
     static Optional<Titolare> findTitolareById(String id) throws PersistenceException {
-        return queryTitolari("select * from titolari where id = ?", id).stream().findFirst();
+        return queryTitolari(SELECT_TITOLARI + " where id = ?", id).stream().findFirst();
     }
 
     static Optional<Titolare> findTitolareByEmail(String email) throws PersistenceException {
-        return queryTitolari("select * from titolari where lower(email) = lower(?)", email).stream().findFirst();
+        return queryTitolari(SELECT_TITOLARI + " where lower(email) = lower(?)", email).stream().findFirst();
     }
 
     static List<Titolare> loadTitolari() throws PersistenceException {
-        return queryTitolari("select * from titolari", null);
+        return queryTitolari(SELECT_TITOLARI, null);
     }
 
     static void saveTitolare(Titolare titolare) throws PersistenceException {
@@ -47,15 +64,15 @@ final class JDBCDataStore {
     }
 
     static Optional<Commesso> findCommessoById(String id) throws PersistenceException {
-        return queryCommessi("select * from commessi where id = ?", id).stream().findFirst();
+        return queryCommessi(SELECT_COMMESSI + " where id = ?", id).stream().findFirst();
     }
 
     static Optional<Commesso> findCommessoByEmail(String email) throws PersistenceException {
-        return queryCommessi("select * from commessi where lower(email) = lower(?)", email).stream().findFirst();
+        return queryCommessi(SELECT_COMMESSI + " where lower(email) = lower(?)", email).stream().findFirst();
     }
 
     static List<Commesso> loadCommessi() throws PersistenceException {
-        return queryCommessi("select * from commessi", null);
+        return queryCommessi(SELECT_COMMESSI, null);
     }
 
     static void saveCommesso(Commesso commesso) throws PersistenceException {
@@ -64,11 +81,11 @@ final class JDBCDataStore {
     }
 
     static List<Fornitore> loadFornitori() throws PersistenceException {
-        return queryFornitori("select * from fornitori", null);
+        return queryFornitori(SELECT_FORNITORI, null);
     }
 
     static Optional<Fornitore> findFornitoreById(String id) throws PersistenceException {
-        return queryFornitori("select * from fornitori where id = ?", id).stream().findFirst();
+        return queryFornitori(SELECT_FORNITORI + " where id = ?", id).stream().findFirst();
     }
 
     static void saveFornitore(Fornitore fornitore) throws PersistenceException {
@@ -77,11 +94,11 @@ final class JDBCDataStore {
     }
 
     static List<Prodotto> loadProdotti() throws PersistenceException {
-        return queryProdotti("select * from prodotti", null);
+        return queryProdotti(SELECT_PRODOTTI, null);
     }
 
     static Optional<Prodotto> findProdottoById(String id) throws PersistenceException {
-        return queryProdotti("select * from prodotti where id = ?", id).stream().findFirst();
+        return queryProdotti(SELECT_PRODOTTI + " where id = ?", id).stream().findFirst();
     }
 
     static void saveProdotto(Prodotto prodotto) throws PersistenceException {
@@ -113,7 +130,7 @@ final class JDBCDataStore {
     static List<Ordine> loadOrdini() throws PersistenceException {
         try (Connection connection = openConnection();
              Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery("select * from ordini")) {
+             ResultSet resultSet = statement.executeQuery(SELECT_ORDINI)) {
             List<Ordine> ordini = new ArrayList<>();
             while (resultSet.next()) {
                 ordini.add(toOrdine(resultSet));
@@ -126,7 +143,7 @@ final class JDBCDataStore {
 
     static Optional<Ordine> findOrdineById(String id) throws PersistenceException {
         try (Connection connection = openConnection();
-             PreparedStatement statement = connection.prepareStatement("select * from ordini where id = ?")) {
+             PreparedStatement statement = connection.prepareStatement(SELECT_ORDINI + " where id = ?")) {
             statement.setString(1, id);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
@@ -153,7 +170,7 @@ final class JDBCDataStore {
                 while (resultSet.next()) {
                     titolari.add(new Titolare(resultSet.getString("id"), resultSet.getString("nome"),
                             resultSet.getString("cognome"), resultSet.getString("email"),
-                            resultSet.getString("password_hash")));
+                            resultSet.getString(PASSWORD_HASH_COLUMN)));
                 }
                 return titolari;
             }
@@ -171,7 +188,7 @@ final class JDBCDataStore {
                 while (resultSet.next()) {
                     commessi.add(new Commesso(resultSet.getString("id"), resultSet.getString("nome"),
                             resultSet.getString("cognome"), resultSet.getString("email"),
-                            resultSet.getString("password_hash")));
+                            resultSet.getString(PASSWORD_HASH_COLUMN)));
                 }
                 return commessi;
             }
@@ -242,7 +259,7 @@ final class JDBCDataStore {
         }
     }
 
-    private static Connection openConnection() throws SQLException, PersistenceException {
+    private static Connection openConnection() throws SQLException {
         Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
         initialize(connection);
         return connection;
@@ -254,8 +271,8 @@ final class JDBCDataStore {
                     + "(id varchar primary key, nome varchar, cognome varchar, email varchar, password_hash varchar)");
             statement.execute("create table if not exists commessi "
                     + "(id varchar primary key, nome varchar, cognome varchar, email varchar, password_hash varchar)");
-            addColumnIfMissing(statement, "titolari", "password_hash");
-            addColumnIfMissing(statement, "commessi", "password_hash");
+            addTitolarePasswordHashColumnIfMissing(statement);
+            addCommessoPasswordHashColumnIfMissing(statement);
             statement.execute("create table if not exists fornitori "
                     + "(id varchar primary key, nome varchar, email varchar, api_endpoint varchar, disponibile boolean)");
             statement.execute("create table if not exists prodotti "
@@ -263,28 +280,62 @@ final class JDBCDataStore {
                     + "soglia_minima int, prezzo_unitario decimal)");
             statement.execute("create table if not exists ordini "
                     + "(id varchar primary key, totale decimal, stato varchar)");
-            statement.execute("merge into titolari key(id) values "
-                    + "('TIT-1', 'Andrea', 'Titolare', 'titolare@stocktrack.local', '"
-                    + PasswordHasher.hash("password123") + "')");
-            statement.execute("merge into commessi key(id) values "
-                    + "('COM-1', 'Mario', 'Commesso', 'commesso@stocktrack.local', '"
-                    + PasswordHasher.hash("password123") + "')");
-            statement.execute("merge into fornitori key(id) values "
-                    + "('FOR-1', 'Forniture Demo', 'fornitore@demo.local', 'simulated://fornitori/demo', true)");
-            statement.execute("merge into prodotti key(id) values "
-                    + "('PROD-1', 'Caffe', 'Alimentari', 8, 10, 3.50)");
-            statement.execute("merge into prodotti key(id) values "
-                    + "('PROD-2', 'Latte', 'Alimentari', 20, 5, 1.40)");
         }
+        seedDemoData(connection);
     }
 
-    private static void addColumnIfMissing(Statement statement, String table, String column) throws SQLException {
+    private static void addTitolarePasswordHashColumnIfMissing(Statement statement) throws SQLException {
         try {
-            statement.execute("alter table " + table + " add column " + column + " varchar");
+            statement.execute("alter table titolari add column password_hash varchar");
         } catch (SQLException e) {
-            if (!"42S21".equals(e.getSQLState())) {
+            if (!DUPLICATE_COLUMN_SQL_STATE.equals(e.getSQLState())) {
                 throw e;
             }
         }
+    }
+
+    private static void addCommessoPasswordHashColumnIfMissing(Statement statement) throws SQLException {
+        try {
+            statement.execute("alter table commessi add column password_hash varchar");
+        } catch (SQLException e) {
+            if (!DUPLICATE_COLUMN_SQL_STATE.equals(e.getSQLState())) {
+                throw e;
+            }
+        }
+    }
+
+    private static void seedDemoData(Connection connection) throws SQLException {
+        executeMerge(connection, "merge into titolari key(id) values (?, ?, ?, ?, ?)", "TIT-1", "Andrea",
+                "Titolare", "titolare@stocktrack.local", PasswordHasher.hash(DEFAULT_LOGIN_PASSWORD));
+        executeMerge(connection, "merge into commessi key(id) values (?, ?, ?, ?, ?)", "COM-1", "Mario",
+                "Commesso", "commesso@stocktrack.local", PasswordHasher.hash(DEFAULT_LOGIN_PASSWORD));
+        executeMerge(connection, "merge into fornitori key(id) values (?, ?, ?, ?, ?)", "FOR-1", "Forniture Demo",
+                "fornitore@demo.local", "simulated://fornitori/demo", true);
+        executeMerge(connection, "merge into prodotti key(id) values (?, ?, ?, ?, ?, ?)", "PROD-1", "Caffe",
+                "Alimentari", 8, 10, new BigDecimal("3.50"));
+        executeMerge(connection, "merge into prodotti key(id) values (?, ?, ?, ?, ?, ?)", "PROD-2", "Latte",
+                "Alimentari", 20, 5, new BigDecimal("1.40"));
+    }
+
+    private static void executeMerge(Connection connection, String sql, Object... values) throws SQLException {
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            for (int index = 0; index < values.length; index++) {
+                statement.setObject(index + 1, values[index]);
+            }
+            statement.executeUpdate();
+        }
+    }
+
+    private static String configuredSecret(String propertyName, String environmentName) {
+        String propertyValue = System.getProperty(propertyName);
+        if (propertyValue != null && !propertyValue.isBlank()) {
+            return propertyValue;
+        }
+        String environmentValue = System.getenv(environmentName);
+        if (environmentValue != null && !environmentValue.isBlank()) {
+            return environmentValue;
+        }
+        throw new IllegalStateException("Credenziali database mancanti: configurare " + propertyName
+                + " o " + environmentName);
     }
 }

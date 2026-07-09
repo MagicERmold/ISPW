@@ -3,6 +3,7 @@ package com.stocktrack.entity;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Carrello {
 
@@ -26,7 +27,7 @@ public class Carrello {
     public BigDecimal calcolaTotale() {
         return prodotti.stream()
                 .map(Prodotto::getPrezzoUnitario)
-                .filter(prezzo -> prezzo != null)
+                .filter(Objects::nonNull)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 

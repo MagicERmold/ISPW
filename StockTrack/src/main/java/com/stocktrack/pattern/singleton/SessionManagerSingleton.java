@@ -3,6 +3,7 @@ package com.stocktrack.pattern.singleton;
 import com.stocktrack.bean.RuoloUtente;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -10,6 +11,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 public class SessionManagerSingleton {
+
+    private static final ZoneId APPLICATION_ZONE = ZoneId.systemDefault();
 
     private final ConcurrentMap<String, Session> sessions = new ConcurrentHashMap<>();
     private final ThreadLocal<String> currentSessionId = new ThreadLocal<>();
@@ -30,7 +33,7 @@ public class SessionManagerSingleton {
         }
 
         String sessionId = UUID.randomUUID().toString();
-        Session session = new Session(sessionId, idUtente, ruolo, LocalDateTime.now());
+        Session session = new Session(sessionId, idUtente, ruolo, LocalDateTime.now(APPLICATION_ZONE));
         sessions.put(sessionId, session);
         currentSessionId.set(sessionId);
         return session;

@@ -3,8 +3,11 @@ package com.stocktrack.pattern.singleton;
 import com.stocktrack.bean.RuoloUtente;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 public class Session {
+
+    private static final ZoneId APPLICATION_ZONE = ZoneId.systemDefault();
 
     private final String id;
     private final String idUtente;
@@ -23,7 +26,7 @@ public class Session {
     }
 
     public void touch() {
-        ultimoAccesso = LocalDateTime.now();
+        ultimoAccesso = LocalDateTime.now(APPLICATION_ZONE);
     }
 
     public void invalidate() {

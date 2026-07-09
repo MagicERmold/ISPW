@@ -7,6 +7,7 @@ import com.stocktrack.exceptions.PersistenceException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.YearMonth;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,11 +16,12 @@ public class AnalizzaStatisticheVenditaController extends GestisciProdottiContro
 
     private static final int MONTHS_TO_SIMULATE = 6;
     private static final DateTimeFormatter MONTH_FORMATTER = DateTimeFormatter.ofPattern("MM/yyyy");
+    private static final ZoneId APPLICATION_ZONE = ZoneId.systemDefault();
 
     public List<StatisticaVenditaMensileBean> analizzaStatisticheMensili() throws PersistenceException {
         List<ProdottoBean> prodotti = visualizzaProdotti();
         List<StatisticaVenditaMensileBean> statistiche = new ArrayList<>();
-        YearMonth currentMonth = YearMonth.now().minusMonths(MONTHS_TO_SIMULATE - 1L);
+        YearMonth currentMonth = YearMonth.now(APPLICATION_ZONE).minusMonths(MONTHS_TO_SIMULATE - 1L);
 
         for (int index = 0; index < MONTHS_TO_SIMULATE; index++) {
             YearMonth mese = currentMonth.plusMonths(index);

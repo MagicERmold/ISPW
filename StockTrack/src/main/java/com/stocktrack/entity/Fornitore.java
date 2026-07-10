@@ -1,10 +1,9 @@
 package com.stocktrack.entity;
 
-public class Fornitore {
+import com.stocktrack.common.AbstractAnagraficaData;
 
-    private String id;
-    private String nome;
-    private String email;
+public class Fornitore extends AbstractAnagraficaData {
+
     private String apiEndpoint;
     private boolean disponibile;
 
@@ -12,39 +11,13 @@ public class Fornitore {
     }
 
     public Fornitore(String id, String nome, String email, String apiEndpoint, boolean disponibile) {
-        this.id = id;
-        this.nome = nome;
-        this.email = email;
+        super(id, nome, email);
         this.apiEndpoint = apiEndpoint;
         this.disponibile = disponibile;
     }
 
     public void notificaPagamento(String idOrdine) {
         // La notifica reale arrivera tramite gateway/controller applicativo.
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public String getApiEndpoint() {

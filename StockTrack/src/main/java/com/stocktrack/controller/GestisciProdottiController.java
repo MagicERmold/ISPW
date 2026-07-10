@@ -15,6 +15,8 @@ import java.util.List;
 
 public class GestisciProdottiController {
 
+    private static final String PRODOTTO_NON_TROVATO = "Prodotto non trovato";
+
     public List<ProdottoBean> visualizzaProdotti() throws PersistenceException {
         return getProdottoDAO().findAll().stream()
                 .map(this::toProdottoBean)
@@ -38,7 +40,7 @@ public class GestisciProdottiController {
         prodottoBean.validate();
         ProdottoDAO prodottoDAO = getProdottoDAO();
         if (prodottoDAO.findById(prodottoBean.getId()).isEmpty()) {
-            return new EsitoOperazioneBean(false, "Prodotto non trovato");
+            return new EsitoOperazioneBean(false, PRODOTTO_NON_TROVATO);
         }
         prodottoDAO.update(toProdotto(prodottoBean));
         sincronizzaInventario();
@@ -52,7 +54,7 @@ public class GestisciProdottiController {
         }
         ProdottoDAO prodottoDAO = getProdottoDAO();
         if (prodottoDAO.findById(prodottoBean.getId()).isEmpty()) {
-            return new EsitoOperazioneBean(false, "Prodotto non trovato");
+            return new EsitoOperazioneBean(false, PRODOTTO_NON_TROVATO);
         }
         prodottoDAO.deleteById(prodottoBean.getId());
         sincronizzaInventario();
@@ -94,7 +96,7 @@ public class GestisciProdottiController {
 
         ProdottoDAO prodottoDAO = getProdottoDAO();
         Prodotto prodotto = prodottoDAO.findById(idProdotto)
-                .orElseThrow(() -> new InvalidInputException("Prodotto non trovato"));
+                .orElseThrow(() -> new InvalidInputException(PRODOTTO_NON_TROVATO));
         int nuovaQuantita = prodotto.getQuantita() + delta;
         if (nuovaQuantita < 0) {
             throw new InvalidInputException("Quantita insufficiente in inventario");

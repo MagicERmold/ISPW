@@ -7,16 +7,16 @@ public class InMemoryInventarioDAO implements InventarioDAO {
 
     @Override
     public Inventario findInventario() {
-        return InMemoryDataStore.inventario;
+        return InMemoryDataStore.getInventario();
     }
 
     @Override
     public void save(Inventario inventario) {
-        InMemoryDataStore.inventario = inventario;
+        InMemoryDataStore.setInventario(inventario);
     }
 
     @Override
     public void update(Inventario inventario) {
-        InMemoryDataStore.inventario = inventario;
+        InMemoryDataStore.setInventario(inventario);
     }
 }

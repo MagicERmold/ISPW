@@ -2,10 +2,12 @@ module com.stocktrack {
     requires java.sql;
     requires javafx.controls;
     requires javafx.fxml;
+    requires org.slf4j;
 
     exports com.stocktrack;
     exports com.stocktrack.bean;
     exports com.stocktrack.boundary;
+    exports com.stocktrack.common;
     exports com.stocktrack.config;
     exports com.stocktrack.controller;
     exports com.stocktrack.entity;

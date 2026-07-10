@@ -8,10 +8,6 @@ import java.io.InputStream;
 import java.util.Properties;
 
 public class Main {
-    private static final String JVM_RELAUNCH_PROPERTY = "stocktrack.jvm.relaunched";
-    private static final String JAVAFX_GRAPHICS_MODULE = "javafx.graphics";
-    private static final String ENABLE_NATIVE_ACCESS = "--enable-native-access=" + JAVAFX_GRAPHICS_MODULE;
-    private static final String ENABLE_UNSAFE_MEMORY_ACCESS = "--sun-misc-unsafe-memory-access=allow";
 
     public static void main(String[] args) {
         String viewType = loadViewType();

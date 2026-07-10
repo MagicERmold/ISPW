@@ -42,4 +42,12 @@ final class InMemoryDataStore {
 
     private InMemoryDataStore() {
     }
+
+    static Inventario getInventario() {
+        return inventario;
+    }
+
+    static void setInventario(Inventario nuovoInventario) {
+        inventario = nuovoInventario;
+    }
 }

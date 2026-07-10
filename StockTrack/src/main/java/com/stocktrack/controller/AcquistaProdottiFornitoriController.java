@@ -4,7 +4,6 @@ import com.stocktrack.bean.CarrelloBean;
 import com.stocktrack.bean.EsitoOrdineBean;
 import com.stocktrack.bean.EsitoPagamentoBean;
 import com.stocktrack.bean.FornitoreBean;
-import com.stocktrack.bean.LoginBean;
 import com.stocktrack.bean.OrdineBean;
 import com.stocktrack.bean.PagamentoBean;
 import com.stocktrack.bean.ProdottoBean;

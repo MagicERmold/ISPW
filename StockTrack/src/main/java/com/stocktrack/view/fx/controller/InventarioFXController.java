@@ -20,6 +20,7 @@ import javafx.scene.text.Text;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 public class InventarioFXController {
 
@@ -61,7 +62,9 @@ public class InventarioFXController {
             inventoryTilePane.getChildren().add(createProductCard(disponibilita));
         }
         long belowThreshold = prodotti.stream()
-                .filter(item -> item.getProdotto() != null && item.getProdotto().isSottoSoglia())
+                .map(DisponibilitaProdottoBean::getProdotto)
+                .filter(Objects::nonNull)
+                .filter(prodotto -> prodotto.isSottoSoglia())
                 .count();
         summaryLabel.setText("Prodotti: " + prodotti.size() + " | Da riordinare: " + belowThreshold);
         messageLabel.setText(prodotti.isEmpty() ? "Inventario vuoto" : "Inventario aggiornato");

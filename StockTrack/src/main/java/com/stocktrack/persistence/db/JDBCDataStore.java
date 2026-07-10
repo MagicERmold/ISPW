@@ -31,27 +31,34 @@ final class JDBCDataStore {
     private static final String PASSWORD = configuredSecret(DB_FILE_PASSWORD_PROPERTY, DB_FILE_PASSWORD_ENV)
             + " " + configuredSecret(DB_USER_PASSWORD_PROPERTY, DB_USER_PASSWORD_ENV);
     private static final String DEFAULT_LOGIN_PASSWORD = "password123";
+    private static final String EMAIL_COLUMN = "email";
     private static final String PASSWORD_HASH_COLUMN = "password_hash";
-    private static final String USER_COLUMNS = "id, nome, cognome, email, password_hash";
-    private static final String SUPPLIER_COLUMNS = "id, nome, email, api_endpoint, disponibile";
+    private static final String USER_COLUMNS = "id, nome, cognome, " + EMAIL_COLUMN + ", password_hash";
+    private static final String SUPPLIER_COLUMNS = "id, nome, " + EMAIL_COLUMN + ", api_endpoint, disponibile";
     private static final String PRODUCT_COLUMNS = "id, nome, categoria, quantita, soglia_minima, prezzo_unitario";
     private static final String ORDER_COLUMNS = "id, totale, stato";
     private static final String DUPLICATE_COLUMN_SQL_STATE = "42S21";
-    private static final String SELECT_TITOLARI = "select " + USER_COLUMNS + " from titolari";
-    private static final String SELECT_COMMESSI = "select " + USER_COLUMNS + " from commessi";
-    private static final String SELECT_FORNITORI = "select " + SUPPLIER_COLUMNS + " from fornitori";
-    private static final String SELECT_PRODOTTI = "select " + PRODUCT_COLUMNS + " from prodotti";
-    private static final String SELECT_ORDINI = "select " + ORDER_COLUMNS + " from ordini";
+    private static final String SELECT = "select ";
+    private static final String WHERE_ID = " where id = ?";
+    private static final String PRODUCT_MERGE_SQL = "merge into prodotti key(id) values (?, ?, ?, ?, ?, ?)";
+    private static final String DELETE_PRODUCT_SQL = "delete from prodotti" + WHERE_ID;
+    private static final String SELECT_TITOLARI = SELECT + USER_COLUMNS + " from titolari";
+    private static final String SELECT_COMMESSI = SELECT + USER_COLUMNS + " from commessi";
+    private static final String SELECT_FORNITORI = SELECT + SUPPLIER_COLUMNS + " from fornitori";
+    private static final String SELECT_PRODOTTI = SELECT + PRODUCT_COLUMNS + " from prodotti";
+    private static final String SELECT_ORDINI = SELECT + ORDER_COLUMNS + " from ordini";
 
     private JDBCDataStore() {
     }
 
     static Optional<Titolare> findTitolareById(String id) throws PersistenceException {
-        return queryTitolari(SELECT_TITOLARI + " where id = ?", id).stream().findFirst();
+        return queryTitolari(SELECT_TITOLARI + WHERE_ID, id).stream().findFirst();
     }
 
     static Optional<Titolare> findTitolareByEmail(String email) throws PersistenceException {
-        return queryTitolari(SELECT_TITOLARI + " where lower(email) = lower(?)", email).stream().findFirst();
+        return queryTitolari(SELECT_TITOLARI + " where lower(" + EMAIL_COLUMN + ") = lower(?)", email)
+                .stream()
+                .findFirst();
     }
 
     static List<Titolare> loadTitolari() throws PersistenceException {
@@ -64,11 +71,13 @@ final class JDBCDataStore {
     }
 
     static Optional<Commesso> findCommessoById(String id) throws PersistenceException {
-        return queryCommessi(SELECT_COMMESSI + " where id = ?", id).stream().findFirst();
+        return queryCommessi(SELECT_COMMESSI + WHERE_ID, id).stream().findFirst();
     }
 
     static Optional<Commesso> findCommessoByEmail(String email) throws PersistenceException {
-        return queryCommessi(SELECT_COMMESSI + " where lower(email) = lower(?)", email).stream().findFirst();
+        return queryCommessi(SELECT_COMMESSI + " where lower(" + EMAIL_COLUMN + ") = lower(?)", email)
+                .stream()
+                .findFirst();
     }
 
     static List<Commesso> loadCommessi() throws PersistenceException {
@@ -85,7 +94,7 @@ final class JDBCDataStore {
     }
 
     static Optional<Fornitore> findFornitoreById(String id) throws PersistenceException {
-        return queryFornitori(SELECT_FORNITORI + " where id = ?", id).stream().findFirst();
+        return queryFornitori(SELECT_FORNITORI + WHERE_ID, id).stream().findFirst();
     }
 
     static void saveFornitore(Fornitore fornitore) throws PersistenceException {
@@ -98,18 +107,18 @@ final class JDBCDataStore {
     }
 
     static Optional<Prodotto> findProdottoById(String id) throws PersistenceException {
-        return queryProdotti(SELECT_PRODOTTI + " where id = ?", id).stream().findFirst();
+        return queryProdotti(SELECT_PRODOTTI + WHERE_ID, id).stream().findFirst();
     }
 
     static void saveProdotto(Prodotto prodotto) throws PersistenceException {
-        executeMerge("merge into prodotti key(id) values (?, ?, ?, ?, ?, ?)", prodotto.getId(), prodotto.getNome(),
+        executeMerge(PRODUCT_MERGE_SQL, prodotto.getId(), prodotto.getNome(),
                 prodotto.getCategoria(), prodotto.getQuantita(), prodotto.getSogliaMinima(),
                 prodotto.getPrezzoUnitario());
     }
 
     static void deleteProdotto(String id) throws PersistenceException {
         try (Connection connection = openConnection();
-             PreparedStatement statement = connection.prepareStatement("delete from prodotti where id = ?")) {
+             PreparedStatement statement = connection.prepareStatement(DELETE_PRODUCT_SQL)) {
             statement.setString(1, id);
             statement.executeUpdate();
         } catch (SQLException e) {
@@ -143,7 +152,7 @@ final class JDBCDataStore {
 
     static Optional<Ordine> findOrdineById(String id) throws PersistenceException {
         try (Connection connection = openConnection();
-             PreparedStatement statement = connection.prepareStatement(SELECT_ORDINI + " where id = ?")) {
+             PreparedStatement statement = connection.prepareStatement(SELECT_ORDINI + WHERE_ID)) {
             statement.setString(1, id);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
@@ -169,7 +178,7 @@ final class JDBCDataStore {
                 List<Titolare> titolari = new ArrayList<>();
                 while (resultSet.next()) {
                     titolari.add(new Titolare(resultSet.getString("id"), resultSet.getString("nome"),
-                            resultSet.getString("cognome"), resultSet.getString("email"),
+                            resultSet.getString("cognome"), resultSet.getString(EMAIL_COLUMN),
                             resultSet.getString(PASSWORD_HASH_COLUMN)));
                 }
                 return titolari;
@@ -187,7 +196,7 @@ final class JDBCDataStore {
                 List<Commesso> commessi = new ArrayList<>();
                 while (resultSet.next()) {
                     commessi.add(new Commesso(resultSet.getString("id"), resultSet.getString("nome"),
-                            resultSet.getString("cognome"), resultSet.getString("email"),
+                            resultSet.getString("cognome"), resultSet.getString(EMAIL_COLUMN),
                             resultSet.getString(PASSWORD_HASH_COLUMN)));
                 }
                 return commessi;
@@ -205,7 +214,7 @@ final class JDBCDataStore {
                 List<Fornitore> fornitori = new ArrayList<>();
                 while (resultSet.next()) {
                     fornitori.add(new Fornitore(resultSet.getString("id"), resultSet.getString("nome"),
-                            resultSet.getString("email"), resultSet.getString("api_endpoint"),
+                            resultSet.getString(EMAIL_COLUMN), resultSet.getString("api_endpoint"),
                             resultSet.getBoolean("disponibile")));
                 }
                 return fornitori;
@@ -268,13 +277,16 @@ final class JDBCDataStore {
     private static void initialize(Connection connection) throws SQLException {
         try (Statement statement = connection.createStatement()) {
             statement.execute("create table if not exists titolari "
-                    + "(id varchar primary key, nome varchar, cognome varchar, email varchar, password_hash varchar)");
+                    + "(id varchar primary key, nome varchar, cognome varchar, " + EMAIL_COLUMN
+                    + " varchar, password_hash varchar)");
             statement.execute("create table if not exists commessi "
-                    + "(id varchar primary key, nome varchar, cognome varchar, email varchar, password_hash varchar)");
+                    + "(id varchar primary key, nome varchar, cognome varchar, " + EMAIL_COLUMN
+                    + " varchar, password_hash varchar)");
             addTitolarePasswordHashColumnIfMissing(statement);
             addCommessoPasswordHashColumnIfMissing(statement);
             statement.execute("create table if not exists fornitori "
-                    + "(id varchar primary key, nome varchar, email varchar, api_endpoint varchar, disponibile boolean)");
+                    + "(id varchar primary key, nome varchar, " + EMAIL_COLUMN
+                    + " varchar, api_endpoint varchar, disponibile boolean)");
             statement.execute("create table if not exists prodotti "
                     + "(id varchar primary key, nome varchar, categoria varchar, quantita int, "
                     + "soglia_minima int, prezzo_unitario decimal)");
@@ -311,9 +323,9 @@ final class JDBCDataStore {
                 "Commesso", "commesso@stocktrack.local", PasswordHasher.hash(DEFAULT_LOGIN_PASSWORD));
         executeMerge(connection, "merge into fornitori key(id) values (?, ?, ?, ?, ?)", "FOR-1", "Forniture Demo",
                 "fornitore@demo.local", "simulated://fornitori/demo", true);
-        executeMerge(connection, "merge into prodotti key(id) values (?, ?, ?, ?, ?, ?)", "PROD-1", "Caffe",
+        executeMerge(connection, PRODUCT_MERGE_SQL, "PROD-1", "Caffe",
                 "Alimentari", 8, 10, new BigDecimal("3.50"));
-        executeMerge(connection, "merge into prodotti key(id) values (?, ?, ?, ?, ?, ?)", "PROD-2", "Latte",
+        executeMerge(connection, PRODUCT_MERGE_SQL, "PROD-2", "Latte",
                 "Alimentari", 20, 5, new BigDecimal("1.40"));
     }
 

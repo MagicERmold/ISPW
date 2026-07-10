@@ -1,12 +1,10 @@
 package com.stocktrack.bean;
 
+import com.stocktrack.common.AbstractPersonaData;
 import com.stocktrack.exceptions.InvalidInputException;
 
-public class RegistrazioneBean {
+public class RegistrazioneBean extends AbstractPersonaData {
 
-    private String nome;
-    private String cognome;
-    private String email;
     private String password;
     private RuoloUtente ruolo = RuoloUtente.TITOLARE;
 
@@ -14,21 +12,19 @@ public class RegistrazioneBean {
     }
 
     public RegistrazioneBean(String nome, String cognome, String email, String password, RuoloUtente ruolo) {
-        this.nome = nome;
-        this.cognome = cognome;
-        this.email = email;
+        super(null, nome, cognome, email);
         this.password = password;
         this.ruolo = ruolo;
     }
 
     public void validate() throws InvalidInputException {
-        if (isBlank(nome)) {
+        if (isBlank(getNome())) {
             throw new InvalidInputException("Nome obbligatorio");
         }
-        if (isBlank(email)) {
+        if (isBlank(getEmail())) {
             throw new InvalidInputException("Email obbligatoria");
         }
-        if (!email.contains("@")) {
+        if (!getEmail().contains("@")) {
             throw new InvalidInputException("Email non valida");
         }
         if (isBlank(password) || password.length() < 8) {
@@ -37,30 +33,6 @@ public class RegistrazioneBean {
         if (ruolo == null) {
             throw new InvalidInputException("Ruolo utente obbligatorio");
         }
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public String getCognome() {
-        return cognome;
-    }
-
-    public void setCognome(String cognome) {
-        this.cognome = cognome;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public String getPassword() {
@@ -79,7 +51,4 @@ public class RegistrazioneBean {
         this.ruolo = ruolo;
     }
 
-    private boolean isBlank(String value) {
-        return value == null || value.isBlank();
-    }
 }

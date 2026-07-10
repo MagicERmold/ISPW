@@ -1,102 +1,35 @@
 package com.stocktrack.bean;
 
+import com.stocktrack.common.AbstractProdottoData;
 import com.stocktrack.exceptions.InvalidInputException;
 
 import java.math.BigDecimal;
 
-public class ProdottoBean {
-
-    private String id;
-    private String nome;
-    private String categoria;
-    private int quantita;
-    private int sogliaMinima;
-    private BigDecimal prezzoUnitario;
+public class ProdottoBean extends AbstractProdottoData {
 
     public ProdottoBean() {
     }
 
     public ProdottoBean(String id, String nome, String categoria, int quantita, int sogliaMinima,
                        BigDecimal prezzoUnitario) {
-        this.id = id;
-        this.nome = nome;
-        this.categoria = categoria;
-        this.quantita = quantita;
-        this.sogliaMinima = sogliaMinima;
-        this.prezzoUnitario = prezzoUnitario;
+        super(id, nome, categoria, quantita, sogliaMinima, prezzoUnitario);
     }
 
     public void validate() throws InvalidInputException {
-        if (isBlank(id)) {
+        if (isBlank(getId())) {
             throw new InvalidInputException("Id prodotto obbligatorio");
         }
-        if (isBlank(nome)) {
+        if (isBlank(getNome())) {
             throw new InvalidInputException("Nome prodotto obbligatorio");
         }
-        if (quantita < 0) {
+        if (getQuantita() < 0) {
             throw new InvalidInputException("Quantita prodotto non valida");
         }
-        if (sogliaMinima < 0) {
+        if (getSogliaMinima() < 0) {
             throw new InvalidInputException("Soglia minima prodotto non valida");
         }
-        if (prezzoUnitario != null && prezzoUnitario.compareTo(BigDecimal.ZERO) < 0) {
+        if (getPrezzoUnitario() != null && getPrezzoUnitario().compareTo(BigDecimal.ZERO) < 0) {
             throw new InvalidInputException("Prezzo prodotto non valido");
         }
-    }
-
-    public boolean isSottoSoglia() {
-        return quantita <= sogliaMinima;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public String getCategoria() {
-        return categoria;
-    }
-
-    public void setCategoria(String categoria) {
-        this.categoria = categoria;
-    }
-
-    public int getQuantita() {
-        return quantita;
-    }
-
-    public void setQuantita(int quantita) {
-        this.quantita = quantita;
-    }
-
-    public int getSogliaMinima() {
-        return sogliaMinima;
-    }
-
-    public void setSogliaMinima(int sogliaMinima) {
-        this.sogliaMinima = sogliaMinima;
-    }
-
-    public BigDecimal getPrezzoUnitario() {
-        return prezzoUnitario;
-    }
-
-    public void setPrezzoUnitario(BigDecimal prezzoUnitario) {
-        this.prezzoUnitario = prezzoUnitario;
-    }
-
-    private boolean isBlank(String value) {
-        return value == null || value.isBlank();
     }
 }

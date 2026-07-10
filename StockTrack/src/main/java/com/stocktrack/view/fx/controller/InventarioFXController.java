@@ -3,6 +3,7 @@ package com.stocktrack.view.fx.controller;
 import com.stocktrack.JavaFXApp;
 import com.stocktrack.bean.DisponibilitaProdottoBean;
 import com.stocktrack.boundary.AnalizzaDisponibilitaInventarioBoundary;
+import com.stocktrack.common.AbstractProdottoData;
 import javafx.fxml.FXML;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Label;
@@ -23,6 +24,15 @@ import java.util.List;
 import java.util.Objects;
 
 public class InventarioFXController {
+
+    private static final String DEFAULT_PRODUCT_COLOR = "#22577a";
+    private static final String[] PRODUCT_COLOR_PALETTE = {
+            DEFAULT_PRODUCT_COLOR,
+            "#2a9d8f",
+            "#6a4c93",
+            "#b56576",
+            "#3d5a80"
+    };
 
     @FXML
     private TilePane inventoryTilePane;
@@ -64,7 +74,7 @@ public class InventarioFXController {
         long belowThreshold = prodotti.stream()
                 .map(DisponibilitaProdottoBean::getProdotto)
                 .filter(Objects::nonNull)
-                .filter(prodotto -> prodotto.isSottoSoglia())
+                .filter(AbstractProdottoData::isSottoSoglia)
                 .count();
         summaryLabel.setText("Prodotti: " + prodotti.size() + " | Da riordinare: " + belowThreshold);
         messageLabel.setText(prodotti.isEmpty() ? "Inventario vuoto" : "Inventario aggiornato");
@@ -115,15 +125,10 @@ public class InventarioFXController {
 
     private Color colorFor(String category) {
         if (category == null) {
-            return Color.web("#22577a");
+            return Color.web(DEFAULT_PRODUCT_COLOR);
         }
-        return switch (Math.abs(category.hashCode()) % 5) {
-            case 0 -> Color.web("#22577a");
-            case 1 -> Color.web("#2a9d8f");
-            case 2 -> Color.web("#6a4c93");
-            case 3 -> Color.web("#b56576");
-            default -> Color.web("#3d5a80");
-        };
+        int colorIndex = Math.floorMod(category.hashCode(), PRODUCT_COLOR_PALETTE.length);
+        return Color.web(PRODUCT_COLOR_PALETTE[colorIndex]);
     }
 
     private String initials(String productName) {

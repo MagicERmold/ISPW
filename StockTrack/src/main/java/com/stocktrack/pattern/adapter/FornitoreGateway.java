@@ -11,5 +11,7 @@ public interface FornitoreGateway {
 
     List<ProdottoBean> recuperaProdotti(FornitoreBean fornitoreBean) throws FornitoreConnectionException;
 
+    void salvaProdotto(FornitoreBean fornitoreBean, ProdottoBean prodottoBean) throws FornitoreConnectionException;
+
     void notificaOrdine(OrdineBean ordineBean) throws FornitoreConnectionException;
 }

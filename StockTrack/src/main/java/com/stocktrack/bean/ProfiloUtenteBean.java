@@ -27,6 +27,10 @@ public class ProfiloUtenteBean {
         return RuoloUtente.COMMESSO.equals(ruolo);
     }
 
+    public boolean isFornitore() {
+        return RuoloUtente.FORNITORE.equals(ruolo);
+    }
+
     public String getIdUtente() {
         return idUtente;
     }

@@ -6,14 +6,21 @@ public class Fornitore extends AbstractAnagraficaData {
 
     private String apiEndpoint;
     private boolean disponibile;
+    private String passwordHash;
 
     public Fornitore() {
     }
 
     public Fornitore(String id, String nome, String email, String apiEndpoint, boolean disponibile) {
+        this(id, nome, email, apiEndpoint, disponibile, "");
+    }
+
+    public Fornitore(String id, String nome, String email, String apiEndpoint, boolean disponibile,
+                     String passwordHash) {
         super(id, nome, email);
         this.apiEndpoint = apiEndpoint;
         this.disponibile = disponibile;
+        this.passwordHash = passwordHash;
     }
 
     public void notificaPagamento(String idOrdine) {
@@ -34,5 +41,13 @@ public class Fornitore extends AbstractAnagraficaData {
 
     public void setDisponibile(boolean disponibile) {
         this.disponibile = disponibile;
+    }
+
+    public String getPasswordHash() {
+        return passwordHash;
+    }
+
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
     }
 }

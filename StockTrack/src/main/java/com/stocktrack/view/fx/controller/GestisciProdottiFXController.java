@@ -185,8 +185,11 @@ public class GestisciProdottiFXController {
                     setText(null);
                     return;
                 }
-                setText(item.getMese() + " | venduti " + item.getQuantitaVenduta() + " | "
-                        + item.getIncassoStimato() + " EUR | top " + item.getProdottoPiuVenduto());
+                setText(item.getMese() + " | venduti " + item.getQuantitaVenduta()
+                        + " | acquistati " + item.getQuantitaAcquistata()
+                        + " | incasso " + item.getIncassoStimato()
+                        + " EUR | acquisti " + item.getSpesaAcquisti()
+                        + " EUR | top " + item.getProdottoPiuVenduto());
             }
         });
     }

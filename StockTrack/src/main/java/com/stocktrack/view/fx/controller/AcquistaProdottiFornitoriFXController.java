@@ -8,9 +8,12 @@ import com.stocktrack.bean.FornitoreBean;
 import com.stocktrack.bean.OrdineBean;
 import com.stocktrack.bean.PagamentoBean;
 import com.stocktrack.bean.ProdottoBean;
+import com.stocktrack.bean.RuoloUtente;
 import com.stocktrack.boundary.AcquistaProdottiFornitoriBoundary;
+import com.stocktrack.pattern.singleton.SessionManagerSingleton;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -34,7 +37,13 @@ public class AcquistaProdottiFornitoriFXController {
     private ListView<ProdottoBean> supplierProductsListView;
 
     @FXML
+    private Button loadProductsButton;
+
+    @FXML
     private TextField quantityField;
+
+    @FXML
+    private Button addToCartButton;
 
     @FXML
     private ListView<ProdottoBean> cartListView;
@@ -58,6 +67,9 @@ public class AcquistaProdottiFornitoriFXController {
     private TextField paypalEmailField;
 
     @FXML
+    private Button payAndConfirmButton;
+
+    @FXML
     private Label messageLabel;
 
     private final AcquistaProdottiFornitoriBoundary boundary = new AcquistaProdottiFornitoriBoundary();
@@ -74,6 +86,7 @@ public class AcquistaProdottiFornitoriFXController {
         updatePaymentFields();
         configureCells();
         supplierComboBox.setItems(FXCollections.observableArrayList(boundary.recuperaFornitori()));
+        configureRoleAccess();
     }
 
     @FXML
@@ -129,6 +142,13 @@ public class AcquistaProdottiFornitoriFXController {
                 currentCart.getProdotti(), currentCart.getTotaleStimato());
         EsitoOrdineBean esitoOrdine = boundary.confermaOrdine(ordineBean);
         setMessage(esitoOrdine.getMessaggio());
+        if (esitoOrdine.isSuccesso()) {
+            selectedProducts.clear();
+            currentCart = new CarrelloBean();
+            cartListView.setItems(FXCollections.observableArrayList());
+            totalLabel.setText("Totale: 0 EUR");
+            onLoadProducts();
+        }
     }
 
     @FXML
@@ -190,6 +210,28 @@ public class AcquistaProdottiFornitoriFXController {
 
     private void setMessage(String message) {
         messageLabel.setText(message);
+    }
+
+    private void configureRoleAccess() {
+        boolean titolare = SessionManagerSingleton.getInstance()
+                .getCurrentSession()
+                .map(session -> RuoloUtente.TITOLARE.equals(session.getRuolo()))
+                .orElse(false);
+        supplierComboBox.setDisable(!titolare);
+        supplierProductsListView.setDisable(!titolare);
+        loadProductsButton.setDisable(!titolare);
+        quantityField.setDisable(!titolare);
+        addToCartButton.setDisable(!titolare);
+        cartListView.setDisable(!titolare);
+        visaRadioButton.setDisable(!titolare);
+        paypalRadioButton.setDisable(!titolare);
+        cardNumberField.setDisable(!titolare);
+        cvvField.setDisable(!titolare);
+        paypalEmailField.setDisable(!titolare);
+        payAndConfirmButton.setDisable(!titolare);
+        if (!titolare) {
+            setMessage("Solo il titolare puo acquistare dai fornitori");
+        }
     }
 
     private void updatePaymentFields() {

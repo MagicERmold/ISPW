@@ -2,10 +2,14 @@ package com.stocktrack.view.fx.controller;
 
 import com.stocktrack.JavaFXApp;
 import com.stocktrack.bean.DisponibilitaProdottoBean;
+import com.stocktrack.bean.RuoloUtente;
 import com.stocktrack.boundary.AnalizzaDisponibilitaInventarioBoundary;
+import com.stocktrack.boundary.AcquistaProdottiFornitoriBoundary;
 import com.stocktrack.common.AbstractProdottoData;
+import com.stocktrack.pattern.singleton.SessionManagerSingleton;
 import javafx.fxml.FXML;
 import javafx.scene.SnapshotParameters;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -43,10 +47,21 @@ public class InventarioFXController {
     @FXML
     private Label messageLabel;
 
+    @FXML
+    private Button buyFromSuppliersButton;
+
+    @FXML
+    private Button suppliersButton;
+
+    @FXML
+    private Button manageProductsButton;
+
     private final AnalizzaDisponibilitaInventarioBoundary boundary = new AnalizzaDisponibilitaInventarioBoundary();
+    private final AcquistaProdottiFornitoriBoundary loginBoundary = new AcquistaProdottiFornitoriBoundary();
 
     @FXML
     private void initialize() {
+        configureRoleActions();
         loadInventory();
     }
 
@@ -63,6 +78,17 @@ public class InventarioFXController {
     @FXML
     private void onManageProducts() throws IOException {
         JavaFXApp.setRoot("gestisci_prodotti");
+    }
+
+    @FXML
+    private void onManageSuppliers() throws IOException {
+        JavaFXApp.setRoot("fornitori");
+    }
+
+    @FXML
+    private void onLogout() throws IOException {
+        loginBoundary.logout();
+        JavaFXApp.setRoot("login");
     }
 
     private void loadInventory() {
@@ -129,6 +155,21 @@ public class InventarioFXController {
         }
         int colorIndex = Math.floorMod(category.hashCode(), PRODUCT_COLOR_PALETTE.length);
         return Color.web(PRODUCT_COLOR_PALETTE[colorIndex]);
+    }
+
+    private void configureRoleActions() {
+        RuoloUtente ruolo = SessionManagerSingleton.getInstance()
+                .getCurrentSession()
+                .map(session -> session.getRuolo())
+                .orElse(null);
+        boolean titolare = RuoloUtente.TITOLARE.equals(ruolo);
+        boolean puoGestireProdotti = titolare || RuoloUtente.COMMESSO.equals(ruolo);
+        buyFromSuppliersButton.setVisible(titolare);
+        buyFromSuppliersButton.setManaged(titolare);
+        suppliersButton.setVisible(titolare);
+        suppliersButton.setManaged(titolare);
+        manageProductsButton.setVisible(puoGestireProdotti);
+        manageProductsButton.setManaged(puoGestireProdotti);
     }
 
     private String initials(String productName) {

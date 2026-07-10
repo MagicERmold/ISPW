@@ -12,5 +12,9 @@ public interface FornitoreDAO {
 
     Optional<Fornitore> findById(String id) throws PersistenceException;
 
+    Optional<Fornitore> findByEmail(String email) throws PersistenceException;
+
     void save(Fornitore fornitore) throws PersistenceException;
+
+    void deleteById(String id) throws PersistenceException;
 }

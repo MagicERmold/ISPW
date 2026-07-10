@@ -7,6 +7,7 @@ import com.stocktrack.bean.FornitoreBean;
 import com.stocktrack.bean.OrdineBean;
 import com.stocktrack.bean.PagamentoBean;
 import com.stocktrack.bean.ProdottoBean;
+import com.stocktrack.bean.RuoloUtente;
 import com.stocktrack.exceptions.FornitoreConnectionException;
 import com.stocktrack.exceptions.InvalidInputException;
 import com.stocktrack.exceptions.PagamentoFallitoException;
@@ -14,8 +15,10 @@ import com.stocktrack.exceptions.PersistenceException;
 import com.stocktrack.exceptions.ProdottoNonDisponibileException;
 import com.stocktrack.entity.Fornitore;
 import com.stocktrack.entity.Inventario;
+import com.stocktrack.entity.MovimentoInventario;
 import com.stocktrack.entity.Ordine;
 import com.stocktrack.entity.Prodotto;
+import com.stocktrack.entity.TipoMovimentoInventario;
 import com.stocktrack.pattern.adapter.FornitoreApiAdapter;
 import com.stocktrack.pattern.adapter.FornitoreGateway;
 import com.stocktrack.pattern.adapter.PagamentoGateway;
@@ -23,11 +26,13 @@ import com.stocktrack.pattern.adapter.PagamentoPaypalAdapter;
 import com.stocktrack.pattern.adapter.PagamentoVisaAdapter;
 import com.stocktrack.pattern.factory.DAOFactory;
 import com.stocktrack.pattern.factory.DAOFactoryProvider;
+import com.stocktrack.pattern.singleton.SessionManagerSingleton;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.UUID;
 
 public class AcquistaProdottiFornitoriController {
@@ -47,6 +52,9 @@ public class AcquistaProdottiFornitoriController {
 
     public CarrelloBean configuraCarrello(List<ProdottoBean> prodottiSelezionati)
             throws InvalidInputException, ProdottoNonDisponibileException {
+        if (!isTitolare()) {
+            throw new InvalidInputException("Solo il titolare puo acquistare prodotti dai fornitori");
+        }
         if (prodottiSelezionati == null || prodottiSelezionati.isEmpty()) {
             throw new InvalidInputException("Selezionare almeno un prodotto");
         }
@@ -68,6 +76,9 @@ public class AcquistaProdottiFornitoriController {
     }
 
     public EsitoPagamentoBean elaboraPagamento(PagamentoBean pagamentoBean) {
+        if (!isTitolare()) {
+            return new EsitoPagamentoBean(false, null, "Solo il titolare puo acquistare prodotti dai fornitori");
+        }
         try {
             PagamentoGateway pagamentoGateway = selezionaPagamentoGateway(pagamentoBean.getMetodoPagamento());
             return pagamentoGateway.autorizzaPagamento(pagamentoBean);
@@ -77,12 +88,17 @@ public class AcquistaProdottiFornitoriController {
     }
 
     public EsitoOrdineBean acquistaProdottiDaFornitore(OrdineBean ordineBean) {
+        if (!isTitolare()) {
+            return new EsitoOrdineBean(false, ordineBean.getIdOrdine(),
+                    "Solo il titolare puo acquistare prodotti dai fornitori");
+        }
         FornitoreGateway fornitoreGateway = new FornitoreApiAdapter();
         try {
             ordineBean.validate();
             fornitoreGateway.notificaOrdine(ordineBean);
             DAOFactory daoFactory = DAOFactoryProvider.getFactory();
             aggiornaInventario(daoFactory, ordineBean);
+            registraMovimentiAcquisto(daoFactory, ordineBean);
             Ordine ordine = toOrdine(ordineBean);
             ordine.marcaPagato();
             daoFactory.getOrdineDAO().save(ordine);
@@ -104,16 +120,54 @@ public class AcquistaProdottiFornitoriController {
         };
     }
 
+    private boolean isTitolare() {
+        return SessionManagerSingleton.getInstance()
+                .getCurrentSession()
+                .map(session -> RuoloUtente.TITOLARE.equals(session.getRuolo()))
+                .orElse(false);
+    }
+
     private void aggiornaInventario(DAOFactory daoFactory, OrdineBean ordineBean) throws PersistenceException {
         Inventario inventario = daoFactory.getInventarioDAO().findInventario();
         for (ProdottoBean prodottoBean : ordineBean.getProdotti()) {
-            inventario.cercaProdotto(prodottoBean.getId())
+            cercaProdottoDaAggiornare(inventario, prodottoBean)
                     .ifPresentOrElse(
                             prodotto -> prodotto.aumentaQuantita(prodottoBean.getQuantita()),
                             () -> inventario.aggiungiProdotto(toProdotto(prodottoBean))
                     );
         }
         daoFactory.getInventarioDAO().update(inventario);
+    }
+
+    private Optional<Prodotto> cercaProdottoDaAggiornare(Inventario inventario, ProdottoBean prodottoBean) {
+        Optional<Prodotto> prodottoPerId = inventario.cercaProdotto(prodottoBean.getId());
+        if (prodottoPerId.isPresent()) {
+            return prodottoPerId;
+        }
+        return inventario.getProdotti().stream()
+                .filter(prodotto -> stessoProdottoCommerciale(prodotto, prodottoBean))
+                .findFirst();
+    }
+
+    private boolean stessoProdottoCommerciale(Prodotto prodotto, ProdottoBean prodottoBean) {
+        return normalizza(prodotto.getNome()).equals(normalizza(prodottoBean.getNome()))
+                && normalizza(prodotto.getCategoria()).equals(normalizza(prodottoBean.getCategoria()));
+    }
+
+    private String normalizza(String value) {
+        return value == null ? "" : value.trim().toLowerCase(Locale.ROOT);
+    }
+
+    private void registraMovimentiAcquisto(DAOFactory daoFactory, OrdineBean ordineBean) throws PersistenceException {
+        String origine = "Fornitore " + ordineBean.getFornitore().getNome();
+        for (ProdottoBean prodottoBean : ordineBean.getProdotti()) {
+            BigDecimal valoreUnitario = prodottoBean.getPrezzoUnitario() == null ? BigDecimal.ZERO
+                    : prodottoBean.getPrezzoUnitario();
+            MovimentoInventario movimento = new MovimentoInventario("MOV-" + UUID.randomUUID(),
+                    prodottoBean.getId(), prodottoBean.getNome(), TipoMovimentoInventario.ACQUISTO_FORNITORE,
+                    prodottoBean.getQuantita(), valoreUnitario, origine);
+            daoFactory.getMovimentoInventarioDAO().save(movimento);
+        }
     }
 
     private FornitoreBean toFornitoreBean(Fornitore fornitore) {

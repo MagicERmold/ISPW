@@ -20,7 +20,17 @@ public class JDBCFornitoreDAO implements FornitoreDAO {
     }
 
     @Override
+    public Optional<Fornitore> findByEmail(String email) throws PersistenceException {
+        return JDBCDataStore.findFornitoreByEmail(email);
+    }
+
+    @Override
     public void save(Fornitore fornitore) throws PersistenceException {
         JDBCDataStore.saveFornitore(fornitore);
+    }
+
+    @Override
+    public void deleteById(String id) throws PersistenceException {
+        JDBCDataStore.deleteFornitore(id);
     }
 }

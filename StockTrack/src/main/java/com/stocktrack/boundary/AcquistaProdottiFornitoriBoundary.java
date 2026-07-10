@@ -2,6 +2,7 @@ package com.stocktrack.boundary;
 
 import com.stocktrack.bean.CarrelloBean;
 import com.stocktrack.bean.EsitoOrdineBean;
+import com.stocktrack.bean.EsitoOperazioneBean;
 import com.stocktrack.bean.EsitoPagamentoBean;
 import com.stocktrack.bean.FornitoreBean;
 import com.stocktrack.bean.LoginBean;
@@ -36,6 +37,10 @@ public class AcquistaProdottiFornitoriBoundary {
         } catch (AutenticazioneException | InvalidInputException | PersistenceException e) {
             return null;
         }
+    }
+
+    public EsitoOperazioneBean logout() {
+        return new LoginController().logout();
     }
 
     public List<FornitoreBean> recuperaFornitori() {

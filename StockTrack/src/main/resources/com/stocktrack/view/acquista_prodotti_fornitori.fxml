@@ -34,11 +34,11 @@
             <VBox GridPane.columnIndex="0" GridPane.rowIndex="0" spacing="10" styleClass="panel">
                 <Label styleClass="section-title" text="Fornitore"/>
                 <ComboBox fx:id="supplierComboBox" maxWidth="Infinity"/>
-                <Button onAction="#onLoadProducts" text="Carica prodotti"/>
+                <Button fx:id="loadProductsButton" onAction="#onLoadProducts" text="Carica prodotti"/>
                 <ListView fx:id="supplierProductsListView" prefHeight="250"/>
                 <HBox spacing="8">
                     <TextField fx:id="quantityField" prefWidth="120" promptText="Quantita"/>
-                    <Button onAction="#onAddToCart" text="Aggiungi"/>
+                    <Button fx:id="addToCartButton" onAction="#onAddToCart" text="Aggiungi"/>
                 </HBox>
             </VBox>
 
@@ -55,7 +55,8 @@
                 <TextField fx:id="cardNumberField" promptText="Numero carta Visa"/>
                 <TextField fx:id="cvvField" promptText="CVV"/>
                 <TextField fx:id="paypalEmailField" promptText="Email PayPal"/>
-                <Button maxWidth="Infinity" onAction="#onPayAndConfirm" text="Paga e conferma ordine"/>
+                <Button fx:id="payAndConfirmButton" maxWidth="Infinity" onAction="#onPayAndConfirm"
+                        text="Paga e conferma ordine"/>
                 <Label fx:id="messageLabel" styleClass="message"/>
             </VBox>
         </GridPane>

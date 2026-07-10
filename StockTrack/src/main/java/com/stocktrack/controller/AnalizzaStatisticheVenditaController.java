@@ -2,7 +2,10 @@ package com.stocktrack.controller;
 
 import com.stocktrack.bean.ProdottoBean;
 import com.stocktrack.bean.StatisticaVenditaMensileBean;
+import com.stocktrack.entity.MovimentoInventario;
+import com.stocktrack.entity.TipoMovimentoInventario;
 import com.stocktrack.exceptions.PersistenceException;
+import com.stocktrack.pattern.factory.DAOFactoryProvider;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -10,7 +13,9 @@ import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class AnalizzaStatisticheVenditaController extends GestisciProdottiController {
 
@@ -20,14 +25,15 @@ public class AnalizzaStatisticheVenditaController extends GestisciProdottiContro
 
     public List<StatisticaVenditaMensileBean> analizzaStatisticheMensili() throws PersistenceException {
         List<ProdottoBean> prodotti = visualizzaProdotti();
-        List<StatisticaVenditaMensileBean> statistiche = new ArrayList<>();
+        Map<YearMonth, StatisticaVenditaMensileBean> statistiche = new LinkedHashMap<>();
         YearMonth currentMonth = YearMonth.now(APPLICATION_ZONE).minusMonths(MONTHS_TO_SIMULATE - 1L);
 
         for (int index = 0; index < MONTHS_TO_SIMULATE; index++) {
             YearMonth mese = currentMonth.plusMonths(index);
-            statistiche.add(simulaStatisticheMese(mese, prodotti));
+            statistiche.put(mese, simulaStatisticheMese(mese, prodotti));
         }
-        return statistiche;
+        integraMovimentiReali(statistiche);
+        return new ArrayList<>(statistiche.values());
     }
 
     private StatisticaVenditaMensileBean simulaStatisticheMese(YearMonth mese, List<ProdottoBean> prodotti) {
@@ -53,6 +59,32 @@ public class AnalizzaStatisticheVenditaController extends GestisciProdottiContro
 
         return new StatisticaVenditaMensileBean(mese.format(MONTH_FORMATTER), quantitaTotale,
                 incasso.setScale(2, RoundingMode.HALF_UP), prodottoPiuVenduto.getNome());
+    }
+
+    private void integraMovimentiReali(Map<YearMonth, StatisticaVenditaMensileBean> statistiche)
+            throws PersistenceException {
+        for (MovimentoInventario movimento : DAOFactoryProvider.getFactory().getMovimentoInventarioDAO().findAll()) {
+            if (movimento.getDataMovimento() == null || movimento.getTipo() == null) {
+                continue;
+            }
+            YearMonth mese = YearMonth.from(movimento.getDataMovimento());
+            StatisticaVenditaMensileBean statistica = statistiche.computeIfAbsent(mese,
+                    key -> new StatisticaVenditaMensileBean(key.format(MONTH_FORMATTER), 0, BigDecimal.ZERO, "N/D"));
+            BigDecimal valoreMovimento = movimento.getValoreUnitario() == null ? BigDecimal.ZERO
+                    : movimento.getValoreUnitario().multiply(BigDecimal.valueOf(movimento.getQuantita()));
+
+            if (TipoMovimentoInventario.VENDITA.equals(movimento.getTipo())) {
+                statistica.setQuantitaVenduta(statistica.getQuantitaVenduta() + movimento.getQuantita());
+                statistica.setIncassoStimato(statistica.getIncassoStimato().add(valoreMovimento)
+                        .setScale(2, RoundingMode.HALF_UP));
+                statistica.setProdottoPiuVenduto(movimento.getNomeProdotto());
+                continue;
+            }
+
+            statistica.setQuantitaAcquistata(statistica.getQuantitaAcquistata() + movimento.getQuantita());
+            statistica.setSpesaAcquisti(statistica.getSpesaAcquisti().add(valoreMovimento)
+                    .setScale(2, RoundingMode.HALF_UP));
+        }
     }
 
     private int simulaVenduto(ProdottoBean prodotto, YearMonth mese) {

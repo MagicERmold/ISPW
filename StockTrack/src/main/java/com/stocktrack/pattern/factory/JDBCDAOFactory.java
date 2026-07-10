@@ -3,12 +3,14 @@ package com.stocktrack.pattern.factory;
 import com.stocktrack.persistence.dao.CommessoDAO;
 import com.stocktrack.persistence.dao.FornitoreDAO;
 import com.stocktrack.persistence.dao.InventarioDAO;
+import com.stocktrack.persistence.dao.MovimentoInventarioDAO;
 import com.stocktrack.persistence.dao.OrdineDAO;
 import com.stocktrack.persistence.dao.ProdottoDAO;
 import com.stocktrack.persistence.dao.TitolareDAO;
 import com.stocktrack.persistence.db.JDBCCommessoDAO;
 import com.stocktrack.persistence.db.JDBCFornitoreDAO;
 import com.stocktrack.persistence.db.JDBCInventarioDAO;
+import com.stocktrack.persistence.db.JDBCMovimentoInventarioDAO;
 import com.stocktrack.persistence.db.JDBCOrdineDAO;
 import com.stocktrack.persistence.db.JDBCProdottoDAO;
 import com.stocktrack.persistence.db.JDBCTitolareDAO;
@@ -43,5 +45,10 @@ public class JDBCDAOFactory extends DAOFactory {
     @Override
     public OrdineDAO getOrdineDAO() {
         return new JDBCOrdineDAO();
+    }
+
+    @Override
+    public MovimentoInventarioDAO getMovimentoInventarioDAO() {
+        return new JDBCMovimentoInventarioDAO();
     }
 }

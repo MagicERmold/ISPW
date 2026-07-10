@@ -1,7 +1,9 @@
 module com.stocktrack {
+    requires java.management;
     requires java.sql;
     requires javafx.controls;
     requires javafx.fxml;
+    requires javafx.graphics;
     requires org.slf4j;
 
     exports com.stocktrack;

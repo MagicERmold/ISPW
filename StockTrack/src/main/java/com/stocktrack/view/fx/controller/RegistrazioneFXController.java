@@ -51,11 +51,19 @@ public class RegistrazioneFXController {
             messageLabel.setText("Registrazione non riuscita");
             return;
         }
-        JavaFXApp.setRoot("inventario");
+        openHome(profiloUtenteBean);
     }
 
     @FXML
     private void onBackToLogin() throws IOException {
         JavaFXApp.setRoot("login");
+    }
+
+    private void openHome(ProfiloUtenteBean profiloUtenteBean) throws IOException {
+        if (RuoloUtente.FORNITORE.equals(profiloUtenteBean.getRuolo())) {
+            JavaFXApp.setRoot("inventario_fornitore");
+            return;
+        }
+        JavaFXApp.setRoot("inventario");
     }
 }

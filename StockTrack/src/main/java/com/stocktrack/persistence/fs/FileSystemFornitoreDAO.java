@@ -20,7 +20,17 @@ public class FileSystemFornitoreDAO implements FornitoreDAO {
     }
 
     @Override
+    public Optional<Fornitore> findByEmail(String email) throws PersistenceException {
+        return FileSystemDataStore.findFornitoreByEmail(email);
+    }
+
+    @Override
     public void save(Fornitore fornitore) throws PersistenceException {
         FileSystemDataStore.saveFornitore(fornitore);
+    }
+
+    @Override
+    public void deleteById(String id) throws PersistenceException {
+        FileSystemDataStore.deleteFornitore(id);
     }
 }

@@ -3,8 +3,10 @@ package com.stocktrack.persistence.fs;
 import com.stocktrack.entity.Commesso;
 import com.stocktrack.entity.Fornitore;
 import com.stocktrack.entity.Inventario;
+import com.stocktrack.entity.MovimentoInventario;
 import com.stocktrack.entity.Ordine;
 import com.stocktrack.entity.Prodotto;
+import com.stocktrack.entity.TipoMovimentoInventario;
 import com.stocktrack.entity.Titolare;
 import com.stocktrack.exceptions.PersistenceException;
 import com.stocktrack.security.PasswordHasher;
@@ -14,6 +16,7 @@ import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -22,13 +25,17 @@ import java.util.Optional;
 
 final class FileSystemDataStore {
 
-    private static final Path DATA_DIR = Path.of("StockTrack", "data");
+    private static final Path DATA_DIR = resolveDataDir();
     private static final Path TITOLARI_FILE = DATA_DIR.resolve("titolari.csv");
     private static final Path COMMESSI_FILE = DATA_DIR.resolve("commessi.csv");
     private static final Path FORNITORI_FILE = DATA_DIR.resolve("fornitori.csv");
     private static final Path PRODOTTI_FILE = DATA_DIR.resolve("prodotti.csv");
     private static final Path ORDINI_FILE = DATA_DIR.resolve("ordini.csv");
+    private static final Path MOVIMENTI_INVENTARIO_FILE = DATA_DIR.resolve("movimenti_inventario.csv");
     private static final String DEFAULT_LOGIN_PASSWORD = "password123";
+    private static final String APPLE_CODE = "APPLE-2026";
+    private static final String SAMSUNG_CODE = "SAMSUNG-2026";
+    private static final String HUAWEI_CODE = "HUAWEI-2026";
 
     private FileSystemDataStore() {
     }
@@ -94,12 +101,19 @@ final class FileSystemDataStore {
     static List<Fornitore> loadFornitori() throws PersistenceException {
         ensureSeedData();
         return readRows(FORNITORI_FILE).stream()
-                .map(row -> new Fornitore(row[0], row[1], row[2], row[3], Boolean.parseBoolean(row[4])))
+                .map(row -> new Fornitore(row[0], row[1], row[2], row[3], Boolean.parseBoolean(row[4]),
+                        credentialAt(row, 5)))
                 .toList();
     }
 
     static Optional<Fornitore> findFornitoreById(String id) throws PersistenceException {
         return loadFornitori().stream().filter(fornitore -> id.equals(fornitore.getId())).findFirst();
+    }
+
+    static Optional<Fornitore> findFornitoreByEmail(String email) throws PersistenceException {
+        return loadFornitori().stream()
+                .filter(fornitore -> fornitore.getEmail() != null && fornitore.getEmail().equalsIgnoreCase(email))
+                .findFirst();
     }
 
     static void saveFornitore(Fornitore fornitore) throws PersistenceException {
@@ -110,7 +124,19 @@ final class FileSystemDataStore {
         fornitori.put(fornitore.getId(), fornitore);
         writeRows(FORNITORI_FILE, fornitori.values().stream()
                 .map(current -> List.of(current.getId(), current.getNome(), current.getEmail(),
-                        current.getApiEndpoint(), Boolean.toString(current.isDisponibile())))
+                        current.getApiEndpoint(), Boolean.toString(current.isDisponibile()),
+                        safe(current.getPasswordHash())))
+                .toList());
+    }
+
+    static void deleteFornitore(String id) throws PersistenceException {
+        List<Fornitore> fornitori = loadFornitori().stream()
+                .filter(fornitore -> !id.equals(fornitore.getId()))
+                .toList();
+        writeRows(FORNITORI_FILE, fornitori.stream()
+                .map(current -> List.of(current.getId(), current.getNome(), current.getEmail(),
+                        current.getApiEndpoint(), Boolean.toString(current.isDisponibile()),
+                        safe(current.getPasswordHash())))
                 .toList());
     }
 
@@ -178,6 +204,27 @@ final class FileSystemDataStore {
                 .toList());
     }
 
+    static List<MovimentoInventario> loadMovimentiInventario() throws PersistenceException {
+        ensureSeedData();
+        return readRows(MOVIMENTI_INVENTARIO_FILE).stream()
+                .map(FileSystemDataStore::toMovimentoInventario)
+                .toList();
+    }
+
+    static void saveMovimentoInventario(MovimentoInventario movimento) throws PersistenceException {
+        Map<String, MovimentoInventario> movimenti = new LinkedHashMap<>();
+        for (MovimentoInventario current : loadMovimentiInventario()) {
+            movimenti.put(current.getId(), current);
+        }
+        movimenti.put(movimento.getId(), movimento);
+        writeRows(MOVIMENTI_INVENTARIO_FILE, movimenti.values().stream()
+                .map(current -> List.of(current.getId(), current.getIdProdotto(), current.getNomeProdotto(),
+                        current.getTipo().name(), Integer.toString(current.getQuantita()),
+                        current.getValoreUnitario().toPlainString(), current.getDataMovimento().toString(),
+                        safe(current.getOrigine())))
+                .toList());
+    }
+
     private static void writeProdotti(List<Prodotto> prodotti) throws PersistenceException {
         writeRows(PRODOTTI_FILE, prodotti.stream()
                 .map(prodotto -> List.of(prodotto.getId(), prodotto.getNome(), prodotto.getCategoria(),
@@ -189,19 +236,51 @@ final class FileSystemDataStore {
     private static void ensureSeedData() throws PersistenceException {
         try {
             Files.createDirectories(DATA_DIR);
-            writeIfMissing(TITOLARI_FILE, List.of("TIT-1;Andrea;Titolare;titolare@stocktrack.local;"
+            writeIfMissing(TITOLARI_FILE, List.of("TIT-1;Andrea;Titolare;titolare@euronics.local;"
                     + PasswordHasher.hash(DEFAULT_LOGIN_PASSWORD)));
-            writeIfMissing(COMMESSI_FILE, List.of("COM-1;Mario;Commesso;commesso@stocktrack.local;"
+            writeIfMissing(COMMESSI_FILE, List.of("COM-1;Mario;Commesso;commesso@euronics.local;"
                     + PasswordHasher.hash(DEFAULT_LOGIN_PASSWORD)));
             writeIfMissing(FORNITORI_FILE, List.of(
-                    "FOR-1;Forniture Demo;fornitore@demo.local;simulated://fornitori/demo;true"));
+                    APPLE_CODE + ";APPLE;business@apple.example;simulated://fornitori/apple;true;"
+                            + PasswordHasher.hash(DEFAULT_LOGIN_PASSWORD),
+                    SAMSUNG_CODE + ";SAMSUNG;business@samsung.example;simulated://fornitori/samsung;true;"
+                            + PasswordHasher.hash(DEFAULT_LOGIN_PASSWORD),
+                    HUAWEI_CODE + ";HUAWEI;business@huawei.example;simulated://fornitori/huawei;true;"
+                            + PasswordHasher.hash(DEFAULT_LOGIN_PASSWORD)));
             writeIfMissing(PRODOTTI_FILE, List.of(
-                    "PROD-1;Caffe;Alimentari;8;10;3.50",
-                    "PROD-2;Latte;Alimentari;20;5;1.40"));
+                    "EUR-IPHONE15;iPhone 15;Smartphone;12;3;799.00",
+                    "EUR-MACBOOKAIR;MacBook Air M3;Notebook;4;2;1299.00",
+                    "EUR-GALAXYS24;Galaxy S24;Smartphone;10;3;749.00",
+                    "EUR-SAMSUNGTV55;Samsung TV OLED 55;TV;6;2;999.00",
+                    "EUR-HUAWEIPURA70;Huawei Pura 70;Smartphone;5;2;699.00",
+                    "EUR-HUAWEIMATEPAD;Huawei MatePad 11;Tablet;8;3;399.00"));
             writeIfMissing(ORDINI_FILE, List.of());
+            writeIfMissing(MOVIMENTI_INVENTARIO_FILE, List.of());
         } catch (IOException e) {
             throw new PersistenceException("Errore inizializzazione persistenza file system", e);
         }
+    }
+
+    private static MovimentoInventario toMovimentoInventario(String[] row) {
+        MovimentoInventario movimento = new MovimentoInventario();
+        movimento.setId(valueAt(row, 0));
+        movimento.setIdProdotto(valueAt(row, 1));
+        movimento.setNomeProdotto(valueAt(row, 2));
+        movimento.setTipo(TipoMovimentoInventario.valueOf(valueAt(row, 3)));
+        movimento.setQuantita(Integer.parseInt(valueAt(row, 4)));
+        movimento.setValoreUnitario(new BigDecimal(valueAt(row, 5)));
+        movimento.setDataMovimento(LocalDateTime.parse(valueAt(row, 6)));
+        movimento.setOrigine(valueAt(row, 7));
+        return movimento;
+    }
+
+    private static Path resolveDataDir() {
+        Path currentDir = Path.of("").toAbsolutePath().normalize();
+        Path fileName = currentDir.getFileName();
+        if (fileName != null && "StockTrack".equalsIgnoreCase(fileName.toString())) {
+            return currentDir.resolve("data");
+        }
+        return currentDir.resolve("StockTrack").resolve("data");
     }
 
     private static void writeIfMissing(Path path, List<String> rows) throws IOException {
@@ -241,7 +320,11 @@ final class FileSystemDataStore {
     }
 
     private static String credentialAt(String[] row) {
-        String value = valueAt(row, 4);
+        return credentialAt(row, 4);
+    }
+
+    private static String credentialAt(String[] row, int index) {
+        String value = valueAt(row, index);
         if (!value.isBlank()) {
             return value;
         }

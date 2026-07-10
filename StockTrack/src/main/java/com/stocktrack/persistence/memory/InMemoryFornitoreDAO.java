@@ -20,7 +20,19 @@ public class InMemoryFornitoreDAO implements FornitoreDAO {
     }
 
     @Override
+    public Optional<Fornitore> findByEmail(String email) {
+        return InMemoryDataStore.FORNITORI.values().stream()
+                .filter(fornitore -> fornitore.getEmail() != null && fornitore.getEmail().equalsIgnoreCase(email))
+                .findFirst();
+    }
+
+    @Override
     public void save(Fornitore fornitore) {
         InMemoryDataStore.FORNITORI.put(fornitore.getId(), fornitore);
+    }
+
+    @Override
+    public void deleteById(String id) {
+        InMemoryDataStore.FORNITORI.remove(id);
     }
 }

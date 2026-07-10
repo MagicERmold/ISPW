@@ -6,6 +6,7 @@ import com.stocktrack.bean.ProfiloUtenteBean;
 import com.stocktrack.bean.RegistrazioneBean;
 import com.stocktrack.bean.RuoloUtente;
 import com.stocktrack.entity.Commesso;
+import com.stocktrack.entity.Fornitore;
 import com.stocktrack.entity.Titolare;
 import com.stocktrack.exceptions.AutenticazioneException;
 import com.stocktrack.exceptions.InvalidInputException;
@@ -16,6 +17,7 @@ import com.stocktrack.pattern.singleton.Session;
 import com.stocktrack.pattern.singleton.SessionManagerSingleton;
 import com.stocktrack.security.PasswordHasher;
 
+import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -38,6 +40,12 @@ public class LoginController {
             return creaProfiloCommesso(commesso.get());
         }
 
+        Optional<Fornitore> fornitore = daoFactory.getFornitoreDAO().findByEmail(loginBean.getUsername());
+        if (fornitore.isPresent()) {
+            verificaPassword(loginBean.getPassword(), fornitore.get().getPasswordHash());
+            return creaProfiloFornitore(fornitore.get());
+        }
+
         throw new AutenticazioneException("Credenziali non valide");
     }
 
@@ -47,7 +55,8 @@ public class LoginController {
 
         DAOFactory daoFactory = DAOFactoryProvider.getFactory();
         if (daoFactory.getTitolareDAO().findByEmail(registrazioneBean.getEmail()).isPresent()
-                || daoFactory.getCommessoDAO().findByEmail(registrazioneBean.getEmail()).isPresent()) {
+                || daoFactory.getCommessoDAO().findByEmail(registrazioneBean.getEmail()).isPresent()
+                || daoFactory.getFornitoreDAO().findByEmail(registrazioneBean.getEmail()).isPresent()) {
             throw new AutenticazioneException("Email gia registrata");
         }
 
@@ -57,6 +66,16 @@ public class LoginController {
                     PasswordHasher.hash(registrazioneBean.getPassword()));
             daoFactory.getCommessoDAO().save(commesso);
             return creaProfiloCommesso(commesso);
+        }
+
+        if (RuoloUtente.FORNITORE.equals(registrazioneBean.getRuolo())) {
+            String supplierCode = registrazioneBean.getNome().trim().toLowerCase(Locale.ROOT)
+                    .replaceAll("[^a-z0-9]+", "-");
+            Fornitore fornitore = new Fornitore("FOR-" + UUID.randomUUID(), registrazioneBean.getNome(),
+                    registrazioneBean.getEmail(), "simulated://fornitori/registrati/" + supplierCode, true,
+                    PasswordHasher.hash(registrazioneBean.getPassword()));
+            daoFactory.getFornitoreDAO().save(fornitore);
+            return creaProfiloFornitore(fornitore);
         }
 
         Titolare titolare = new Titolare("TIT-" + UUID.randomUUID(), registrazioneBean.getNome(),
@@ -80,6 +99,12 @@ public class LoginController {
     private ProfiloUtenteBean creaProfiloCommesso(Commesso commesso) {
         Session session = SessionManagerSingleton.getInstance().createSession(commesso.getId(), RuoloUtente.COMMESSO);
         return new ProfiloUtenteBean(commesso.getId(), commesso.getNome(), RuoloUtente.COMMESSO,
+                session.getDataLogin());
+    }
+
+    private ProfiloUtenteBean creaProfiloFornitore(Fornitore fornitore) {
+        Session session = SessionManagerSingleton.getInstance().createSession(fornitore.getId(), RuoloUtente.FORNITORE);
+        return new ProfiloUtenteBean(fornitore.getId(), fornitore.getNome(), RuoloUtente.FORNITORE,
                 session.getDataLogin());
     }
 

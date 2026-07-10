@@ -3,12 +3,14 @@ package com.stocktrack.pattern.factory;
 import com.stocktrack.persistence.dao.CommessoDAO;
 import com.stocktrack.persistence.dao.FornitoreDAO;
 import com.stocktrack.persistence.dao.InventarioDAO;
+import com.stocktrack.persistence.dao.MovimentoInventarioDAO;
 import com.stocktrack.persistence.dao.OrdineDAO;
 import com.stocktrack.persistence.dao.ProdottoDAO;
 import com.stocktrack.persistence.dao.TitolareDAO;
 import com.stocktrack.persistence.fs.FileSystemCommessoDAO;
 import com.stocktrack.persistence.fs.FileSystemFornitoreDAO;
 import com.stocktrack.persistence.fs.FileSystemInventarioDAO;
+import com.stocktrack.persistence.fs.FileSystemMovimentoInventarioDAO;
 import com.stocktrack.persistence.fs.FileSystemOrdineDAO;
 import com.stocktrack.persistence.fs.FileSystemProdottoDAO;
 import com.stocktrack.persistence.fs.FileSystemTitolareDAO;
@@ -43,5 +45,10 @@ public class FileSystemDAOFactory extends DAOFactory {
     @Override
     public OrdineDAO getOrdineDAO() {
         return new FileSystemOrdineDAO();
+    }
+
+    @Override
+    public MovimentoInventarioDAO getMovimentoInventarioDAO() {
+        return new FileSystemMovimentoInventarioDAO();
     }
 }

@@ -11,6 +11,7 @@ import com.stocktrack.bean.ProdottoBean;
 import com.stocktrack.bean.RuoloUtente;
 import com.stocktrack.boundary.AcquistaProdottiFornitoriBoundary;
 import com.stocktrack.pattern.singleton.SessionManagerSingleton;
+import com.stocktrack.view.fx.component.ProductCardFactory;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -23,7 +24,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -194,18 +194,7 @@ public class AcquistaProdottiFornitoriFXController {
     }
 
     private ListCell<ProdottoBean> productCell() {
-        return new ListCell<>() {
-            @Override
-            protected void updateItem(ProdottoBean item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                    return;
-                }
-                BigDecimal price = item.getPrezzoUnitario() == null ? BigDecimal.ZERO : item.getPrezzoUnitario();
-                setText(item.getNome() + " | qta " + item.getQuantita() + " | " + price + " EUR");
-            }
-        };
+        return ProductCardFactory.productCell(false);
     }
 
     private void setMessage(String message) {

@@ -30,7 +30,7 @@
     </top>
     <center>
         <ScrollPane fitToWidth="true" styleClass="content">
-            <TilePane fx:id="inventoryTilePane" hgap="16" prefColumns="4" vgap="16">
+            <TilePane fx:id="inventoryTilePane" hgap="18" prefColumns="3" vgap="18">
                 <padding>
                     <Insets top="20" right="24" bottom="20" left="24"/>
                 </padding>

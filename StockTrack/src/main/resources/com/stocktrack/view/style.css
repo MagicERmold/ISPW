@@ -18,7 +18,7 @@
     -fx-border-color: #d8dee9;
     -fx-border-radius: 6;
     -fx-background-radius: 6;
-    -fx-padding: 16;
+    -fx-padding: 18;
 }
 
 .product-card {
@@ -26,12 +26,34 @@
     -fx-border-color: #d8dee9;
     -fx-border-radius: 6;
     -fx-background-radius: 6;
+    -fx-padding: 14;
+    -fx-pref-width: 222;
+}
+
+.product-card-compact {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #d8dee9;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
     -fx-padding: 12;
-    -fx-pref-width: 176;
+    -fx-pref-width: 318;
+}
+
+.product-image-frame {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #edf0f5;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-padding: 6;
+    -fx-alignment: center;
+}
+
+.product-image {
+    -fx-background-color: #ffffff;
 }
 
 .product-name {
-    -fx-font-size: 14;
+    -fx-font-size: 15;
     -fx-font-weight: bold;
     -fx-text-fill: #1d2733;
 }
@@ -85,4 +107,22 @@ Button {
 
 TextField, PasswordField, ComboBox, ListView {
     -fx-background-radius: 5;
+}
+
+ListView .list-cell {
+    -fx-background-color: transparent;
+    -fx-padding: 8;
+}
+
+ListView .list-cell:filled:hover .product-card-compact {
+    -fx-border-color: #8bb4d0;
+}
+
+ListView .list-cell:filled:selected .product-card-compact {
+    -fx-border-color: #22577a;
+    -fx-border-width: 2;
+}
+
+ListView .list-cell:filled:selected {
+    -fx-background-color: transparent;
 }

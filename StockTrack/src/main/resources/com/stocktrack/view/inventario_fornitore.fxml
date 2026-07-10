@@ -28,14 +28,14 @@
         </VBox>
     </top>
     <center>
-        <GridPane hgap="18" vgap="14" styleClass="content">
+            <GridPane hgap="20" vgap="14" styleClass="content">
             <padding>
                 <Insets top="18" right="24" bottom="18" left="24"/>
             </padding>
 
             <VBox GridPane.columnIndex="0" GridPane.rowIndex="0" spacing="10" styleClass="panel">
                 <Label styleClass="section-title" text="Inventario del fornitore"/>
-                <ListView fx:id="supplierProductsListView" prefHeight="430" prefWidth="380"/>
+                <ListView fx:id="supplierProductsListView" prefHeight="520" prefWidth="390"/>
             </VBox>
 
             <VBox GridPane.columnIndex="1" GridPane.rowIndex="0" spacing="10" styleClass="panel">

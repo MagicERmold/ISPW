@@ -26,21 +26,21 @@
         </VBox>
     </top>
     <center>
-        <GridPane hgap="18" vgap="14" styleClass="content">
+            <GridPane hgap="20" vgap="14" styleClass="content">
             <padding>
                 <Insets top="18" right="24" bottom="18" left="24"/>
             </padding>
 
             <VBox GridPane.columnIndex="0" GridPane.rowIndex="0" spacing="10" styleClass="panel">
                 <Label styleClass="section-title" text="Fornitori collegati"/>
-                <ListView fx:id="suppliersListView" prefHeight="420" prefWidth="320"/>
+                <ListView fx:id="suppliersListView" prefHeight="500" prefWidth="320"/>
                 <Button fx:id="removeSupplierButton" maxWidth="Infinity" onAction="#onRemoveSupplier"
                         text="Rimuovi fornitore"/>
             </VBox>
 
             <VBox GridPane.columnIndex="1" GridPane.rowIndex="0" spacing="10" styleClass="panel">
                 <Label styleClass="section-title" text="Inventario fornitore"/>
-                <ListView fx:id="supplierProductsListView" prefHeight="420" prefWidth="390"/>
+                <ListView fx:id="supplierProductsListView" prefHeight="500" prefWidth="390"/>
             </VBox>
 
             <VBox fx:id="addSupplierPanel" GridPane.columnIndex="2" GridPane.rowIndex="0" spacing="10"

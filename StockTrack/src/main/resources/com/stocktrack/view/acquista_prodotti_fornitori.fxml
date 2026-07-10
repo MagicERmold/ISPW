@@ -26,7 +26,7 @@
         </VBox>
     </top>
     <center>
-        <GridPane hgap="18" vgap="14" styleClass="content">
+            <GridPane hgap="20" vgap="14" styleClass="content">
             <padding>
                 <Insets top="18" right="24" bottom="18" left="24"/>
             </padding>
@@ -35,7 +35,7 @@
                 <Label styleClass="section-title" text="Fornitore"/>
                 <ComboBox fx:id="supplierComboBox" maxWidth="Infinity"/>
                 <Button fx:id="loadProductsButton" onAction="#onLoadProducts" text="Carica prodotti"/>
-                <ListView fx:id="supplierProductsListView" prefHeight="250"/>
+                <ListView fx:id="supplierProductsListView" prefHeight="430" prefWidth="390"/>
                 <HBox spacing="8">
                     <TextField fx:id="quantityField" prefWidth="120" promptText="Quantita"/>
                     <Button fx:id="addToCartButton" onAction="#onAddToCart" text="Aggiungi"/>
@@ -44,7 +44,7 @@
 
             <VBox GridPane.columnIndex="1" GridPane.rowIndex="0" spacing="10" styleClass="panel">
                 <Label styleClass="section-title" text="Carrello"/>
-                <ListView fx:id="cartListView" prefHeight="250"/>
+                <ListView fx:id="cartListView" prefHeight="430" prefWidth="390"/>
                 <Label fx:id="totalLabel" styleClass="total" text="Totale: 0 EUR"/>
 
                 <Label styleClass="section-title" text="Pagamento"/>

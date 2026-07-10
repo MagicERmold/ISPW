@@ -5,10 +5,10 @@ import com.stocktrack.bean.EsitoOperazioneBean;
 import com.stocktrack.bean.FornitoreBean;
 import com.stocktrack.bean.ProdottoBean;
 import com.stocktrack.boundary.GestisciInventarioFornitoreBoundary;
+import com.stocktrack.view.fx.component.ProductCardFactory;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 
@@ -95,18 +95,7 @@ public class InventarioFornitoreFXController {
     }
 
     private void configureCells() {
-        supplierProductsListView.setCellFactory(listView -> new ListCell<>() {
-            @Override
-            protected void updateItem(ProdottoBean item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                    return;
-                }
-                BigDecimal price = item.getPrezzoUnitario() == null ? BigDecimal.ZERO : item.getPrezzoUnitario();
-                setText(item.getNome() + " | qta " + item.getQuantita() + " | " + price + " EUR");
-            }
-        });
+        supplierProductsListView.setCellFactory(listView -> ProductCardFactory.productCell(false));
     }
 
     private ProdottoBean readProductFromForm() {

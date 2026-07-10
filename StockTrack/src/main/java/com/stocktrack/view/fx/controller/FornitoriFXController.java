@@ -7,6 +7,7 @@ import com.stocktrack.bean.ProdottoBean;
 import com.stocktrack.bean.RuoloUtente;
 import com.stocktrack.boundary.GestisciFornitoriBoundary;
 import com.stocktrack.pattern.singleton.SessionManagerSingleton;
+import com.stocktrack.view.fx.component.ProductCardFactory;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -17,7 +18,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.List;
 
 public class FornitoriFXController {
@@ -127,18 +127,7 @@ public class FornitoriFXController {
             }
         });
 
-        supplierProductsListView.setCellFactory(listView -> new ListCell<>() {
-            @Override
-            protected void updateItem(ProdottoBean item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                    return;
-                }
-                BigDecimal prezzo = item.getPrezzoUnitario() == null ? BigDecimal.ZERO : item.getPrezzoUnitario();
-                setText(item.getNome() + " | qta " + item.getQuantita() + " | " + prezzo + " EUR");
-            }
-        });
+        supplierProductsListView.setCellFactory(listView -> ProductCardFactory.productCell(false));
     }
 
     private void setMessage(String message) {

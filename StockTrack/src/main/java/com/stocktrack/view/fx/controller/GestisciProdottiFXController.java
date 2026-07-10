@@ -5,6 +5,7 @@ import com.stocktrack.bean.EsitoOperazioneBean;
 import com.stocktrack.bean.ProdottoBean;
 import com.stocktrack.bean.StatisticaVenditaMensileBean;
 import com.stocktrack.boundary.GestisciProdottiBoundary;
+import com.stocktrack.view.fx.component.ProductCardFactory;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -165,17 +166,7 @@ public class GestisciProdottiFXController {
     }
 
     private void configureCells() {
-        productsListView.setCellFactory(listView -> new ListCell<>() {
-            @Override
-            protected void updateItem(ProdottoBean item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                    return;
-                }
-                setText(item.getNome() + " | qta " + item.getQuantita() + " | soglia " + item.getSogliaMinima());
-            }
-        });
+        productsListView.setCellFactory(listView -> ProductCardFactory.productCell(true));
 
         statisticsListView.setCellFactory(listView -> new ListCell<>() {
             @Override

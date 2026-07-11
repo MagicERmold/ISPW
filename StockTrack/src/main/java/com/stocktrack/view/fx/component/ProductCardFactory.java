@@ -49,10 +49,6 @@ public final class ProductCardFactory {
     private ProductCardFactory() {
     }
 
-    public static VBox createAvailabilityCard(DisponibilitaProdottoBean disponibilita) {
-        return createAvailabilityCard(disponibilita, null);
-    }
-
     public static VBox createAvailabilityCard(DisponibilitaProdottoBean disponibilita,
                                               EventHandler<ActionEvent> editHandler) {
         ProdottoBean prodotto = disponibilita.getProdotto();
@@ -98,7 +94,7 @@ public final class ProductCardFactory {
         imageFrame.setMaxSize(compact ? COMPACT_IMAGE_WIDTH : FULL_IMAGE_WIDTH,
                 compact ? COMPACT_IMAGE_HEIGHT : FULL_IMAGE_HEIGHT);
 
-        Label nameLabel = new Label(safeText(safeProduct.getNome(), "Prodotto"));
+        Label nameLabel = new Label(safeText(safeProduct.getNome()));
         nameLabel.getStyleClass().add("product-name");
         nameLabel.setWrapText(true);
 
@@ -191,10 +187,10 @@ public final class ProductCardFactory {
         if (parts.length == 1) {
             return parts[0].substring(0, Math.min(2, parts[0].length())).toUpperCase(Locale.ROOT);
         }
-        return (parts[0].substring(0, 1) + parts[1].substring(0, 1)).toUpperCase(Locale.ROOT);
+        return (parts[0].charAt(0) + parts[1].substring(0, 1)).toUpperCase(Locale.ROOT);
     }
 
-    private static String safeText(String value, String fallback) {
-        return value == null || value.isBlank() ? fallback : value;
+    private static String safeText(String value) {
+        return value == null || value.isBlank() ? "Prodotto" : value;
     }
 }

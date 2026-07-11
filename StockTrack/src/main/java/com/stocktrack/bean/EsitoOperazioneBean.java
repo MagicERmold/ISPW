@@ -17,10 +17,6 @@ public class EsitoOperazioneBean {
         return successo;
     }
 
-    public void setSuccesso(boolean successo) {
-        this.successo = successo;
-    }
-
     public String getMessaggio() {
         return messaggio;
     }

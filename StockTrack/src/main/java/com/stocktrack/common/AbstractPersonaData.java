@@ -16,7 +16,4 @@ public abstract class AbstractPersonaData extends AbstractAnagraficaData {
         return cognome;
     }
 
-    public void setCognome(String cognome) {
-        this.cognome = cognome;
-    }
 }

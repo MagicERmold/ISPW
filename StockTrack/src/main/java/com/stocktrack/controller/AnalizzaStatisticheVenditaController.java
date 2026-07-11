@@ -44,7 +44,7 @@ public class AnalizzaStatisticheVenditaController {
 
         int quantitaTotale = 0;
         BigDecimal incasso = BigDecimal.ZERO;
-        ProdottoBean prodottoPiuVenduto = prodotti.get(0);
+        ProdottoBean prodottoPiuVenduto = prodotti.getFirst();
         int maxVenduto = -1;
 
         for (ProdottoBean prodotto : prodotti) {

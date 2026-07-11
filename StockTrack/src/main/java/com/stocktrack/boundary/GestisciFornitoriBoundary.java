@@ -14,10 +14,6 @@ import java.util.List;
 
 public class GestisciFornitoriBoundary {
 
-    public List<FornitoreBean> visualizzaFornitori() {
-        return visualizzaFornitoriConEsito().getElementi();
-    }
-
     public EsitoListaBean<FornitoreBean> visualizzaFornitoriConEsito() {
         GestisciFornitoriController controller = new GestisciFornitoriController();
         try {
@@ -27,10 +23,6 @@ public class GestisciFornitoriBoundary {
         } catch (PersistenceException e) {
             return EsitoListaBean.failure("Errore caricamento fornitori: " + e.getMessage());
         }
-    }
-
-    public List<ProdottoBean> visualizzaInventarioFornitore(FornitoreBean fornitoreBean) {
-        return visualizzaInventarioFornitoreConEsito(fornitoreBean).getElementi();
     }
 
     public EsitoListaBean<ProdottoBean> visualizzaInventarioFornitoreConEsito(FornitoreBean fornitoreBean) {

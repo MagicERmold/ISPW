@@ -24,8 +24,13 @@ import com.stocktrack.boundary.GestisciInventarioFornitoreBoundary;
 import com.stocktrack.boundary.GestisciProdottiBoundary;
 import com.stocktrack.view.support.ProductImageAssetStore;
 
+import java.io.FileDescriptor;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -393,7 +398,7 @@ public class AcquistaProdottiFornitoriCLI {
         String nome = leggiTesto("Nome: ");
         String categoria = leggiTesto("Categoria: ");
         int quantita = leggiIntero("Scorte disponibili: ", 0, Integer.MAX_VALUE);
-        BigDecimal prezzo = leggiDecimal("Prezzo unitario: ");
+        BigDecimal prezzo = leggiDecimal();
         return new ProdottoBean(id, nome, categoria, quantita, 0, prezzo);
     }
 
@@ -471,9 +476,9 @@ public class AcquistaProdottiFornitoriCLI {
         }
     }
 
-    private BigDecimal leggiDecimal(String prompt) {
+    private BigDecimal leggiDecimal() {
         while (true) {
-            LOGGER.info(prompt);
+            LOGGER.info("Prezzo unitario: ");
             try {
                 return new BigDecimal(scanner.nextLine());
             } catch (NumberFormatException e) {
@@ -489,12 +494,15 @@ public class AcquistaProdottiFornitoriCLI {
 
     private static final class ConsoleOutput {
 
+        private static final PrintWriter WRITER = new PrintWriter(new OutputStreamWriter(
+                new FileOutputStream(FileDescriptor.out), StandardCharsets.UTF_8), true);
+
         private void info(String message) {
-            System.out.println(message);
+            WRITER.println(message);
         }
 
         private void info(String template, Object... values) {
-            System.out.println(format(template, values));
+            WRITER.println(format(template, values));
         }
 
         private String format(String template, Object... values) {

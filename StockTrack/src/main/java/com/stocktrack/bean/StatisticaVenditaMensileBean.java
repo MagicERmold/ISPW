@@ -34,10 +34,6 @@ public class StatisticaVenditaMensileBean {
         return mese;
     }
 
-    public void setMese(String mese) {
-        this.mese = mese;
-    }
-
     public int getQuantitaVenduta() {
         return quantitaVenduta;
     }

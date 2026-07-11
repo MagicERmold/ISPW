@@ -34,10 +34,6 @@ public class CarrelloBean {
         }
     }
 
-    public void addProdotto(ProdottoBean prodottoBean) {
-        prodotti.add(prodottoBean);
-    }
-
     public List<ProdottoBean> getProdotti() {
         return new ArrayList<>(prodotti);
     }
@@ -50,16 +46,8 @@ public class CarrelloBean {
         return totaleStimato;
     }
 
-    public void setTotaleStimato(BigDecimal totaleStimato) {
-        this.totaleStimato = totaleStimato;
-    }
-
     public boolean isSuccesso() {
         return successo;
-    }
-
-    public void setSuccesso(boolean successo) {
-        this.successo = successo;
     }
 
     public String getMessaggio() {

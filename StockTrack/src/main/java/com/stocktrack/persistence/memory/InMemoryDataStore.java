@@ -12,6 +12,7 @@ import com.stocktrack.security.PasswordHasher;
 import java.math.BigDecimal;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 final class InMemoryDataStore {
 
@@ -26,7 +27,7 @@ final class InMemoryDataStore {
     private static final String SAMSUNG_CODE = "SAMSUNG-2026";
     private static final String HUAWEI_CODE = "HUAWEI-2026";
     private static final String SMARTPHONE_CATEGORY = "Smartphone";
-    private static volatile Inventario inventario;
+    private static final AtomicReference<Inventario> INVENTARIO = new AtomicReference<>();
 
     static {
         Titolare titolare = new Titolare("TIT-1", "Andrea", "Titolare", "titolare@euronics.local",
@@ -53,18 +54,18 @@ final class InMemoryDataStore {
                 new BigDecimal("699.00")));
         addProdotto(new Prodotto("EUR-HUAWEIMATEPAD", "Huawei MatePad 11", "Tablet", 8, 3,
                 new BigDecimal("399.00")));
-        inventario = new Inventario("INV-1", PRODOTTI.values().stream().toList());
+        INVENTARIO.set(new Inventario("INV-1", PRODOTTI.values().stream().toList()));
     }
 
     private InMemoryDataStore() {
     }
 
     static Inventario getInventario() {
-        return inventario;
+        return INVENTARIO.get();
     }
 
     static void setInventario(Inventario nuovoInventario) {
-        inventario = nuovoInventario;
+        INVENTARIO.set(nuovoInventario);
     }
 
     private static void addProdotto(Prodotto prodotto) {

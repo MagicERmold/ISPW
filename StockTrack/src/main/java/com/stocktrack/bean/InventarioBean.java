@@ -14,10 +14,6 @@ public class InventarioBean {
         setProdotti(prodotti);
     }
 
-    public void addProdotto(ProdottoBean prodottoBean) {
-        prodotti.add(prodottoBean);
-    }
-
     public List<ProdottoBean> getProdotti() {
         return new ArrayList<>(prodotti);
     }

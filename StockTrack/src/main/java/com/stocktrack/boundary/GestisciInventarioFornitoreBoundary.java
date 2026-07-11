@@ -23,10 +23,6 @@ public class GestisciInventarioFornitoreBoundary {
         }
     }
 
-    public List<ProdottoBean> visualizzaInventario() {
-        return visualizzaInventarioConEsito().getElementi();
-    }
-
     public EsitoListaBean<ProdottoBean> visualizzaInventarioConEsito() {
         GestisciInventarioFornitoreController controller = new GestisciInventarioFornitoreController();
         try {
@@ -48,9 +44,9 @@ public class GestisciInventarioFornitoreBoundary {
         }
     }
 
-    public EsitoOperazioneBean logout() {
+    public void logout() {
         LoginController controller = new LoginController();
-        return controller.logout();
+        controller.logout();
     }
 
     private void validateProdotto(ProdottoBean prodottoBean) throws InvalidInputException {

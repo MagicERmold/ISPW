@@ -2,10 +2,8 @@ package com.stocktrack.boundary;
 
 import com.stocktrack.bean.DisponibilitaProdottoBean;
 import com.stocktrack.bean.EsitoListaBean;
-import com.stocktrack.bean.InventarioBean;
 import com.stocktrack.bean.LoginBean;
 import com.stocktrack.bean.ProfiloUtenteBean;
-import com.stocktrack.bean.ProdottoBean;
 import com.stocktrack.controller.AnalizzaDisponibilitaInventarioController;
 import com.stocktrack.controller.LoginController;
 import com.stocktrack.exceptions.AutenticazioneException;
@@ -26,19 +24,6 @@ public class AnalizzaDisponibilitaInventarioBoundary {
         }
     }
 
-    public InventarioBean visualizzaInventario() {
-        AnalizzaDisponibilitaInventarioController controller = new AnalizzaDisponibilitaInventarioController();
-        try {
-            return controller.visualizzaInventario();
-        } catch (PersistenceException e) {
-            return new InventarioBean();
-        }
-    }
-
-    public List<DisponibilitaProdottoBean> analizzaDisponibilita() {
-        return analizzaDisponibilitaConEsito().getElementi();
-    }
-
     public EsitoListaBean<DisponibilitaProdottoBean> analizzaDisponibilitaConEsito() {
         AnalizzaDisponibilitaInventarioController controller = new AnalizzaDisponibilitaInventarioController();
         try {
@@ -48,23 +33,6 @@ public class AnalizzaDisponibilitaInventarioBoundary {
         } catch (PersistenceException e) {
             return EsitoListaBean.failure("Errore caricamento inventario: " + e.getMessage());
         }
-    }
-
-    public DisponibilitaProdottoBean verificaDisponibilita(ProdottoBean prodottoBean) {
-        AnalizzaDisponibilitaInventarioController controller = new AnalizzaDisponibilitaInventarioController();
-        try {
-            validateProdotto(prodottoBean);
-            return controller.verificaDisponibilita(prodottoBean);
-        } catch (InvalidInputException e) {
-            return new DisponibilitaProdottoBean(prodottoBean, 0, false, e.getMessage());
-        }
-    }
-
-    private void validateProdotto(ProdottoBean prodottoBean) throws InvalidInputException {
-        if (prodottoBean == null) {
-            throw new InvalidInputException("Prodotto obbligatorio");
-        }
-        prodottoBean.validate();
     }
 
     private void validateLogin(LoginBean loginBean) throws InvalidInputException {

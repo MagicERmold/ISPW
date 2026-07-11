@@ -6,7 +6,4 @@ public class AutenticazioneException extends Exception {
         super(message);
     }
 
-    public AutenticazioneException(String message, Throwable cause) {
-        super(message, cause);
-    }
 }

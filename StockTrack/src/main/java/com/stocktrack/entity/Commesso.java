@@ -9,10 +9,6 @@ public class Commesso extends AbstractPersonaData {
     public Commesso() {
     }
 
-    public Commesso(String id, String nome, String cognome, String email) {
-        this(id, nome, cognome, email, null);
-    }
-
     public Commesso(String id, String nome, String cognome, String email, String passwordHash) {
         super(id, nome, cognome, email);
         this.passwordHash = passwordHash;
@@ -22,7 +18,4 @@ public class Commesso extends AbstractPersonaData {
         return passwordHash;
     }
 
-    public void setPasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
-    }
 }

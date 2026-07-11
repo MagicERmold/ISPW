@@ -23,7 +23,4 @@ public class ProdottoSelezionatoBean {
         return idProdotto;
     }
 
-    public void setIdProdotto(String idProdotto) {
-        this.idProdotto = idProdotto;
-    }
 }

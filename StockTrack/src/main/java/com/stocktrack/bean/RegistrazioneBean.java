@@ -39,16 +39,8 @@ public class RegistrazioneBean extends AbstractPersonaData {
         return password;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public RuoloUtente getRuolo() {
         return ruolo;
-    }
-
-    public void setRuolo(RuoloUtente ruolo) {
-        this.ruolo = ruolo;
     }
 
 }

@@ -24,7 +24,7 @@ import java.util.UUID;
 public class LoginController {
 
     public ProfiloUtenteBean login(LoginBean loginBean)
-            throws InvalidInputException, AutenticazioneException, PersistenceException {
+            throws AutenticazioneException, PersistenceException {
         DAOFactory daoFactory = DAOFactoryProvider.getFactory();
         Optional<Titolare> titolare = daoFactory.getTitolareDAO().findByEmail(loginBean.getUsername());
         if (titolare.isPresent()) {
@@ -48,7 +48,7 @@ public class LoginController {
     }
 
     public ProfiloUtenteBean registra(RegistrazioneBean registrazioneBean)
-            throws InvalidInputException, AutenticazioneException, PersistenceException {
+            throws AutenticazioneException, PersistenceException {
         DAOFactory daoFactory = DAOFactoryProvider.getFactory();
         if (daoFactory.getTitolareDAO().findByEmail(registrazioneBean.getEmail()).isPresent()
                 || daoFactory.getCommessoDAO().findByEmail(registrazioneBean.getEmail()).isPresent()
@@ -88,20 +88,20 @@ public class LoginController {
 
     private ProfiloUtenteBean creaProfiloTitolare(Titolare titolare) {
         Session session = SessionManagerSingleton.getInstance().createSession(titolare.getId(), RuoloUtente.TITOLARE);
-        return new ProfiloUtenteBean(titolare.getId(), titolare.getNome(), RuoloUtente.TITOLARE,
-                session.getDataLogin());
+        return new ProfiloUtenteBean(titolare.getNome(), RuoloUtente.TITOLARE
+        );
     }
 
     private ProfiloUtenteBean creaProfiloCommesso(Commesso commesso) {
         Session session = SessionManagerSingleton.getInstance().createSession(commesso.getId(), RuoloUtente.COMMESSO);
-        return new ProfiloUtenteBean(commesso.getId(), commesso.getNome(), RuoloUtente.COMMESSO,
-                session.getDataLogin());
+        return new ProfiloUtenteBean(commesso.getNome(), RuoloUtente.COMMESSO
+        );
     }
 
     private ProfiloUtenteBean creaProfiloFornitore(Fornitore fornitore) {
         Session session = SessionManagerSingleton.getInstance().createSession(fornitore.getId(), RuoloUtente.FORNITORE);
-        return new ProfiloUtenteBean(fornitore.getId(), fornitore.getNome(), RuoloUtente.FORNITORE,
-                session.getDataLogin());
+        return new ProfiloUtenteBean(fornitore.getNome(), RuoloUtente.FORNITORE
+        );
     }
 
     private void verificaPassword(String password, String expectedHash) throws AutenticazioneException {

@@ -25,10 +25,6 @@ public class AnalizzaDisponibilitaInventarioController {
                 .toList();
     }
 
-    public DisponibilitaProdottoBean verificaDisponibilita(ProdottoBean prodottoBean) {
-        return toDisponibilitaProdottoBean(prodottoBean);
-    }
-
     private DisponibilitaProdottoBean toDisponibilitaProdottoBean(ProdottoBean prodottoBean) {
         boolean disponibile = prodottoBean.getQuantita() > 0;
         String messaggio = disponibile ? "Disponibile" : "Non disponibile";

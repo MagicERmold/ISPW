@@ -4,7 +4,6 @@ import com.stocktrack.bean.RuoloUtente;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,16 +38,6 @@ public class SessionManagerSingleton {
         return session;
     }
 
-    public boolean bindSessionToCurrentThread(String sessionId) {
-        Optional<Session> session = getSession(sessionId);
-        if (session.isEmpty()) {
-            return false;
-        }
-        currentSessionId.set(sessionId);
-        session.get().touch();
-        return true;
-    }
-
     public Optional<Session> getCurrentSession() {
         String sessionId = currentSessionId.get();
         if (sessionId == null) {
@@ -66,16 +55,6 @@ public class SessionManagerSingleton {
         return Optional.of(session);
     }
 
-    public List<Session> getActiveSessions() {
-        return sessions.values().stream()
-                .filter(Session::isActive)
-                .toList();
-    }
-
-    public int getActiveSessionCount() {
-        return getActiveSessions().size();
-    }
-
     public void logoutCurrentSession() {
         String sessionId = currentSessionId.get();
         if (sessionId != null) {
@@ -89,10 +68,6 @@ public class SessionManagerSingleton {
         if (session != null) {
             session.invalidate();
         }
-    }
-
-    public void clearCurrentThreadSession() {
-        currentSessionId.remove();
     }
 
     private static class Holder {

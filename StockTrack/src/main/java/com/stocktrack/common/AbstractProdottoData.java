@@ -52,10 +52,6 @@ public abstract class AbstractProdottoData {
         return categoria;
     }
 
-    public void setCategoria(String categoria) {
-        this.categoria = categoria;
-    }
-
     public int getQuantita() {
         return quantita;
     }
@@ -68,16 +64,8 @@ public abstract class AbstractProdottoData {
         return sogliaMinima;
     }
 
-    public void setSogliaMinima(int sogliaMinima) {
-        this.sogliaMinima = sogliaMinima;
-    }
-
     public BigDecimal getPrezzoUnitario() {
         return prezzoUnitario;
-    }
-
-    public void setPrezzoUnitario(BigDecimal prezzoUnitario) {
-        this.prezzoUnitario = prezzoUnitario;
     }
 
     protected boolean isBlank(String value) {

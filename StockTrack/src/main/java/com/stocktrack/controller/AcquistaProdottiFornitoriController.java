@@ -46,7 +46,7 @@ public class AcquistaProdottiFornitoriController {
     }
 
     public List<ProdottoBean> recuperaProdotti(FornitoreBean fornitoreBean)
-            throws FornitoreConnectionException, InvalidInputException {
+            throws FornitoreConnectionException {
         FornitoreGateway fornitoreGateway = new FornitoreApiAdapter();
         return fornitoreGateway.recuperaProdotti(fornitoreBean);
     }
@@ -77,19 +77,19 @@ public class AcquistaProdottiFornitoriController {
 
     public EsitoPagamentoBean elaboraPagamento(PagamentoBean pagamentoBean) {
         if (!isTitolare()) {
-            return new EsitoPagamentoBean(false, null, "Solo il titolare puo acquistare prodotti dai fornitori");
+            return new EsitoPagamentoBean(false, "Solo il titolare puo acquistare prodotti dai fornitori");
         }
         try {
             PagamentoGateway pagamentoGateway = selezionaPagamentoGateway(pagamentoBean.getMetodoPagamento());
             return pagamentoGateway.autorizzaPagamento(pagamentoBean);
         } catch (PagamentoFallitoException | IllegalArgumentException e) {
-            return new EsitoPagamentoBean(false, null, e.getMessage());
+            return new EsitoPagamentoBean(false, e.getMessage());
         }
     }
 
     public EsitoOrdineBean acquistaProdottiDaFornitore(OrdineBean ordineBean) {
         if (!isTitolare()) {
-            return new EsitoOrdineBean(false, ordineBean.getIdOrdine(),
+            return new EsitoOrdineBean(false,
                     "Solo il titolare puo acquistare prodotti dai fornitori");
         }
         FornitoreGateway fornitoreGateway = new FornitoreApiAdapter();
@@ -101,9 +101,9 @@ public class AcquistaProdottiFornitoriController {
             Ordine ordine = toOrdine(ordineBean);
             ordine.marcaPagato();
             daoFactory.getOrdineDAO().save(ordine);
-            return new EsitoOrdineBean(true, ordine.getId(), "Ordine confermato, inventario aggiornato");
+            return new EsitoOrdineBean(true, "Ordine confermato, inventario aggiornato");
         } catch (FornitoreConnectionException | PersistenceException e) {
-            return new EsitoOrdineBean(false, ordineBean.getIdOrdine(), e.getMessage());
+            return new EsitoOrdineBean(false, e.getMessage());
         }
     }
 

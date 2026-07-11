@@ -39,10 +39,6 @@ public class OrdineBean {
         return idOrdine;
     }
 
-    public void setIdOrdine(String idOrdine) {
-        this.idOrdine = idOrdine;
-    }
-
     public FornitoreBean getFornitore() {
         return fornitore;
     }
@@ -63,7 +59,4 @@ public class OrdineBean {
         return totale;
     }
 
-    public void setTotale(BigDecimal totale) {
-        this.totale = totale;
-    }
 }

@@ -30,6 +30,6 @@ public class PagamentoVisaAdapter implements PagamentoGateway {
         if (authCode == null || !visaApi.settleTransaction(authCode)) {
             throw new PagamentoFallitoException("Pagamento Visa rifiutato");
         }
-        return new EsitoPagamentoBean(true, authCode, "Pagamento Visa autorizzato");
+        return new EsitoPagamentoBean(true, "Pagamento Visa autorizzato");
     }
 }

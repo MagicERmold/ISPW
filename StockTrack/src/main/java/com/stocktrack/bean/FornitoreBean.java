@@ -30,16 +30,8 @@ public class FornitoreBean extends AbstractAnagraficaData {
         return apiEndpoint;
     }
 
-    public void setApiEndpoint(String apiEndpoint) {
-        this.apiEndpoint = apiEndpoint;
-    }
-
     public boolean isDisponibile() {
         return disponibile;
-    }
-
-    public void setDisponibile(boolean disponibile) {
-        this.disponibile = disponibile;
     }
 
 }

@@ -5,7 +5,6 @@ import com.stocktrack.bean.EsitoListaBean;
 import com.stocktrack.bean.LoginBean;
 import com.stocktrack.bean.ProfiloUtenteBean;
 import com.stocktrack.bean.ProdottoSelezionatoBean;
-import com.stocktrack.bean.ProdottoBean;
 import com.stocktrack.bean.QuantitaProdottoBean;
 import com.stocktrack.bean.StatisticaVenditaMensileBean;
 import com.stocktrack.controller.AnalizzaStatisticheVenditaController;
@@ -29,25 +28,6 @@ public class GestisciProdottiBoundary {
         }
     }
 
-    public List<ProdottoBean> visualizzaProdotti() {
-        return visualizzaProdottiConEsito().getElementi();
-    }
-
-    public EsitoListaBean<ProdottoBean> visualizzaProdottiConEsito() {
-        GestisciProdottiController controller = new GestisciProdottiController();
-        try {
-            List<ProdottoBean> prodotti = controller.visualizzaProdotti();
-            String messaggio = prodotti.isEmpty() ? "Inventario vuoto" : "Prodotti caricati";
-            return EsitoListaBean.success(messaggio, prodotti);
-        } catch (PersistenceException e) {
-            return EsitoListaBean.failure("Errore caricamento prodotti: " + e.getMessage());
-        }
-    }
-
-    public EsitoOperazioneBean modificaQuantitaProdotto(String idProdotto, int quantita) {
-        return modificaQuantitaProdotto(new QuantitaProdottoBean(idProdotto, quantita));
-    }
-
     public EsitoOperazioneBean modificaQuantitaProdotto(QuantitaProdottoBean quantitaProdottoBean) {
         GestisciProdottiController controller = new GestisciProdottiController();
         try {
@@ -56,10 +36,6 @@ public class GestisciProdottiBoundary {
         } catch (InvalidInputException | PersistenceException e) {
             return new EsitoOperazioneBean(false, e.getMessage());
         }
-    }
-
-    public EsitoOperazioneBean rimuoviProdotto(ProdottoBean prodottoBean) {
-        return rimuoviProdotto(new ProdottoSelezionatoBean(prodottoBean == null ? null : prodottoBean.getId()));
     }
 
     public EsitoOperazioneBean rimuoviProdotto(ProdottoSelezionatoBean prodottoSelezionatoBean) {
@@ -72,10 +48,6 @@ public class GestisciProdottiBoundary {
         }
     }
 
-    public EsitoOperazioneBean registraVenditaManuale(String idProdotto, int quantita) {
-        return registraVenditaManuale(new QuantitaProdottoBean(idProdotto, quantita));
-    }
-
     public EsitoOperazioneBean registraVenditaManuale(QuantitaProdottoBean movimentoProdottoBean) {
         GestisciProdottiController controller = new GestisciProdottiController();
         try {
@@ -86,10 +58,6 @@ public class GestisciProdottiBoundary {
         }
     }
 
-    public EsitoOperazioneBean registraAcquistoEsterno(String idProdotto, int quantita) {
-        return registraAcquistoEsterno(new QuantitaProdottoBean(idProdotto, quantita));
-    }
-
     public EsitoOperazioneBean registraAcquistoEsterno(QuantitaProdottoBean movimentoProdottoBean) {
         GestisciProdottiController controller = new GestisciProdottiController();
         try {
@@ -98,10 +66,6 @@ public class GestisciProdottiBoundary {
         } catch (InvalidInputException | PersistenceException e) {
             return new EsitoOperazioneBean(false, e.getMessage());
         }
-    }
-
-    public List<StatisticaVenditaMensileBean> analizzaStatisticheVenditaMensili() {
-        return analizzaStatisticheVenditaMensiliConEsito().getElementi();
     }
 
     public EsitoListaBean<StatisticaVenditaMensileBean> analizzaStatisticheVenditaMensiliConEsito() {

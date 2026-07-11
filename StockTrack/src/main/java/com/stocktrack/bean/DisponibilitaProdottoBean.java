@@ -30,16 +30,8 @@ public class DisponibilitaProdottoBean {
         return quantitaDisponibile;
     }
 
-    public void setQuantitaDisponibile(int quantitaDisponibile) {
-        this.quantitaDisponibile = quantitaDisponibile;
-    }
-
     public boolean isDisponibile() {
         return disponibile;
-    }
-
-    public void setDisponibile(boolean disponibile) {
-        this.disponibile = disponibile;
     }
 
     public String getMessaggio() {

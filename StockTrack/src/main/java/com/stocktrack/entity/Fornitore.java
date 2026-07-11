@@ -23,31 +23,15 @@ public class Fornitore extends AbstractAnagraficaData {
         this.passwordHash = passwordHash;
     }
 
-    public void notificaPagamento(String idOrdine) {
-        // La notifica reale arrivera tramite gateway/controller applicativo.
-    }
-
     public String getApiEndpoint() {
         return apiEndpoint;
-    }
-
-    public void setApiEndpoint(String apiEndpoint) {
-        this.apiEndpoint = apiEndpoint;
     }
 
     public boolean isDisponibile() {
         return disponibile;
     }
 
-    public void setDisponibile(boolean disponibile) {
-        this.disponibile = disponibile;
-    }
-
     public String getPasswordHash() {
         return passwordHash;
-    }
-
-    public void setPasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
     }
 }

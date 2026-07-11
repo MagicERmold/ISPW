@@ -42,48 +42,24 @@ public class PagamentoBean {
         return metodoPagamento;
     }
 
-    public void setMetodoPagamento(String metodoPagamento) {
-        this.metodoPagamento = metodoPagamento;
-    }
-
     public String getNumeroCarta() {
         return numeroCarta;
-    }
-
-    public void setNumeroCarta(String numeroCarta) {
-        this.numeroCarta = numeroCarta;
     }
 
     public String getCvv() {
         return cvv;
     }
 
-    public void setCvv(String cvv) {
-        this.cvv = cvv;
-    }
-
     public String getEmailAccount() {
         return emailAccount;
-    }
-
-    public void setEmailAccount(String emailAccount) {
-        this.emailAccount = emailAccount;
     }
 
     public BigDecimal getImporto() {
         return importo;
     }
 
-    public void setImporto(BigDecimal importo) {
-        this.importo = importo;
-    }
-
     public String getValuta() {
         return valuta;
-    }
-
-    public void setValuta(String valuta) {
-        this.valuta = valuta;
     }
 
     private boolean isBlank(String value) {

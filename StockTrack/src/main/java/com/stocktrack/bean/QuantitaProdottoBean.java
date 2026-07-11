@@ -35,10 +35,6 @@ public class QuantitaProdottoBean {
         return idProdotto;
     }
 
-    public void setIdProdotto(String idProdotto) {
-        this.idProdotto = idProdotto;
-    }
-
     public int getQuantita() {
         return quantita;
     }

@@ -2,7 +2,6 @@ package com.stocktrack.controller;
 
 import com.stocktrack.bean.EsitoOperazioneBean;
 import com.stocktrack.bean.ProdottoSelezionatoBean;
-import com.stocktrack.bean.ProdottoBean;
 import com.stocktrack.bean.QuantitaProdottoBean;
 import com.stocktrack.bean.RuoloUtente;
 import com.stocktrack.entity.Inventario;
@@ -18,19 +17,12 @@ import com.stocktrack.persistence.dao.ProdottoDAO;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 public class GestisciProdottiController {
 
     private static final String PRODOTTO_NON_TROVATO = "Prodotto non trovato";
     private static final Object PRODUCT_MANAGEMENT_LOCK = new Object();
-
-    public List<ProdottoBean> visualizzaProdotti() throws PersistenceException {
-        return getProdottoDAO().findAll().stream()
-                .map(this::toProdottoBean)
-                .toList();
-    }
 
     public EsitoOperazioneBean modificaQuantitaProdotto(QuantitaProdottoBean quantitaProdottoBean)
             throws InvalidInputException, PersistenceException {
@@ -79,11 +71,6 @@ public class GestisciProdottiController {
         return DAOFactoryProvider.getFactory().getProdottoDAO();
     }
 
-    protected ProdottoBean toProdottoBean(Prodotto prodotto) {
-        return new ProdottoBean(prodotto.getId(), prodotto.getNome(), prodotto.getCategoria(),
-                prodotto.getQuantita(), prodotto.getSogliaMinima(), prodotto.getPrezzoUnitario());
-    }
-
     private EsitoOperazioneBean aggiornaQuantitaManuale(QuantitaProdottoBean movimentoProdottoBean,
                                                         TipoMovimentoInventario tipo, String messaggio)
             throws InvalidInputException, PersistenceException {
@@ -92,20 +79,25 @@ public class GestisciProdottiController {
             String idProdotto = movimentoProdottoBean.getIdProdotto();
             int quantita = movimentoProdottoBean.getQuantita();
 
-            ProdottoDAO prodottoDAO = getProdottoDAO();
-            Prodotto prodotto = prodottoDAO.findById(idProdotto)
-                    .orElseThrow(() -> new InvalidInputException(PRODOTTO_NON_TROVATO));
-            int delta = TipoMovimentoInventario.VENDITA.equals(tipo) ? -quantita : quantita;
-            int nuovaQuantita = prodotto.getQuantita() + delta;
-            if (nuovaQuantita < 0) {
-                throw new InvalidInputException("Quantita insufficiente in inventario");
-            }
-            prodotto.setQuantita(nuovaQuantita);
-            prodottoDAO.update(prodotto);
-            registraMovimento(prodotto, tipo, quantita, "Inventario");
+            Prodotto prodotto = getProdotto(tipo, idProdotto, quantita);
+            registraMovimento(prodotto, tipo, quantita);
             sincronizzaInventario();
         }
         return new EsitoOperazioneBean(true, messaggio);
+    }
+
+    private Prodotto getProdotto(TipoMovimentoInventario tipo, String idProdotto, int quantita) throws InvalidInputException, PersistenceException {
+        ProdottoDAO prodottoDAO = getProdottoDAO();
+        Prodotto prodotto = prodottoDAO.findById(idProdotto)
+                .orElseThrow(() -> new InvalidInputException(PRODOTTO_NON_TROVATO));
+        int delta = TipoMovimentoInventario.VENDITA.equals(tipo) ? -quantita : quantita;
+        int nuovaQuantita = prodotto.getQuantita() + delta;
+        if (nuovaQuantita < 0) {
+            throw new InvalidInputException("Quantita insufficiente in inventario");
+        }
+        prodotto.setQuantita(nuovaQuantita);
+        prodottoDAO.update(prodotto);
+        return prodotto;
     }
 
     private void verificaPermessiGestioneProdotti() throws InvalidInputException {
@@ -119,12 +111,12 @@ public class GestisciProdottiController {
         }
     }
 
-    protected void registraMovimento(Prodotto prodotto, TipoMovimentoInventario tipo, int quantita, String origine)
+    protected void registraMovimento(Prodotto prodotto, TipoMovimentoInventario tipo, int quantita)
             throws PersistenceException {
         BigDecimal valoreUnitario = prodotto.getPrezzoUnitario() == null ? BigDecimal.ZERO
                 : prodotto.getPrezzoUnitario();
         MovimentoInventario movimento = new MovimentoInventario("MOV-" + UUID.randomUUID(), prodotto.getId(),
-                prodotto.getNome(), tipo, quantita, valoreUnitario, origine);
+                prodotto.getNome(), tipo, quantita, valoreUnitario, "Inventario");
         DAOFactoryProvider.getFactory().getMovimentoInventarioDAO().save(movimento);
     }
 

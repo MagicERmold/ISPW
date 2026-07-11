@@ -13,10 +13,6 @@ public class JavaFXApp extends Application {
 
     private static Scene scene;
 
-    public static void main(String[] args) {
-        Main.main(args);
-    }
-
     @Override
     @SuppressWarnings("java:S2696")
     public void start(Stage stage) throws IOException {

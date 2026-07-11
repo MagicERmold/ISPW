@@ -14,7 +14,6 @@ public class Ordine {
     private Fornitore fornitore;
     private List<Prodotto> prodotti = new ArrayList<>();
     private BigDecimal totale = BigDecimal.ZERO;
-    private LocalDateTime dataCreazione;
     private String stato;
 
     public Ordine() {
@@ -25,16 +24,12 @@ public class Ordine {
         this.fornitore = fornitore;
         setProdotti(prodotti);
         this.totale = totale;
-        this.dataCreazione = LocalDateTime.now(APPLICATION_ZONE);
+        LocalDateTime.now(APPLICATION_ZONE);
         this.stato = "CREATO";
     }
 
     public void marcaPagato() {
         stato = "PAGATO";
-    }
-
-    public void marcaFallito() {
-        stato = "FALLITO";
     }
 
     public String getId() {
@@ -67,14 +62,6 @@ public class Ordine {
 
     public void setTotale(BigDecimal totale) {
         this.totale = totale;
-    }
-
-    public LocalDateTime getDataCreazione() {
-        return dataCreazione;
-    }
-
-    public void setDataCreazione(LocalDateTime dataCreazione) {
-        this.dataCreazione = dataCreazione;
     }
 
     public String getStato() {

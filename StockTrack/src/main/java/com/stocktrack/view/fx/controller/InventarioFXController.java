@@ -138,17 +138,17 @@ public class InventarioFXController {
         Button saveQuantityButton = new Button("Salva quantita");
         saveQuantityButton.setOnAction(event -> handleProductOperation(dialog, dialogMessageLabel,
                 () -> productManagementBoundary.modificaQuantitaProdotto(new QuantitaProdottoBean(prodotto.getId(),
-                        parseInt(quantityField.getText()))), true));
+                        parseInt(quantityField.getText())))));
 
         Button registerSaleButton = new Button("Vendita");
         registerSaleButton.setOnAction(event -> handleProductOperation(dialog, dialogMessageLabel,
                 () -> productManagementBoundary.registraVenditaManuale(new QuantitaProdottoBean(prodotto.getId(),
-                        parseInt(movementQuantityField.getText()))), true));
+                        parseInt(movementQuantityField.getText())))));
 
         Button registerPurchaseButton = new Button("Acquisto");
         registerPurchaseButton.setOnAction(event -> handleProductOperation(dialog, dialogMessageLabel,
                 () -> productManagementBoundary.registraAcquistoEsterno(new QuantitaProdottoBean(prodotto.getId(),
-                        parseInt(movementQuantityField.getText()))), true));
+                        parseInt(movementQuantityField.getText())))));
 
         Button deleteButton = new Button("Elimina prodotto");
         deleteButton.getStyleClass().add("danger-button");
@@ -195,18 +195,17 @@ public class InventarioFXController {
         alert.showAndWait()
                 .filter(ButtonType.OK::equals)
                 .ifPresent(buttonType -> handleProductOperation(dialog, dialogMessageLabel,
-                        () -> productManagementBoundary.rimuoviProdotto(new ProdottoSelezionatoBean(prodotto.getId())),
-                        true));
+                        () -> productManagementBoundary.rimuoviProdotto(new ProdottoSelezionatoBean(prodotto.getId()))
+                ));
     }
 
-    private void handleProductOperation(Dialog<Void> dialog, Label dialogMessageLabel, ProductOperation operation,
-                                        boolean closeOnSuccess) {
+    private void handleProductOperation(Dialog<Void> dialog, Label dialogMessageLabel, ProductOperation operation) {
         EsitoOperazioneBean esito = operation.execute();
         dialogMessageLabel.setText(esito.getMessaggio());
         messageLabel.setText(esito.getMessaggio());
         if (esito.isSuccesso()) {
             loadInventory();
-            if (closeOnSuccess) {
+            if (true) {
                 dialog.close();
             }
         }

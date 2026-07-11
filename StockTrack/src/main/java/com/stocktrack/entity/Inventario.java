@@ -27,12 +27,6 @@ public class Inventario {
                 .findFirst();
     }
 
-    public List<Prodotto> prodottiSottoSoglia() {
-        return prodotti.stream()
-                .filter(Prodotto::isSottoSoglia)
-                .toList();
-    }
-
     public String getId() {
         return id;
     }

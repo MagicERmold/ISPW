@@ -8,10 +8,6 @@ public class CommessoBean extends AbstractPersonaData {
     public CommessoBean() {
     }
 
-    public CommessoBean(String id, String nome, String cognome, String email) {
-        super(id, nome, cognome, email);
-    }
-
     public void validate() throws InvalidInputException {
         if (isBlank(getId())) {
             throw new InvalidInputException("Id commesso obbligatorio");

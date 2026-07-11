@@ -6,7 +6,4 @@ public class ProdottoNonDisponibileException extends Exception {
         super(message);
     }
 
-    public ProdottoNonDisponibileException(String message, Throwable cause) {
-        super(message, cause);
-    }
 }

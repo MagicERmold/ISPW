@@ -30,6 +30,6 @@ public class PagamentoPaypalAdapter implements PagamentoGateway {
         if (paymentId == null || !paypalApi.capturePayment(paymentId)) {
             throw new PagamentoFallitoException("Pagamento PayPal rifiutato");
         }
-        return new EsitoPagamentoBean(true, paymentId, "Pagamento PayPal autorizzato");
+        return new EsitoPagamentoBean(true, "Pagamento PayPal autorizzato");
     }
 }

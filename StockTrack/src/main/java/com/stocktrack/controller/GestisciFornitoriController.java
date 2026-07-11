@@ -24,14 +24,14 @@ public class GestisciFornitoriController {
     }
 
     public List<ProdottoBean> visualizzaInventarioFornitore(FornitoreBean fornitoreBean)
-            throws InvalidInputException, FornitoreConnectionException {
+            throws FornitoreConnectionException {
         FornitoreApiAdapter fornitoreApiAdapter = new FornitoreApiAdapter();
         return fornitoreApiAdapter.recuperaProdotti(fornitoreBean);
     }
 
     public EsitoOperazioneBean aggiungiFornitoreConCodice(CodiceFornitoreBean codiceFornitoreBean)
             throws InvalidInputException, PersistenceException {
-        if (!isTitolare()) {
+        if (isTitolare()) {
             return new EsitoOperazioneBean(false, "Solo il titolare puo aggiungere fornitori");
         }
 
@@ -47,8 +47,8 @@ public class GestisciFornitoriController {
     }
 
     public EsitoOperazioneBean rimuoviFornitore(FornitoreBean fornitoreBean)
-            throws InvalidInputException, PersistenceException {
-        if (!isTitolare()) {
+            throws PersistenceException {
+        if (isTitolare()) {
             return new EsitoOperazioneBean(false, "Solo il titolare puo rimuovere fornitori");
         }
         if (DAOFactoryProvider.getFactory().getFornitoreDAO().findById(fornitoreBean.getId()).isEmpty()) {

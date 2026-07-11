@@ -35,8 +35,8 @@ public final class ProductImageAssetStore {
 
     public static List<String> imageStemsFor(ProdottoBean prodotto) {
         ProdottoBean safeProduct = prodotto == null ? new ProdottoBean() : prodotto;
-        String id = safeText(safeProduct.getId(), "");
-        String name = safeText(safeProduct.getNome(), "");
+        String id = safeText(safeProduct.getId());
+        String name = safeText(safeProduct.getNome());
         List<String> stems = new ArrayList<>();
         addStem(stems, slug(name));
         addStem(stems, slug(id));
@@ -104,7 +104,7 @@ public final class ProductImageAssetStore {
         return value.substring(start, end);
     }
 
-    private static String safeText(String value, String fallback) {
-        return value == null || value.isBlank() ? fallback : value;
+    private static String safeText(String value) {
+        return value == null || value.isBlank() ? "" : value;
     }
 }

@@ -3,7 +3,6 @@ package com.stocktrack.boundary;
 import com.stocktrack.bean.CarrelloBean;
 import com.stocktrack.bean.EsitoListaBean;
 import com.stocktrack.bean.EsitoOrdineBean;
-import com.stocktrack.bean.EsitoOperazioneBean;
 import com.stocktrack.bean.EsitoPagamentoBean;
 import com.stocktrack.bean.FornitoreBean;
 import com.stocktrack.bean.LoginBean;
@@ -44,13 +43,9 @@ public class AcquistaProdottiFornitoriBoundary {
         }
     }
 
-    public EsitoOperazioneBean logout() {
+    public void logout() {
         LoginController controller = new LoginController();
-        return controller.logout();
-    }
-
-    public List<FornitoreBean> recuperaFornitori() {
-        return recuperaFornitoriConEsito().getElementi();
+        controller.logout();
     }
 
     public EsitoListaBean<FornitoreBean> recuperaFornitoriConEsito() {
@@ -62,10 +57,6 @@ public class AcquistaProdottiFornitoriBoundary {
         } catch (PersistenceException e) {
             return EsitoListaBean.failure("Errore caricamento fornitori: " + e.getMessage());
         }
-    }
-
-    public List<ProdottoBean> recuperaProdotti(FornitoreBean fornitoreBean) {
-        return recuperaProdottiConEsito(fornitoreBean).getElementi();
     }
 
     public EsitoListaBean<ProdottoBean> recuperaProdottiConEsito(FornitoreBean fornitoreBean) {
@@ -99,7 +90,7 @@ public class AcquistaProdottiFornitoriBoundary {
             pagamentoBean.validate();
             return controller.elaboraPagamento(pagamentoBean);
         } catch (InvalidInputException e) {
-            return new EsitoPagamentoBean(false, null, e.getMessage());
+            return new EsitoPagamentoBean(false, e.getMessage());
         }
     }
 
@@ -109,8 +100,7 @@ public class AcquistaProdottiFornitoriBoundary {
             validateOrdine(ordineBean);
             return controller.acquistaProdottiDaFornitore(ordineBean);
         } catch (InvalidInputException e) {
-            String idOrdine = ordineBean == null ? null : ordineBean.getIdOrdine();
-            return new EsitoOrdineBean(false, idOrdine, e.getMessage());
+            return new EsitoOrdineBean(false, e.getMessage());
         }
     }
 

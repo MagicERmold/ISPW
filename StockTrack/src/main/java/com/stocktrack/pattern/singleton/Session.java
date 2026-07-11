@@ -12,7 +12,6 @@ public class Session {
     private final String id;
     private final String idUtente;
     private final RuoloUtente ruolo;
-    private final LocalDateTime dataLogin;
     private volatile LocalDateTime ultimoAccesso;
     private volatile boolean active;
 
@@ -20,7 +19,6 @@ public class Session {
         this.id = id;
         this.idUtente = idUtente;
         this.ruolo = ruolo;
-        this.dataLogin = dataLogin;
         this.ultimoAccesso = dataLogin;
         this.active = true;
     }
@@ -45,15 +43,15 @@ public class Session {
         return ruolo;
     }
 
-    public LocalDateTime getDataLogin() {
-        return dataLogin;
+    public boolean isActive() {
+        return active;
     }
 
     public LocalDateTime getUltimoAccesso() {
         return ultimoAccesso;
     }
 
-    public boolean isActive() {
-        return active;
+    public void setUltimoAccesso(LocalDateTime ultimoAccesso) {
+        this.ultimoAccesso = ultimoAccesso;
     }
 }

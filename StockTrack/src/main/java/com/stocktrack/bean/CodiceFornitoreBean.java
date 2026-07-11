@@ -23,7 +23,4 @@ public class CodiceFornitoreBean {
         return codiceFornitore;
     }
 
-    public void setCodiceFornitore(String codiceFornitore) {
-        this.codiceFornitore = codiceFornitore;
-    }
 }

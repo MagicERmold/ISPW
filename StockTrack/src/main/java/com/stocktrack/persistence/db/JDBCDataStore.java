@@ -53,6 +53,7 @@ final class JDBCDataStore {
     private static final String MOVEMENT_VALUE_COLUMN = "valore_unitario";
     private static final String MOVEMENT_DATE_COLUMN = "data_movimento";
     private static final String MOVEMENT_ORIGIN_COLUMN = "origine";
+    private static final String VARCHAR_CLOSE = " varchar)";
     private static final String USER_COLUMNS = ID_COLUMN + ", " + NAME_COLUMN + ", " + SURNAME_COLUMN + ", "
             + EMAIL_COLUMN + ", " + PASSWORD_HASH_COLUMN;
     private static final String SUPPLIER_COLUMNS = ID_COLUMN + ", " + NAME_COLUMN + ", " + EMAIL_COLUMN
@@ -362,24 +363,25 @@ final class JDBCDataStore {
         try (Statement statement = connection.createStatement()) {
             statement.execute("create table if not exists titolari "
                     + "(id varchar primary key, nome varchar, cognome varchar, " + EMAIL_COLUMN
-                    + " varchar, " + PASSWORD_HASH_COLUMN + " varchar)");
+                    + " varchar, " + PASSWORD_HASH_COLUMN + VARCHAR_CLOSE);
             statement.execute("create table if not exists commessi "
                     + "(id varchar primary key, nome varchar, cognome varchar, " + EMAIL_COLUMN
-                    + " varchar, " + PASSWORD_HASH_COLUMN + " varchar)");
+                    + " varchar, " + PASSWORD_HASH_COLUMN + VARCHAR_CLOSE);
             addTitolarePasswordHashColumnIfMissing(statement);
             addCommessoPasswordHashColumnIfMissing(statement);
             statement.execute("create table if not exists fornitori "
                     + "(id varchar primary key, nome varchar, " + EMAIL_COLUMN
-                    + " varchar, api_endpoint varchar, disponibile boolean, " + PASSWORD_HASH_COLUMN + " varchar)");
+                    + " varchar, api_endpoint varchar, disponibile boolean, " + PASSWORD_HASH_COLUMN + VARCHAR_CLOSE);
             addFornitorePasswordHashColumnIfMissing(statement);
             statement.execute("create table if not exists prodotti "
                     + "(id varchar primary key, nome varchar, categoria varchar, quantita int, "
                     + "soglia_minima int, prezzo_unitario decimal)");
             statement.execute("create table if not exists ordini "
-                    + "(id varchar primary key, totale decimal, stato varchar)");
+                    + "(id varchar primary key, totale decimal, " + STATUS_COLUMN + VARCHAR_CLOSE);
             statement.execute("create table if not exists movimenti_inventario "
                     + "(id varchar primary key, id_prodotto varchar, nome_prodotto varchar, tipo varchar, "
-                    + "quantita int, valore_unitario decimal, data_movimento timestamp, origine varchar)");
+                    + "quantita int, valore_unitario decimal, data_movimento timestamp, "
+                    + MOVEMENT_ORIGIN_COLUMN + VARCHAR_CLOSE);
         }
         seedDemoData(connection);
     }

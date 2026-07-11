@@ -88,6 +88,7 @@
 .total {
     -fx-font-size: 15;
     -fx-font-weight: bold;
+    -fx-text-fill: #1d2733;
 }
 
 .message {
@@ -105,12 +106,21 @@ Button {
     -fx-background-radius: 5;
 }
 
+.danger-button {
+    -fx-background-color: #b42318;
+}
+
 TextField, PasswordField, ComboBox, ListView {
     -fx-background-radius: 5;
 }
 
+ComboBox .list-cell {
+    -fx-text-fill: #1d2733;
+}
+
 ListView .list-cell {
     -fx-background-color: transparent;
+    -fx-text-fill: #1d2733;
     -fx-padding: 8;
 }
 
@@ -125,4 +135,30 @@ ListView .list-cell:filled:selected .product-card-compact {
 
 ListView .list-cell:filled:selected {
     -fx-background-color: transparent;
+    -fx-text-fill: #1d2733;
+}
+
+ListView .list-cell:filled:selected .product-name,
+ListView .list-cell:filled:focused .product-name {
+    -fx-text-fill: #1d2733;
+}
+
+ListView .list-cell:filled:selected .subtitle,
+ListView .list-cell:filled:focused .subtitle {
+    -fx-text-fill: #667085;
+}
+
+ListView .list-cell:filled:selected .total,
+ListView .list-cell:filled:focused .total {
+    -fx-text-fill: #1d2733;
+}
+
+ListView .list-cell:filled:selected .availability-ok,
+ListView .list-cell:filled:focused .availability-ok {
+    -fx-text-fill: #157347;
+}
+
+ListView .list-cell:filled:selected .availability-ko,
+ListView .list-cell:filled:focused .availability-ko {
+    -fx-text-fill: #b42318;
 }

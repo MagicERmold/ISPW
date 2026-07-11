@@ -45,6 +45,10 @@
                 <TextField fx:id="categoryField" promptText="Categoria"/>
                 <TextField fx:id="quantityField" promptText="Scorte disponibili"/>
                 <TextField fx:id="priceField" promptText="Prezzo unitario"/>
+                <HBox spacing="8">
+                    <Button onAction="#onChoosePhoto" text="Scegli foto"/>
+                    <Label fx:id="photoLabel" styleClass="subtitle" text="Nessuna foto selezionata"/>
+                </HBox>
                 <Button maxWidth="Infinity" onAction="#onSaveProduct" text="Salva prodotto"/>
             </VBox>
         </GridPane>

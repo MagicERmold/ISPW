@@ -6,12 +6,15 @@ import com.stocktrack.bean.FornitoreBean;
 import com.stocktrack.bean.ProdottoBean;
 import com.stocktrack.boundary.GestisciInventarioFornitoreBoundary;
 import com.stocktrack.view.fx.component.ProductCardFactory;
+import com.stocktrack.view.support.ProductImageAssetStore;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.stage.FileChooser;
 
+import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
@@ -43,9 +46,13 @@ public class InventarioFornitoreFXController {
     private TextField priceField;
 
     @FXML
+    private Label photoLabel;
+
+    @FXML
     private Label messageLabel;
 
     private final GestisciInventarioFornitoreBoundary boundary = new GestisciInventarioFornitoreBoundary();
+    private File selectedPhotoFile;
 
     @FXML
     private void initialize() {
@@ -71,10 +78,25 @@ public class InventarioFornitoreFXController {
     }
 
     @FXML
+    private void onChoosePhoto() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Seleziona foto prodotto");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Immagini", "*.png", "*.jpg", "*.jpeg"));
+        File file = fileChooser.showOpenDialog(photoLabel.getScene().getWindow());
+        if (file == null) {
+            return;
+        }
+        selectedPhotoFile = file;
+        photoLabel.setText(file.getName());
+    }
+
+    @FXML
     private void onSaveProduct() {
-        EsitoOperazioneBean esito = boundary.salvaProdotto(readProductFromForm());
+        ProdottoBean prodottoBean = readProductFromForm();
+        EsitoOperazioneBean esito = boundary.salvaProdotto(prodottoBean);
         setMessage(esito.getMessaggio());
         if (esito.isSuccesso()) {
+            saveSelectedPhoto(prodottoBean);
             loadInventory();
         }
     }
@@ -110,6 +132,8 @@ public class InventarioFornitoreFXController {
             categoryField.clear();
             quantityField.clear();
             priceField.clear();
+            selectedPhotoFile = null;
+            photoLabel.setText("Nessuna foto selezionata");
             return;
         }
 
@@ -118,6 +142,8 @@ public class InventarioFornitoreFXController {
         categoryField.setText(prodotto.getCategoria());
         quantityField.setText(Integer.toString(prodotto.getQuantita()));
         priceField.setText(prodotto.getPrezzoUnitario() == null ? "0" : prodotto.getPrezzoUnitario().toPlainString());
+        selectedPhotoFile = null;
+        photoLabel.setText("Foto esistente o non selezionata");
     }
 
     private int parseInt(String value) {
@@ -142,5 +168,20 @@ public class InventarioFornitoreFXController {
 
     private void setMessage(String message) {
         messageLabel.setText(message);
+    }
+
+    private void saveSelectedPhoto(ProdottoBean prodottoBean) {
+        if (selectedPhotoFile == null) {
+            return;
+        }
+
+        try {
+            ProductImageAssetStore.saveProductImage(selectedPhotoFile.toPath(), prodottoBean);
+            selectedPhotoFile = null;
+            photoLabel.setText("Foto salvata");
+            setMessage("Prodotto e foto salvati");
+        } catch (IOException e) {
+            setMessage("Prodotto salvato, errore salvataggio foto");
+        }
     }
 }

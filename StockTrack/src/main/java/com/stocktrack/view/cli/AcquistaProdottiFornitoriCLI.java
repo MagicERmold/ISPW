@@ -19,10 +19,13 @@ import com.stocktrack.boundary.AnalizzaDisponibilitaInventarioBoundary;
 import com.stocktrack.boundary.GestisciFornitoriBoundary;
 import com.stocktrack.boundary.GestisciInventarioFornitoreBoundary;
 import com.stocktrack.boundary.GestisciProdottiBoundary;
+import com.stocktrack.view.support.ProductImageAssetStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -115,18 +118,16 @@ public class AcquistaProdottiFornitoriCLI {
             LOGGER.info("");
             LOGGER.info("Menu titolare");
             LOGGER.info("1. Visualizza inventario Euronics");
-            LOGGER.info("2. Gestisci prodotti");
-            LOGGER.info("3. Acquista da fornitori");
-            LOGGER.info("4. Gestisci fornitori");
-            LOGGER.info("5. Statistiche vendite/acquisti");
+            LOGGER.info("2. Acquista da fornitori");
+            LOGGER.info("3. Gestisci fornitori");
+            LOGGER.info("4. Statistiche vendite/acquisti");
             LOGGER.info("0. Logout");
-            int scelta = leggiIntero("Scegli: ", 0, 5);
+            int scelta = leggiIntero("Scegli: ", 0, 4);
             switch (scelta) {
                 case 1 -> visualizzaInventario();
-                case 2 -> menuGestisciProdotti();
-                case 3 -> acquistaDaFornitore();
-                case 4 -> menuGestisciFornitori();
-                case 5 -> visualizzaStatistiche();
+                case 2 -> acquistaDaFornitore();
+                case 3 -> menuGestisciFornitori();
+                case 4 -> visualizzaStatistiche();
                 default -> continua = false;
             }
         }
@@ -139,14 +140,12 @@ public class AcquistaProdottiFornitoriCLI {
             LOGGER.info("");
             LOGGER.info("Menu commesso");
             LOGGER.info("1. Visualizza inventario Euronics");
-            LOGGER.info("2. Gestisci prodotti");
-            LOGGER.info("3. Statistiche vendite/acquisti");
+            LOGGER.info("2. Statistiche vendite/acquisti");
             LOGGER.info("0. Logout");
-            int scelta = leggiIntero("Scegli: ", 0, 3);
+            int scelta = leggiIntero("Scegli: ", 0, 2);
             switch (scelta) {
                 case 1 -> visualizzaInventario();
-                case 2 -> menuGestisciProdotti();
-                case 3 -> visualizzaStatistiche();
+                case 2 -> visualizzaStatistiche();
                 default -> continua = false;
             }
         }
@@ -179,45 +178,47 @@ public class AcquistaProdottiFornitoriCLI {
         }
         disponibilita.forEach(item -> LOGGER.info("{} | qta {} | {}",
                 item.getProdotto().getNome(), item.getQuantitaDisponibile(), item.getMessaggio()));
+        if (conferma("Gestire un prodotto dell'inventario? (s/n): ")) {
+            menuGestisciProdotto(leggiTesto("Id prodotto: "));
+        }
     }
 
-    private void menuGestisciProdotti() {
+    private void menuGestisciProdotto(String idProdotto) {
         boolean continua = true;
         while (continua) {
             LOGGER.info("");
-            LOGGER.info("Gestisci prodotti");
-            LOGGER.info("1. Lista prodotti");
-            LOGGER.info("2. Aggiungi prodotto");
-            LOGGER.info("3. Modifica prodotto");
-            LOGGER.info("4. Rimuovi prodotto");
-            LOGGER.info("5. Registra vendita manuale");
-            LOGGER.info("6. Registra acquisto esterno");
+            LOGGER.info("Prodotto {}", idProdotto);
+            LOGGER.info("1. Modifica quantita prodotto");
+            LOGGER.info("2. Rimuovi prodotto");
+            LOGGER.info("3. Registra vendita manuale");
+            LOGGER.info("4. Registra acquisto esterno");
             LOGGER.info(BACK_OPTION);
-            int scelta = leggiIntero("Scegli: ", 0, 6);
+            int scelta = leggiIntero("Scegli: ", 0, 4);
             switch (scelta) {
-                case 1 -> stampaProdotti(prodottiBoundary.visualizzaProdotti());
-                case 2 -> stampaEsito(prodottiBoundary.aggiungiProdotto(leggiProdotto()));
-                case 3 -> stampaEsito(prodottiBoundary.modificaProdotto(leggiProdotto()));
-                case 4 -> rimuoviProdotto();
-                case 5 -> registraMovimentoManuale(true);
-                case 6 -> registraMovimentoManuale(false);
+                case 1 -> modificaQuantitaProdotto(idProdotto);
+                case 2 -> rimuoviProdotto(idProdotto);
+                case 3 -> registraMovimentoManuale(idProdotto, true);
+                case 4 -> registraMovimentoManuale(idProdotto, false);
                 default -> continua = false;
             }
         }
     }
 
-    private void rimuoviProdotto() {
-        String id = leggiTesto("Id prodotto da rimuovere: ");
-        stampaEsito(prodottiBoundary.rimuoviProdotto(new ProdottoBean(id, "placeholder", "placeholder", 0, 0,
+    private void modificaQuantitaProdotto(String idProdotto) {
+        int quantita = leggiIntero("Nuova quantita: ", 0, Integer.MAX_VALUE);
+        stampaEsito(prodottiBoundary.modificaQuantitaProdotto(idProdotto, quantita));
+    }
+
+    private void rimuoviProdotto(String idProdotto) {
+        stampaEsito(prodottiBoundary.rimuoviProdotto(new ProdottoBean(idProdotto, "placeholder", "placeholder", 0, 0,
                 BigDecimal.ZERO)));
     }
 
-    private void registraMovimentoManuale(boolean vendita) {
-        String id = leggiTesto("Id prodotto: ");
+    private void registraMovimentoManuale(String idProdotto, boolean vendita) {
         int quantita = leggiIntero("Quantita: ", 1, Integer.MAX_VALUE);
         EsitoOperazioneBean esito = vendita
-                ? prodottiBoundary.registraVenditaManuale(id, quantita)
-                : prodottiBoundary.registraAcquistoEsterno(id, quantita);
+                ? prodottiBoundary.registraVenditaManuale(idProdotto, quantita)
+                : prodottiBoundary.registraAcquistoEsterno(idProdotto, quantita);
         stampaEsito(esito);
     }
 
@@ -316,7 +317,25 @@ public class AcquistaProdottiFornitoriCLI {
     }
 
     private void salvaProdottoFornitore() {
-        stampaEsito(inventarioFornitoreBoundary.salvaProdotto(leggiProdottoFornitore()));
+        ProdottoBean prodotto = leggiProdottoFornitore();
+        EsitoOperazioneBean esito = inventarioFornitoreBoundary.salvaProdotto(prodotto);
+        stampaEsito(esito);
+        if (esito.isSuccesso()) {
+            salvaFotoProdottoFornitore(prodotto);
+        }
+    }
+
+    private void salvaFotoProdottoFornitore(ProdottoBean prodotto) {
+        String percorsoFoto = leggiTesto("Percorso foto prodotto (invio per saltare): ");
+        if (percorsoFoto.isBlank()) {
+            return;
+        }
+        try {
+            ProductImageAssetStore.saveProductImage(Path.of(percorsoFoto), prodotto);
+            LOGGER.info("Foto prodotto salvata");
+        } catch (IOException e) {
+            LOGGER.info("Foto non salvata: {}", e.getMessage());
+        }
     }
 
     private FornitoreBean scegliFornitore() {
@@ -350,16 +369,6 @@ public class AcquistaProdottiFornitoriCLI {
         }
 
         return selezionati;
-    }
-
-    private ProdottoBean leggiProdotto() {
-        String id = leggiTesto("Id: ");
-        String nome = leggiTesto("Nome: ");
-        String categoria = leggiTesto("Categoria: ");
-        int quantita = leggiIntero("Quantita: ", 0, Integer.MAX_VALUE);
-        int soglia = leggiIntero("Soglia minima: ", 0, Integer.MAX_VALUE);
-        BigDecimal prezzo = leggiDecimal("Prezzo unitario: ");
-        return new ProdottoBean(id, nome, categoria, quantita, soglia, prezzo);
     }
 
     private ProdottoBean leggiProdottoFornitore() {

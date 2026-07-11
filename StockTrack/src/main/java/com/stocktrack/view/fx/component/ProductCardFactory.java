@@ -2,8 +2,12 @@ package com.stocktrack.view.fx.component;
 
 import com.stocktrack.bean.DisponibilitaProdottoBean;
 import com.stocktrack.bean.ProdottoBean;
+import com.stocktrack.view.support.ProductImageAssetStore;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.SnapshotParameters;
+import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -20,7 +24,6 @@ import javafx.scene.text.Text;
 
 import java.math.BigDecimal;
 import java.net.URL;
-import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -46,6 +49,11 @@ public final class ProductCardFactory {
     }
 
     public static VBox createAvailabilityCard(DisponibilitaProdottoBean disponibilita) {
+        return createAvailabilityCard(disponibilita, null);
+    }
+
+    public static VBox createAvailabilityCard(DisponibilitaProdottoBean disponibilita,
+                                              EventHandler<ActionEvent> editHandler) {
         ProdottoBean prodotto = disponibilita.getProdotto();
         VBox card = createProductCard(prodotto, false, false);
 
@@ -57,6 +65,12 @@ public final class ProductCardFactory {
         statusLabel.setWrapText(true);
 
         card.getChildren().addAll(quantityLabel, statusLabel);
+        if (editHandler != null) {
+            Button editButton = new Button("Modifica");
+            editButton.setMaxWidth(Double.MAX_VALUE);
+            editButton.setOnAction(editHandler);
+            card.getChildren().add(editButton);
+        }
         return card;
     }
 
@@ -131,36 +145,13 @@ public final class ProductCardFactory {
     }
 
     private static List<String> imageCandidates(ProdottoBean prodotto) {
-        String id = safeText(prodotto.getId(), "");
-        String name = safeText(prodotto.getNome(), "");
-        List<String> stems = new ArrayList<>();
-        addStem(stems, slug(name));
-        addStem(stems, slug(id));
-
-        String lowerName = name.toLowerCase(Locale.ROOT);
-        if (lowerName.contains("galaxy") || id.toUpperCase(Locale.ROOT).contains("SAM")) {
-            addStem(stems, "samsung_" + slug(name));
-        }
-        if (lowerName.contains("iphone") || lowerName.contains("airpods") || id.toUpperCase(Locale.ROOT).contains("APL")) {
-            addStem(stems, "apple_" + slug(name));
-        }
-        if (lowerName.contains("huawei") || id.toUpperCase(Locale.ROOT).contains("HUA")) {
-            addStem(stems, "huawei_" + slug(name.replaceFirst("(?i)^huawei\\s+", "")));
-        }
-
         List<String> candidates = new ArrayList<>();
-        for (String stem : stems) {
+        for (String stem : ProductImageAssetStore.imageStemsFor(prodotto)) {
             candidates.add("/Images/" + stem + ".png");
             candidates.add("/Images/" + stem + ".jpg");
             candidates.add("/Images/" + stem + ".jpeg");
         }
         return candidates;
-    }
-
-    private static void addStem(List<String> stems, String stem) {
-        if (!stem.isBlank() && !stems.contains(stem)) {
-            stems.add(stem);
-        }
     }
 
     private static Image createPlaceholderImage(ProdottoBean prodotto) {
@@ -200,14 +191,6 @@ public final class ProductCardFactory {
             return parts[0].substring(0, Math.min(2, parts[0].length())).toUpperCase(Locale.ROOT);
         }
         return (parts[0].substring(0, 1) + parts[1].substring(0, 1)).toUpperCase(Locale.ROOT);
-    }
-
-    private static String slug(String value) {
-        String normalized = Normalizer.normalize(value, Normalizer.Form.NFD)
-                .replaceAll("\\p{M}", "");
-        return normalized.toLowerCase(Locale.ROOT)
-                .replaceAll("[^a-z0-9]+", "_")
-                .replaceAll("^_+|_+$", "");
     }
 
     private static String safeText(String value, String fallback) {

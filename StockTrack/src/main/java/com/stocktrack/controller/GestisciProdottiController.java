@@ -2,6 +2,7 @@ package com.stocktrack.controller;
 
 import com.stocktrack.bean.EsitoOperazioneBean;
 import com.stocktrack.bean.ProdottoBean;
+import com.stocktrack.bean.RuoloUtente;
 import com.stocktrack.entity.Inventario;
 import com.stocktrack.entity.MovimentoInventario;
 import com.stocktrack.entity.Prodotto;
@@ -10,6 +11,7 @@ import com.stocktrack.exceptions.InvalidInputException;
 import com.stocktrack.exceptions.PersistenceException;
 import com.stocktrack.pattern.factory.DAOFactory;
 import com.stocktrack.pattern.factory.DAOFactoryProvider;
+import com.stocktrack.pattern.singleton.SessionManagerSingleton;
 import com.stocktrack.persistence.dao.ProdottoDAO;
 
 import java.math.BigDecimal;
@@ -27,32 +29,27 @@ public class GestisciProdottiController {
                 .toList();
     }
 
-    public EsitoOperazioneBean aggiungiProdotto(ProdottoBean prodottoBean)
+    public EsitoOperazioneBean modificaQuantitaProdotto(String idProdotto, int quantita)
             throws InvalidInputException, PersistenceException {
-        prodottoBean.validate();
-        ProdottoDAO prodottoDAO = getProdottoDAO();
-        if (prodottoDAO.findById(prodottoBean.getId()).isPresent()) {
-            return new EsitoOperazioneBean(false, "Prodotto gia presente");
+        verificaPermessiGestioneProdotti();
+        if (idProdotto == null || idProdotto.isBlank()) {
+            throw new InvalidInputException("Selezionare un prodotto");
         }
-        prodottoDAO.save(toProdotto(prodottoBean));
-        sincronizzaInventario();
-        return new EsitoOperazioneBean(true, "Prodotto aggiunto");
-    }
-
-    public EsitoOperazioneBean modificaProdotto(ProdottoBean prodottoBean)
-            throws InvalidInputException, PersistenceException {
-        prodottoBean.validate();
-        ProdottoDAO prodottoDAO = getProdottoDAO();
-        if (prodottoDAO.findById(prodottoBean.getId()).isEmpty()) {
-            return new EsitoOperazioneBean(false, PRODOTTO_NON_TROVATO);
+        if (quantita < 0) {
+            throw new InvalidInputException("Quantita prodotto non valida");
         }
-        prodottoDAO.update(toProdotto(prodottoBean));
+        ProdottoDAO prodottoDAO = getProdottoDAO();
+        Prodotto prodotto = prodottoDAO.findById(idProdotto)
+                .orElseThrow(() -> new InvalidInputException(PRODOTTO_NON_TROVATO));
+        prodotto.setQuantita(quantita);
+        prodottoDAO.update(prodotto);
         sincronizzaInventario();
-        return new EsitoOperazioneBean(true, "Prodotto modificato");
+        return new EsitoOperazioneBean(true, "Quantita prodotto modificata");
     }
 
     public EsitoOperazioneBean rimuoviProdotto(ProdottoBean prodottoBean)
             throws InvalidInputException, PersistenceException {
+        verificaPermessiGestioneProdotti();
         if (prodottoBean == null || prodottoBean.getId() == null || prodottoBean.getId().isBlank()) {
             throw new InvalidInputException("Id prodotto obbligatorio");
         }
@@ -86,14 +83,10 @@ public class GestisciProdottiController {
                 prodotto.getQuantita(), prodotto.getSogliaMinima(), prodotto.getPrezzoUnitario());
     }
 
-    protected Prodotto toProdotto(ProdottoBean prodottoBean) {
-        return new Prodotto(prodottoBean.getId(), prodottoBean.getNome(), prodottoBean.getCategoria(),
-                prodottoBean.getQuantita(), prodottoBean.getSogliaMinima(), prodottoBean.getPrezzoUnitario());
-    }
-
     private EsitoOperazioneBean aggiornaQuantitaManuale(String idProdotto, int quantita,
                                                         TipoMovimentoInventario tipo, String messaggio)
             throws InvalidInputException, PersistenceException {
+        verificaPermessiGestioneProdotti();
         if (idProdotto == null || idProdotto.isBlank()) {
             throw new InvalidInputException("Selezionare un prodotto");
         }
@@ -111,9 +104,20 @@ public class GestisciProdottiController {
         }
         prodotto.setQuantita(nuovaQuantita);
         prodottoDAO.update(prodotto);
-        registraMovimento(prodotto, tipo, quantita, "Gestisci prodotti");
+        registraMovimento(prodotto, tipo, quantita, "Inventario");
         sincronizzaInventario();
         return new EsitoOperazioneBean(true, messaggio);
+    }
+
+    private void verificaPermessiGestioneProdotti() throws InvalidInputException {
+        boolean autorizzato = SessionManagerSingleton.getInstance()
+                .getCurrentSession()
+                .map(session -> RuoloUtente.TITOLARE.equals(session.getRuolo())
+                        || RuoloUtente.COMMESSO.equals(session.getRuolo()))
+                .orElse(false);
+        if (!autorizzato) {
+            throw new InvalidInputException("Solo titolare o commesso possono gestire i prodotti");
+        }
     }
 
     protected void registraMovimento(Prodotto prodotto, TipoMovimentoInventario tipo, int quantita, String origine)

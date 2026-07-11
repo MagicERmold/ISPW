@@ -16,10 +16,6 @@ import java.util.List;
 
 public class GestisciProdottiBoundary {
 
-    private final GestisciProdottiController gestisciProdottiController = new GestisciProdottiController();
-    private final AnalizzaStatisticheVenditaController statisticheVenditaController =
-            new AnalizzaStatisticheVenditaController();
-
     public ProfiloUtenteBean login(LoginBean loginBean) {
         try {
             return new LoginController().login(loginBean);
@@ -30,23 +26,15 @@ public class GestisciProdottiBoundary {
 
     public List<ProdottoBean> visualizzaProdotti() {
         try {
-            return gestisciProdottiController.visualizzaProdotti();
+            return new GestisciProdottiController().visualizzaProdotti();
         } catch (PersistenceException e) {
             return List.of();
         }
     }
 
-    public EsitoOperazioneBean aggiungiProdotto(ProdottoBean prodottoBean) {
+    public EsitoOperazioneBean modificaQuantitaProdotto(String idProdotto, int quantita) {
         try {
-            return gestisciProdottiController.aggiungiProdotto(prodottoBean);
-        } catch (InvalidInputException | PersistenceException e) {
-            return new EsitoOperazioneBean(false, e.getMessage());
-        }
-    }
-
-    public EsitoOperazioneBean modificaProdotto(ProdottoBean prodottoBean) {
-        try {
-            return gestisciProdottiController.modificaProdotto(prodottoBean);
+            return new GestisciProdottiController().modificaQuantitaProdotto(idProdotto, quantita);
         } catch (InvalidInputException | PersistenceException e) {
             return new EsitoOperazioneBean(false, e.getMessage());
         }
@@ -54,7 +42,7 @@ public class GestisciProdottiBoundary {
 
     public EsitoOperazioneBean rimuoviProdotto(ProdottoBean prodottoBean) {
         try {
-            return gestisciProdottiController.rimuoviProdotto(prodottoBean);
+            return new GestisciProdottiController().rimuoviProdotto(prodottoBean);
         } catch (InvalidInputException | PersistenceException e) {
             return new EsitoOperazioneBean(false, e.getMessage());
         }
@@ -62,7 +50,7 @@ public class GestisciProdottiBoundary {
 
     public EsitoOperazioneBean registraVenditaManuale(String idProdotto, int quantita) {
         try {
-            return gestisciProdottiController.registraVenditaManuale(idProdotto, quantita);
+            return new GestisciProdottiController().registraVenditaManuale(idProdotto, quantita);
         } catch (InvalidInputException | PersistenceException e) {
             return new EsitoOperazioneBean(false, e.getMessage());
         }
@@ -70,7 +58,7 @@ public class GestisciProdottiBoundary {
 
     public EsitoOperazioneBean registraAcquistoEsterno(String idProdotto, int quantita) {
         try {
-            return gestisciProdottiController.registraAcquistoEsterno(idProdotto, quantita);
+            return new GestisciProdottiController().registraAcquistoEsterno(idProdotto, quantita);
         } catch (InvalidInputException | PersistenceException e) {
             return new EsitoOperazioneBean(false, e.getMessage());
         }
@@ -78,7 +66,7 @@ public class GestisciProdottiBoundary {
 
     public List<StatisticaVenditaMensileBean> analizzaStatisticheVenditaMensili() {
         try {
-            return statisticheVenditaController.analizzaStatisticheMensili();
+            return new AnalizzaStatisticheVenditaController().analizzaStatisticheMensili();
         } catch (PersistenceException e) {
             return List.of();
         }

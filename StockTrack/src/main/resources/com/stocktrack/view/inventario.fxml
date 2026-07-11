@@ -21,7 +21,6 @@
             <Label fx:id="summaryLabel" styleClass="subtitle" text="Prodotti: 0"/>
             <HBox spacing="10">
                 <Button onAction="#onRefreshInventory" text="Aggiorna"/>
-                <Button fx:id="manageProductsButton" onAction="#onManageProducts" text="Gestisci prodotti"/>
                 <Button fx:id="suppliersButton" onAction="#onManageSuppliers" text="Fornitori"/>
                 <Button fx:id="buyFromSuppliersButton" onAction="#onBuyFromSuppliers" text="Acquista da fornitori"/>
                 <Button onAction="#onLogout" text="Logout"/>

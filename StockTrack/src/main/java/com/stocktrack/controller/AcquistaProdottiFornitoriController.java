@@ -37,6 +37,8 @@ import java.util.UUID;
 
 public class AcquistaProdottiFornitoriController {
 
+    private static final Object INVENTORY_UPDATE_LOCK = new Object();
+
     public List<FornitoreBean> recuperaFornitori() throws PersistenceException {
         return DAOFactoryProvider.getFactory().getFornitoreDAO().findAll().stream()
                 .map(this::toFornitoreBean)
@@ -45,7 +47,6 @@ public class AcquistaProdottiFornitoriController {
 
     public List<ProdottoBean> recuperaProdotti(FornitoreBean fornitoreBean)
             throws FornitoreConnectionException, InvalidInputException {
-        fornitoreBean.validate();
         FornitoreGateway fornitoreGateway = new FornitoreApiAdapter();
         return fornitoreGateway.recuperaProdotti(fornitoreBean);
     }
@@ -62,7 +63,6 @@ public class AcquistaProdottiFornitoriController {
         BigDecimal totale = BigDecimal.ZERO;
         List<ProdottoBean> prodottiValidi = new ArrayList<>();
         for (ProdottoBean prodottoBean : prodottiSelezionati) {
-            prodottoBean.validate();
             if (prodottoBean.getQuantita() <= 0) {
                 throw new ProdottoNonDisponibileException("Prodotto non disponibile: " + prodottoBean.getNome());
             }
@@ -94,7 +94,6 @@ public class AcquistaProdottiFornitoriController {
         }
         FornitoreGateway fornitoreGateway = new FornitoreApiAdapter();
         try {
-            ordineBean.validate();
             fornitoreGateway.notificaOrdine(ordineBean);
             DAOFactory daoFactory = DAOFactoryProvider.getFactory();
             aggiornaInventario(daoFactory, ordineBean);
@@ -103,7 +102,7 @@ public class AcquistaProdottiFornitoriController {
             ordine.marcaPagato();
             daoFactory.getOrdineDAO().save(ordine);
             return new EsitoOrdineBean(true, ordine.getId(), "Ordine confermato, inventario aggiornato");
-        } catch (FornitoreConnectionException | InvalidInputException | PersistenceException e) {
+        } catch (FornitoreConnectionException | PersistenceException e) {
             return new EsitoOrdineBean(false, ordineBean.getIdOrdine(), e.getMessage());
         }
     }
@@ -128,15 +127,17 @@ public class AcquistaProdottiFornitoriController {
     }
 
     private void aggiornaInventario(DAOFactory daoFactory, OrdineBean ordineBean) throws PersistenceException {
-        Inventario inventario = daoFactory.getInventarioDAO().findInventario();
-        for (ProdottoBean prodottoBean : ordineBean.getProdotti()) {
-            cercaProdottoDaAggiornare(inventario, prodottoBean)
-                    .ifPresentOrElse(
-                            prodotto -> prodotto.aumentaQuantita(prodottoBean.getQuantita()),
-                            () -> inventario.aggiungiProdotto(toProdotto(prodottoBean))
-                    );
+        synchronized (INVENTORY_UPDATE_LOCK) {
+            Inventario inventario = daoFactory.getInventarioDAO().findInventario();
+            for (ProdottoBean prodottoBean : ordineBean.getProdotti()) {
+                cercaProdottoDaAggiornare(inventario, prodottoBean)
+                        .ifPresentOrElse(
+                                prodotto -> prodotto.aumentaQuantita(prodottoBean.getQuantita()),
+                                () -> inventario.aggiungiProdotto(toProdotto(prodottoBean))
+                        );
+            }
+            daoFactory.getInventarioDAO().update(inventario);
         }
-        daoFactory.getInventarioDAO().update(inventario);
     }
 
     private Optional<Prodotto> cercaProdottoDaAggiornare(Inventario inventario, ProdottoBean prodottoBean) {

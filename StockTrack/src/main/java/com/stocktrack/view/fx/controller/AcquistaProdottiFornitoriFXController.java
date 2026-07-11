@@ -2,6 +2,7 @@ package com.stocktrack.view.fx.controller;
 
 import com.stocktrack.JavaFXApp;
 import com.stocktrack.bean.CarrelloBean;
+import com.stocktrack.bean.EsitoListaBean;
 import com.stocktrack.bean.EsitoOrdineBean;
 import com.stocktrack.bean.EsitoPagamentoBean;
 import com.stocktrack.bean.FornitoreBean;
@@ -85,7 +86,7 @@ public class AcquistaProdottiFornitoriFXController {
         paymentGroup.selectedToggleProperty().addListener((observable, oldValue, newValue) -> updatePaymentFields());
         updatePaymentFields();
         configureCells();
-        supplierComboBox.setItems(FXCollections.observableArrayList(boundary.recuperaFornitori()));
+        loadSuppliers();
         configureRoleAccess();
     }
 
@@ -97,9 +98,10 @@ public class AcquistaProdottiFornitoriFXController {
             return;
         }
 
-        List<ProdottoBean> prodotti = boundary.recuperaProdotti(fornitoreBean);
+        EsitoListaBean<ProdottoBean> esito = boundary.recuperaProdottiConEsito(fornitoreBean);
+        List<ProdottoBean> prodotti = esito.getElementi();
         supplierProductsListView.setItems(FXCollections.observableArrayList(prodotti));
-        setMessage(prodotti.isEmpty() ? "Nessun prodotto disponibile" : "Prodotti caricati");
+        setMessage(esito.getMessaggio());
     }
 
     @FXML
@@ -120,9 +122,13 @@ public class AcquistaProdottiFornitoriFXController {
                 prodottoBean.getCategoria(), quantita, prodottoBean.getSogliaMinima(),
                 prodottoBean.getPrezzoUnitario()));
         currentCart = boundary.configuraCarrello(selectedProducts);
+        if (!currentCart.isSuccesso()) {
+            setMessage(currentCart.getMessaggio());
+            return;
+        }
         cartListView.setItems(FXCollections.observableArrayList(currentCart.getProdotti()));
         totalLabel.setText("Totale: " + currentCart.getTotaleStimato() + " EUR");
-        setMessage("Prodotto aggiunto al carrello");
+        setMessage(currentCart.getMessaggio());
     }
 
     @FXML
@@ -191,6 +197,12 @@ public class AcquistaProdottiFornitoriFXController {
 
         supplierProductsListView.setCellFactory(listView -> productCell());
         cartListView.setCellFactory(listView -> productCell());
+    }
+
+    private void loadSuppliers() {
+        EsitoListaBean<FornitoreBean> esito = boundary.recuperaFornitoriConEsito();
+        supplierComboBox.setItems(FXCollections.observableArrayList(esito.getElementi()));
+        setMessage(esito.getMessaggio());
     }
 
     private ListCell<ProdottoBean> productCell() {

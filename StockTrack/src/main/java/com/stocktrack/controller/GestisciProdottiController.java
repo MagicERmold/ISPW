@@ -1,7 +1,9 @@
 package com.stocktrack.controller;
 
 import com.stocktrack.bean.EsitoOperazioneBean;
+import com.stocktrack.bean.ProdottoSelezionatoBean;
 import com.stocktrack.bean.ProdottoBean;
+import com.stocktrack.bean.QuantitaProdottoBean;
 import com.stocktrack.bean.RuoloUtente;
 import com.stocktrack.entity.Inventario;
 import com.stocktrack.entity.MovimentoInventario;
@@ -22,6 +24,7 @@ import java.util.UUID;
 public class GestisciProdottiController {
 
     private static final String PRODOTTO_NON_TROVATO = "Prodotto non trovato";
+    private static final Object PRODUCT_MANAGEMENT_LOCK = new Object();
 
     public List<ProdottoBean> visualizzaProdotti() throws PersistenceException {
         return getProdottoDAO().findAll().stream()
@@ -29,48 +32,46 @@ public class GestisciProdottiController {
                 .toList();
     }
 
-    public EsitoOperazioneBean modificaQuantitaProdotto(String idProdotto, int quantita)
+    public EsitoOperazioneBean modificaQuantitaProdotto(QuantitaProdottoBean quantitaProdottoBean)
             throws InvalidInputException, PersistenceException {
         verificaPermessiGestioneProdotti();
-        if (idProdotto == null || idProdotto.isBlank()) {
-            throw new InvalidInputException("Selezionare un prodotto");
+        synchronized (PRODUCT_MANAGEMENT_LOCK) {
+            String idProdotto = quantitaProdottoBean.getIdProdotto();
+            int quantita = quantitaProdottoBean.getQuantita();
+            ProdottoDAO prodottoDAO = getProdottoDAO();
+            Prodotto prodotto = prodottoDAO.findById(idProdotto)
+                    .orElseThrow(() -> new InvalidInputException(PRODOTTO_NON_TROVATO));
+            prodotto.setQuantita(quantita);
+            prodottoDAO.update(prodotto);
+            sincronizzaInventario();
         }
-        if (quantita < 0) {
-            throw new InvalidInputException("Quantita prodotto non valida");
-        }
-        ProdottoDAO prodottoDAO = getProdottoDAO();
-        Prodotto prodotto = prodottoDAO.findById(idProdotto)
-                .orElseThrow(() -> new InvalidInputException(PRODOTTO_NON_TROVATO));
-        prodotto.setQuantita(quantita);
-        prodottoDAO.update(prodotto);
-        sincronizzaInventario();
         return new EsitoOperazioneBean(true, "Quantita prodotto modificata");
     }
 
-    public EsitoOperazioneBean rimuoviProdotto(ProdottoBean prodottoBean)
+    public EsitoOperazioneBean rimuoviProdotto(ProdottoSelezionatoBean prodottoSelezionatoBean)
             throws InvalidInputException, PersistenceException {
         verificaPermessiGestioneProdotti();
-        if (prodottoBean == null || prodottoBean.getId() == null || prodottoBean.getId().isBlank()) {
-            throw new InvalidInputException("Id prodotto obbligatorio");
+        synchronized (PRODUCT_MANAGEMENT_LOCK) {
+            String idProdotto = prodottoSelezionatoBean.getIdProdotto();
+            ProdottoDAO prodottoDAO = getProdottoDAO();
+            if (prodottoDAO.findById(idProdotto).isEmpty()) {
+                return new EsitoOperazioneBean(false, PRODOTTO_NON_TROVATO);
+            }
+            prodottoDAO.deleteById(idProdotto);
+            sincronizzaInventario();
         }
-        ProdottoDAO prodottoDAO = getProdottoDAO();
-        if (prodottoDAO.findById(prodottoBean.getId()).isEmpty()) {
-            return new EsitoOperazioneBean(false, PRODOTTO_NON_TROVATO);
-        }
-        prodottoDAO.deleteById(prodottoBean.getId());
-        sincronizzaInventario();
         return new EsitoOperazioneBean(true, "Prodotto rimosso");
     }
 
-    public EsitoOperazioneBean registraVenditaManuale(String idProdotto, int quantita)
+    public EsitoOperazioneBean registraVenditaManuale(QuantitaProdottoBean movimentoProdottoBean)
             throws InvalidInputException, PersistenceException {
-        return aggiornaQuantitaManuale(idProdotto, quantita, TipoMovimentoInventario.VENDITA,
+        return aggiornaQuantitaManuale(movimentoProdottoBean, TipoMovimentoInventario.VENDITA,
                 "Vendita manuale registrata");
     }
 
-    public EsitoOperazioneBean registraAcquistoEsterno(String idProdotto, int quantita)
+    public EsitoOperazioneBean registraAcquistoEsterno(QuantitaProdottoBean movimentoProdottoBean)
             throws InvalidInputException, PersistenceException {
-        return aggiornaQuantitaManuale(idProdotto, quantita, TipoMovimentoInventario.ACQUISTO_ESTERNO,
+        return aggiornaQuantitaManuale(movimentoProdottoBean, TipoMovimentoInventario.ACQUISTO_ESTERNO,
                 "Acquisto esterno registrato");
     }
 
@@ -83,29 +84,27 @@ public class GestisciProdottiController {
                 prodotto.getQuantita(), prodotto.getSogliaMinima(), prodotto.getPrezzoUnitario());
     }
 
-    private EsitoOperazioneBean aggiornaQuantitaManuale(String idProdotto, int quantita,
+    private EsitoOperazioneBean aggiornaQuantitaManuale(QuantitaProdottoBean movimentoProdottoBean,
                                                         TipoMovimentoInventario tipo, String messaggio)
             throws InvalidInputException, PersistenceException {
         verificaPermessiGestioneProdotti();
-        if (idProdotto == null || idProdotto.isBlank()) {
-            throw new InvalidInputException("Selezionare un prodotto");
-        }
-        if (quantita <= 0) {
-            throw new InvalidInputException("Quantita movimento non valida");
-        }
+        synchronized (PRODUCT_MANAGEMENT_LOCK) {
+            String idProdotto = movimentoProdottoBean.getIdProdotto();
+            int quantita = movimentoProdottoBean.getQuantita();
 
-        ProdottoDAO prodottoDAO = getProdottoDAO();
-        Prodotto prodotto = prodottoDAO.findById(idProdotto)
-                .orElseThrow(() -> new InvalidInputException(PRODOTTO_NON_TROVATO));
-        int delta = TipoMovimentoInventario.VENDITA.equals(tipo) ? -quantita : quantita;
-        int nuovaQuantita = prodotto.getQuantita() + delta;
-        if (nuovaQuantita < 0) {
-            throw new InvalidInputException("Quantita insufficiente in inventario");
+            ProdottoDAO prodottoDAO = getProdottoDAO();
+            Prodotto prodotto = prodottoDAO.findById(idProdotto)
+                    .orElseThrow(() -> new InvalidInputException(PRODOTTO_NON_TROVATO));
+            int delta = TipoMovimentoInventario.VENDITA.equals(tipo) ? -quantita : quantita;
+            int nuovaQuantita = prodotto.getQuantita() + delta;
+            if (nuovaQuantita < 0) {
+                throw new InvalidInputException("Quantita insufficiente in inventario");
+            }
+            prodotto.setQuantita(nuovaQuantita);
+            prodottoDAO.update(prodotto);
+            registraMovimento(prodotto, tipo, quantita, "Inventario");
+            sincronizzaInventario();
         }
-        prodotto.setQuantita(nuovaQuantita);
-        prodottoDAO.update(prodotto);
-        registraMovimento(prodotto, tipo, quantita, "Inventario");
-        sincronizzaInventario();
         return new EsitoOperazioneBean(true, messaggio);
     }
 

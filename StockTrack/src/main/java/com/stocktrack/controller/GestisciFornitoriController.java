@@ -1,5 +1,6 @@
 package com.stocktrack.controller;
 
+import com.stocktrack.bean.CodiceFornitoreBean;
 import com.stocktrack.bean.EsitoOperazioneBean;
 import com.stocktrack.bean.FornitoreBean;
 import com.stocktrack.bean.ProdottoBean;
@@ -16,8 +17,6 @@ import java.util.List;
 
 public class GestisciFornitoriController {
 
-    private final FornitoreApiAdapter fornitoreApiAdapter = new FornitoreApiAdapter();
-
     public List<FornitoreBean> visualizzaFornitori() throws PersistenceException {
         return DAOFactoryProvider.getFactory().getFornitoreDAO().findAll().stream()
                 .map(this::toFornitoreBean)
@@ -26,20 +25,19 @@ public class GestisciFornitoriController {
 
     public List<ProdottoBean> visualizzaInventarioFornitore(FornitoreBean fornitoreBean)
             throws InvalidInputException, FornitoreConnectionException {
-        fornitoreBean.validate();
+        FornitoreApiAdapter fornitoreApiAdapter = new FornitoreApiAdapter();
         return fornitoreApiAdapter.recuperaProdotti(fornitoreBean);
     }
 
-    public EsitoOperazioneBean aggiungiFornitoreConCodice(String codiceFornitore)
+    public EsitoOperazioneBean aggiungiFornitoreConCodice(CodiceFornitoreBean codiceFornitoreBean)
             throws InvalidInputException, PersistenceException {
         if (!isTitolare()) {
             return new EsitoOperazioneBean(false, "Solo il titolare puo aggiungere fornitori");
         }
-        if (codiceFornitore == null || codiceFornitore.isBlank()) {
-            throw new InvalidInputException("Codice fornitore obbligatorio");
-        }
 
-        FornitoreBean fornitoreBean = fornitoreApiAdapter.recuperaFornitoreDaCodice(codiceFornitore)
+        FornitoreApiAdapter fornitoreApiAdapter = new FornitoreApiAdapter();
+        FornitoreBean fornitoreBean = fornitoreApiAdapter.recuperaFornitoreDaCodice(
+                        codiceFornitoreBean.getCodiceFornitore())
                 .orElseThrow(() -> new InvalidInputException("Codice fornitore non riconosciuto"));
         if (DAOFactoryProvider.getFactory().getFornitoreDAO().findById(fornitoreBean.getId()).isPresent()) {
             return new EsitoOperazioneBean(false, "Fornitore gia presente");
@@ -52,9 +50,6 @@ public class GestisciFornitoriController {
             throws InvalidInputException, PersistenceException {
         if (!isTitolare()) {
             return new EsitoOperazioneBean(false, "Solo il titolare puo rimuovere fornitori");
-        }
-        if (fornitoreBean == null || fornitoreBean.getId() == null || fornitoreBean.getId().isBlank()) {
-            throw new InvalidInputException("Selezionare un fornitore");
         }
         if (DAOFactoryProvider.getFactory().getFornitoreDAO().findById(fornitoreBean.getId()).isEmpty()) {
             return new EsitoOperazioneBean(false, "Fornitore non trovato");

@@ -5,7 +5,6 @@ import com.stocktrack.bean.InventarioBean;
 import com.stocktrack.bean.ProdottoBean;
 import com.stocktrack.entity.Inventario;
 import com.stocktrack.entity.Prodotto;
-import com.stocktrack.exceptions.InvalidInputException;
 import com.stocktrack.exceptions.PersistenceException;
 import com.stocktrack.pattern.factory.DAOFactoryProvider;
 
@@ -26,8 +25,7 @@ public class AnalizzaDisponibilitaInventarioController {
                 .toList();
     }
 
-    public DisponibilitaProdottoBean verificaDisponibilita(ProdottoBean prodottoBean) throws InvalidInputException {
-        prodottoBean.validate();
+    public DisponibilitaProdottoBean verificaDisponibilita(ProdottoBean prodottoBean) {
         return toDisponibilitaProdottoBean(prodottoBean);
     }
 

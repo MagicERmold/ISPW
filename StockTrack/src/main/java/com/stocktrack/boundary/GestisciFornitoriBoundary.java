@@ -1,5 +1,7 @@
 package com.stocktrack.boundary;
 
+import com.stocktrack.bean.CodiceFornitoreBean;
+import com.stocktrack.bean.EsitoListaBean;
 import com.stocktrack.bean.EsitoOperazioneBean;
 import com.stocktrack.bean.FornitoreBean;
 import com.stocktrack.bean.ProdottoBean;
@@ -12,37 +14,67 @@ import java.util.List;
 
 public class GestisciFornitoriBoundary {
 
-    private final GestisciFornitoriController controller = new GestisciFornitoriController();
-
     public List<FornitoreBean> visualizzaFornitori() {
+        return visualizzaFornitoriConEsito().getElementi();
+    }
+
+    public EsitoListaBean<FornitoreBean> visualizzaFornitoriConEsito() {
+        GestisciFornitoriController controller = new GestisciFornitoriController();
         try {
-            return controller.visualizzaFornitori();
+            List<FornitoreBean> fornitori = controller.visualizzaFornitori();
+            String messaggio = fornitori.isEmpty() ? "Nessun fornitore collegato" : "Fornitori aggiornati";
+            return EsitoListaBean.success(messaggio, fornitori);
         } catch (PersistenceException e) {
-            return List.of();
+            return EsitoListaBean.failure("Errore caricamento fornitori: " + e.getMessage());
         }
     }
 
     public List<ProdottoBean> visualizzaInventarioFornitore(FornitoreBean fornitoreBean) {
+        return visualizzaInventarioFornitoreConEsito(fornitoreBean).getElementi();
+    }
+
+    public EsitoListaBean<ProdottoBean> visualizzaInventarioFornitoreConEsito(FornitoreBean fornitoreBean) {
+        GestisciFornitoriController controller = new GestisciFornitoriController();
         try {
-            return controller.visualizzaInventarioFornitore(fornitoreBean);
+            validateFornitore(fornitoreBean);
+            List<ProdottoBean> prodotti = controller.visualizzaInventarioFornitore(fornitoreBean);
+            String messaggio = prodotti.isEmpty()
+                    ? "Inventario fornitore non disponibile"
+                    : "Inventario fornitore caricato";
+            return EsitoListaBean.success(messaggio, prodotti);
         } catch (InvalidInputException | FornitoreConnectionException e) {
-            return List.of();
+            return EsitoListaBean.failure(e.getMessage());
         }
     }
 
     public EsitoOperazioneBean aggiungiFornitoreConCodice(String codiceFornitore) {
+        return aggiungiFornitoreConCodice(new CodiceFornitoreBean(codiceFornitore));
+    }
+
+    public EsitoOperazioneBean aggiungiFornitoreConCodice(CodiceFornitoreBean codiceFornitoreBean) {
+        GestisciFornitoriController controller = new GestisciFornitoriController();
         try {
-            return controller.aggiungiFornitoreConCodice(codiceFornitore);
+            codiceFornitoreBean.validate();
+            return controller.aggiungiFornitoreConCodice(codiceFornitoreBean);
         } catch (InvalidInputException | PersistenceException e) {
             return new EsitoOperazioneBean(false, e.getMessage());
         }
     }
 
     public EsitoOperazioneBean rimuoviFornitore(FornitoreBean fornitoreBean) {
+        GestisciFornitoriController controller = new GestisciFornitoriController();
         try {
+            validateFornitore(fornitoreBean);
             return controller.rimuoviFornitore(fornitoreBean);
         } catch (InvalidInputException | PersistenceException e) {
             return new EsitoOperazioneBean(false, e.getMessage());
         }
+    }
+
+    private void validateFornitore(FornitoreBean fornitoreBean) throws InvalidInputException {
+        if (fornitoreBean == null) {
+            throw new InvalidInputException("Selezionare un fornitore");
+        }
+        fornitoreBean.validate();
     }
 }

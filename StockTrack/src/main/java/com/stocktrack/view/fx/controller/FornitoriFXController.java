@@ -1,6 +1,7 @@
 package com.stocktrack.view.fx.controller;
 
 import com.stocktrack.JavaFXApp;
+import com.stocktrack.bean.EsitoListaBean;
 import com.stocktrack.bean.EsitoOperazioneBean;
 import com.stocktrack.bean.FornitoreBean;
 import com.stocktrack.bean.ProdottoBean;
@@ -62,7 +63,6 @@ public class FornitoriFXController {
     @FXML
     private void onRefresh() {
         loadSuppliers();
-        setMessage("Fornitori aggiornati");
     }
 
     @FXML
@@ -98,14 +98,15 @@ public class FornitoriFXController {
     }
 
     private void loadSuppliers() {
-        List<FornitoreBean> fornitori = boundary.visualizzaFornitori();
+        EsitoListaBean<FornitoreBean> esito = boundary.visualizzaFornitoriConEsito();
+        List<FornitoreBean> fornitori = esito.getElementi();
         suppliersListView.setItems(FXCollections.observableArrayList(fornitori));
         if (!fornitori.isEmpty()) {
             suppliersListView.getSelectionModel().selectFirst();
         } else {
             supplierProductsListView.getItems().clear();
-            setMessage("Nessun fornitore collegato");
         }
+        setMessage(esito.getMessaggio());
     }
 
     private void loadSupplierProducts(FornitoreBean fornitoreBean) {
@@ -113,9 +114,10 @@ public class FornitoriFXController {
             supplierProductsListView.getItems().clear();
             return;
         }
-        List<ProdottoBean> prodotti = boundary.visualizzaInventarioFornitore(fornitoreBean);
+        EsitoListaBean<ProdottoBean> esito = boundary.visualizzaInventarioFornitoreConEsito(fornitoreBean);
+        List<ProdottoBean> prodotti = esito.getElementi();
         supplierProductsListView.setItems(FXCollections.observableArrayList(prodotti));
-        setMessage(prodotti.isEmpty() ? "Inventario fornitore non disponibile" : "Inventario fornitore caricato");
+        setMessage(esito.getMessaggio());
     }
 
     private void configureCells() {

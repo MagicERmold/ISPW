@@ -2,6 +2,7 @@ package com.stocktrack.view.cli;
 
 import com.stocktrack.bean.CarrelloBean;
 import com.stocktrack.bean.DisponibilitaProdottoBean;
+import com.stocktrack.bean.EsitoListaBean;
 import com.stocktrack.bean.EsitoOperazioneBean;
 import com.stocktrack.bean.EsitoOrdineBean;
 import com.stocktrack.bean.EsitoPagamentoBean;
@@ -9,8 +10,10 @@ import com.stocktrack.bean.FornitoreBean;
 import com.stocktrack.bean.LoginBean;
 import com.stocktrack.bean.OrdineBean;
 import com.stocktrack.bean.PagamentoBean;
+import com.stocktrack.bean.ProdottoSelezionatoBean;
 import com.stocktrack.bean.ProdottoBean;
 import com.stocktrack.bean.ProfiloUtenteBean;
+import com.stocktrack.bean.QuantitaProdottoBean;
 import com.stocktrack.bean.RegistrazioneBean;
 import com.stocktrack.bean.RuoloUtente;
 import com.stocktrack.bean.StatisticaVenditaMensileBean;
@@ -20,8 +23,6 @@ import com.stocktrack.boundary.GestisciFornitoriBoundary;
 import com.stocktrack.boundary.GestisciInventarioFornitoreBoundary;
 import com.stocktrack.boundary.GestisciProdottiBoundary;
 import com.stocktrack.view.support.ProductImageAssetStore;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -33,8 +34,14 @@ import java.util.UUID;
 
 public class AcquistaProdottiFornitoriCLI {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AcquistaProdottiFornitoriCLI.class);
+    private static final ConsoleOutput LOGGER = new ConsoleOutput();
     private static final String BACK_OPTION = "0. Indietro";
+    private static final String LOGOUT_OPTION = "0. Logout";
+    private static final String CHOOSE_PROMPT = "Scegli: ";
+    private static final String INVENTORY_OPTION = "1. Visualizza inventario Euronics";
+    private static final String INVALID_VALUE = "Valore non valido";
+    private static final String CURRENCY_CODE = "EUR";
+    private static final String CURRENCY_EUR = " EUR";
 
     private final AcquistaProdottiFornitoriBoundary acquistoBoundary = new AcquistaProdottiFornitoriBoundary();
     private final AnalizzaDisponibilitaInventarioBoundary inventarioBoundary =
@@ -69,7 +76,7 @@ public class AcquistaProdottiFornitoriCLI {
             LOGGER.info("1. Login");
             LOGGER.info("2. Registrazione");
             LOGGER.info("0. Esci");
-            int scelta = leggiIntero("Scegli: ", 0, 2);
+            int scelta = leggiIntero(CHOOSE_PROMPT, 0, 2);
             if (scelta == 0) {
                 return null;
             }
@@ -117,12 +124,12 @@ public class AcquistaProdottiFornitoriCLI {
         while (continua) {
             LOGGER.info("");
             LOGGER.info("Menu titolare");
-            LOGGER.info("1. Visualizza inventario Euronics");
+            LOGGER.info(INVENTORY_OPTION);
             LOGGER.info("2. Acquista da fornitori");
             LOGGER.info("3. Gestisci fornitori");
             LOGGER.info("4. Statistiche vendite/acquisti");
-            LOGGER.info("0. Logout");
-            int scelta = leggiIntero("Scegli: ", 0, 4);
+            LOGGER.info(LOGOUT_OPTION);
+            int scelta = leggiIntero(CHOOSE_PROMPT, 0, 4);
             switch (scelta) {
                 case 1 -> visualizzaInventario();
                 case 2 -> acquistaDaFornitore();
@@ -139,10 +146,10 @@ public class AcquistaProdottiFornitoriCLI {
         while (continua) {
             LOGGER.info("");
             LOGGER.info("Menu commesso");
-            LOGGER.info("1. Visualizza inventario Euronics");
+            LOGGER.info(INVENTORY_OPTION);
             LOGGER.info("2. Statistiche vendite/acquisti");
-            LOGGER.info("0. Logout");
-            int scelta = leggiIntero("Scegli: ", 0, 2);
+            LOGGER.info(LOGOUT_OPTION);
+            int scelta = leggiIntero(CHOOSE_PROMPT, 0, 2);
             switch (scelta) {
                 case 1 -> visualizzaInventario();
                 case 2 -> visualizzaStatistiche();
@@ -159,8 +166,8 @@ public class AcquistaProdottiFornitoriCLI {
             LOGGER.info("Menu fornitore");
             LOGGER.info("1. Visualizza il mio magazzino");
             LOGGER.info("2. Aggiungi o modifica prodotto");
-            LOGGER.info("0. Logout");
-            int scelta = leggiIntero("Scegli: ", 0, 2);
+            LOGGER.info(LOGOUT_OPTION);
+            int scelta = leggiIntero(CHOOSE_PROMPT, 0, 2);
             switch (scelta) {
                 case 1 -> visualizzaInventarioFornitore();
                 case 2 -> salvaProdottoFornitore();
@@ -171,9 +178,10 @@ public class AcquistaProdottiFornitoriCLI {
     }
 
     private void visualizzaInventario() {
-        List<DisponibilitaProdottoBean> disponibilita = inventarioBoundary.analizzaDisponibilita();
+        EsitoListaBean<DisponibilitaProdottoBean> esito = inventarioBoundary.analizzaDisponibilitaConEsito();
+        List<DisponibilitaProdottoBean> disponibilita = esito.getElementi();
         if (disponibilita.isEmpty()) {
-            LOGGER.info("Inventario vuoto");
+            LOGGER.info(esito.getMessaggio());
             return;
         }
         disponibilita.forEach(item -> LOGGER.info("{} | qta {} | {}",
@@ -193,7 +201,7 @@ public class AcquistaProdottiFornitoriCLI {
             LOGGER.info("3. Registra vendita manuale");
             LOGGER.info("4. Registra acquisto esterno");
             LOGGER.info(BACK_OPTION);
-            int scelta = leggiIntero("Scegli: ", 0, 4);
+            int scelta = leggiIntero(CHOOSE_PROMPT, 0, 4);
             switch (scelta) {
                 case 1 -> modificaQuantitaProdotto(idProdotto);
                 case 2 -> rimuoviProdotto(idProdotto);
@@ -206,43 +214,43 @@ public class AcquistaProdottiFornitoriCLI {
 
     private void modificaQuantitaProdotto(String idProdotto) {
         int quantita = leggiIntero("Nuova quantita: ", 0, Integer.MAX_VALUE);
-        stampaEsito(prodottiBoundary.modificaQuantitaProdotto(idProdotto, quantita));
+        stampaEsito(prodottiBoundary.modificaQuantitaProdotto(new QuantitaProdottoBean(idProdotto, quantita)));
     }
 
     private void rimuoviProdotto(String idProdotto) {
-        stampaEsito(prodottiBoundary.rimuoviProdotto(new ProdottoBean(idProdotto, "placeholder", "placeholder", 0, 0,
-                BigDecimal.ZERO)));
+        stampaEsito(prodottiBoundary.rimuoviProdotto(new ProdottoSelezionatoBean(idProdotto)));
     }
 
     private void registraMovimentoManuale(String idProdotto, boolean vendita) {
         int quantita = leggiIntero("Quantita: ", 1, Integer.MAX_VALUE);
+        QuantitaProdottoBean movimentoProdottoBean = new QuantitaProdottoBean(idProdotto, quantita);
         EsitoOperazioneBean esito = vendita
-                ? prodottiBoundary.registraVenditaManuale(idProdotto, quantita)
-                : prodottiBoundary.registraAcquistoEsterno(idProdotto, quantita);
+                ? prodottiBoundary.registraVenditaManuale(movimentoProdottoBean)
+                : prodottiBoundary.registraAcquistoEsterno(movimentoProdottoBean);
         stampaEsito(esito);
     }
 
     private void acquistaDaFornitore() {
         FornitoreBean fornitore = scegliFornitore();
         if (fornitore == null) {
-            LOGGER.info("Nessun fornitore disponibile");
             return;
         }
 
-        List<ProdottoBean> prodottiDisponibili = acquistoBoundary.recuperaProdotti(fornitore);
+        EsitoListaBean<ProdottoBean> esitoProdotti = acquistoBoundary.recuperaProdottiConEsito(fornitore);
+        List<ProdottoBean> prodottiDisponibili = esitoProdotti.getElementi();
         if (prodottiDisponibili.isEmpty()) {
-            LOGGER.info("Prodotti fornitore non disponibili");
+            LOGGER.info(esitoProdotti.getMessaggio());
             return;
         }
 
         List<ProdottoBean> prodottiSelezionati = selezionaProdotti(prodottiDisponibili);
         CarrelloBean carrello = acquistoBoundary.configuraCarrello(prodottiSelezionati);
         if (carrello.getProdotti().isEmpty()) {
-            LOGGER.info("Carrello non valido");
+            LOGGER.info(carrello.getMessaggio());
             return;
         }
 
-        LOGGER.info("Totale stimato: {} EUR", carrello.getTotaleStimato());
+        LOGGER.info("Totale stimato: {}", carrello.getTotaleStimato() + CURRENCY_EUR);
         EsitoPagamentoBean esitoPagamento = acquistoBoundary.effettuaPagamento(creaPagamento(carrello.getTotaleStimato()));
         LOGGER.info(esitoPagamento.getMessaggio());
         if (!esitoPagamento.isSuccesso()) {
@@ -265,15 +273,20 @@ public class AcquistaProdottiFornitoriCLI {
             LOGGER.info("3. Rimuovi fornitore");
             LOGGER.info("4. Visualizza inventario fornitore");
             LOGGER.info(BACK_OPTION);
-            int scelta = leggiIntero("Scegli: ", 0, 4);
+            int scelta = leggiIntero(CHOOSE_PROMPT, 0, 4);
             switch (scelta) {
-                case 1 -> stampaFornitori(fornitoriBoundary.visualizzaFornitori());
+                case 1 -> visualizzaFornitori();
                 case 2 -> aggiungiFornitore();
                 case 3 -> rimuoviFornitore();
                 case 4 -> visualizzaInventarioFornitoreDaTitolare();
                 default -> continua = false;
             }
         }
+    }
+
+    private void visualizzaFornitori() {
+        EsitoListaBean<FornitoreBean> esito = fornitoriBoundary.visualizzaFornitoriConEsito();
+        stampaFornitori(esito.getElementi(), esito.getMessaggio());
     }
 
     private void aggiungiFornitore() {
@@ -284,7 +297,6 @@ public class AcquistaProdottiFornitoriCLI {
     private void rimuoviFornitore() {
         FornitoreBean fornitore = scegliFornitore();
         if (fornitore == null) {
-            LOGGER.info("Nessun fornitore selezionato");
             return;
         }
         stampaEsito(fornitoriBoundary.rimuoviFornitore(fornitore));
@@ -293,27 +305,31 @@ public class AcquistaProdottiFornitoriCLI {
     private void visualizzaInventarioFornitoreDaTitolare() {
         FornitoreBean fornitore = scegliFornitore();
         if (fornitore == null) {
-            LOGGER.info("Nessun fornitore selezionato");
             return;
         }
-        stampaProdotti(fornitoriBoundary.visualizzaInventarioFornitore(fornitore));
+        EsitoListaBean<ProdottoBean> esito = fornitoriBoundary.visualizzaInventarioFornitoreConEsito(fornitore);
+        stampaProdotti(esito.getElementi(), esito.getMessaggio());
     }
 
     private void visualizzaStatistiche() {
-        List<StatisticaVenditaMensileBean> statistiche = prodottiBoundary.analizzaStatisticheVenditaMensili();
+        EsitoListaBean<StatisticaVenditaMensileBean> esito =
+                prodottiBoundary.analizzaStatisticheVenditaMensiliConEsito();
+        List<StatisticaVenditaMensileBean> statistiche = esito.getElementi();
         if (statistiche.isEmpty()) {
-            LOGGER.info("Statistiche non disponibili");
+            LOGGER.info(esito.getMessaggio());
             return;
         }
-        statistiche.forEach(statistica -> LOGGER.info("{} | venduti {} | acquistati {} | incasso {} EUR | acquisti {} EUR | top {}",
+        statistiche.forEach(statistica -> LOGGER.info("{} | venduti {} | acquistati {} | incasso {} | acquisti {} | top {}",
                 statistica.getMese(), statistica.getQuantitaVenduta(), statistica.getQuantitaAcquistata(),
-                statistica.getIncassoStimato(), statistica.getSpesaAcquisti(), statistica.getProdottoPiuVenduto()));
+                statistica.getIncassoStimato() + CURRENCY_EUR, statistica.getSpesaAcquisti() + CURRENCY_EUR,
+                statistica.getProdottoPiuVenduto()));
     }
 
     private void visualizzaInventarioFornitore() {
         FornitoreBean profilo = inventarioFornitoreBoundary.visualizzaProfilo();
         LOGGER.info("Magazzino {}", profilo.getNome());
-        stampaProdotti(inventarioFornitoreBoundary.visualizzaInventario());
+        EsitoListaBean<ProdottoBean> esito = inventarioFornitoreBoundary.visualizzaInventarioConEsito();
+        stampaProdotti(esito.getElementi(), esito.getMessaggio());
     }
 
     private void salvaProdottoFornitore() {
@@ -339,8 +355,10 @@ public class AcquistaProdottiFornitoriCLI {
     }
 
     private FornitoreBean scegliFornitore() {
-        List<FornitoreBean> fornitori = fornitoriBoundary.visualizzaFornitori();
+        EsitoListaBean<FornitoreBean> esito = fornitoriBoundary.visualizzaFornitoriConEsito();
+        List<FornitoreBean> fornitori = esito.getElementi();
         if (fornitori.isEmpty()) {
+            LOGGER.info(esito.getMessaggio());
             return null;
         }
 
@@ -359,13 +377,12 @@ public class AcquistaProdottiFornitoriCLI {
             ProdottoBean prodotto = prodottiDisponibili.get(scelta - 1);
             if (prodotto.getQuantita() <= 0) {
                 LOGGER.info("Prodotto non disponibile");
-                continue;
+            } else {
+                int quantita = leggiIntero("Quantita da acquistare: ", 1, Math.max(1, prodotto.getQuantita()));
+                selezionati.add(new ProdottoBean(prodotto.getId(), prodotto.getNome(), prodotto.getCategoria(),
+                        quantita, prodotto.getSogliaMinima(), prodotto.getPrezzoUnitario()));
+                continua = conferma("Aggiungere un altro prodotto? (s/n): ");
             }
-            int quantita = leggiIntero("Quantita da acquistare: ", 1, Math.max(1, prodotto.getQuantita()));
-            selezionati.add(new ProdottoBean(prodotto.getId(), prodotto.getNome(), prodotto.getCategoria(),
-                    quantita, prodotto.getSogliaMinima(), prodotto.getPrezzoUnitario()));
-
-            continua = conferma("Aggiungere un altro prodotto? (s/n): ");
         }
 
         return selezionati;
@@ -381,8 +398,12 @@ public class AcquistaProdottiFornitoriCLI {
     }
 
     private void stampaProdotti(List<ProdottoBean> prodotti) {
+        stampaProdotti(prodotti, "Nessun prodotto");
+    }
+
+    private void stampaProdotti(List<ProdottoBean> prodotti, String messaggioVuoto) {
         if (prodotti.isEmpty()) {
-            LOGGER.info("Nessun prodotto");
+            LOGGER.info(messaggioVuoto);
             return;
         }
         for (int index = 0; index < prodotti.size(); index++) {
@@ -393,8 +414,12 @@ public class AcquistaProdottiFornitoriCLI {
     }
 
     private void stampaFornitori(List<FornitoreBean> fornitori) {
+        stampaFornitori(fornitori, "Nessun fornitore");
+    }
+
+    private void stampaFornitori(List<FornitoreBean> fornitori, String messaggioVuoto) {
         if (fornitori.isEmpty()) {
-            LOGGER.info("Nessun fornitore");
+            LOGGER.info(messaggioVuoto);
             return;
         }
         for (int index = 0; index < fornitori.size(); index++) {
@@ -414,11 +439,11 @@ public class AcquistaProdottiFornitoriCLI {
         if (scelta == 1) {
             String numeroCarta = leggiTesto("Numero carta Visa: ");
             String cvv = leggiTesto("CVV: ");
-            return new PagamentoBean("VISA", numeroCarta, cvv, null, importo, "EUR");
+            return new PagamentoBean("VISA", numeroCarta, cvv, null, importo, CURRENCY_CODE);
         }
 
         String emailAccount = leggiTesto("Email account PayPal: ");
-        return new PagamentoBean("PAYPAL", null, null, emailAccount, importo, "EUR");
+        return new PagamentoBean("PAYPAL", null, null, emailAccount, importo, CURRENCY_CODE);
     }
 
     private void stampaEsito(EsitoOperazioneBean esito) {
@@ -442,7 +467,7 @@ public class AcquistaProdottiFornitoriCLI {
             } catch (NumberFormatException e) {
                 // Richiedi nuovamente il valore.
             }
-            LOGGER.info("Valore non valido");
+            LOGGER.info(INVALID_VALUE);
         }
     }
 
@@ -452,7 +477,7 @@ public class AcquistaProdottiFornitoriCLI {
             try {
                 return new BigDecimal(scanner.nextLine());
             } catch (NumberFormatException e) {
-                LOGGER.info("Valore non valido");
+                LOGGER.info(INVALID_VALUE);
             }
         }
     }
@@ -460,5 +485,32 @@ public class AcquistaProdottiFornitoriCLI {
     private boolean conferma(String prompt) {
         LOGGER.info(prompt);
         return scanner.nextLine().trim().equalsIgnoreCase("s");
+    }
+
+    private static final class ConsoleOutput {
+
+        private void info(String message) {
+            System.out.println(message);
+        }
+
+        private void info(String template, Object... values) {
+            System.out.println(format(template, values));
+        }
+
+        private String format(String template, Object... values) {
+            StringBuilder builder = new StringBuilder();
+            int start = 0;
+            for (Object value : values) {
+                int placeholder = template.indexOf("{}", start);
+                if (placeholder < 0) {
+                    break;
+                }
+                builder.append(template, start, placeholder);
+                builder.append(value);
+                start = placeholder + 2;
+            }
+            builder.append(template.substring(start));
+            return builder.toString();
+        }
     }
 }

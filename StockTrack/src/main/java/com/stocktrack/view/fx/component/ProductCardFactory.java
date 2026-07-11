@@ -36,6 +36,7 @@ public final class ProductCardFactory {
     private static final int FULL_IMAGE_HEIGHT = 132;
     private static final int COMPACT_IMAGE_WIDTH = 146;
     private static final int COMPACT_IMAGE_HEIGHT = 104;
+    private static final String IMAGE_RESOURCE_DIR = "/Images/";
     private static final String DEFAULT_PRODUCT_COLOR = "#22577a";
     private static final String[] PRODUCT_COLOR_PALETTE = {
             DEFAULT_PRODUCT_COLOR,
@@ -147,9 +148,9 @@ public final class ProductCardFactory {
     private static List<String> imageCandidates(ProdottoBean prodotto) {
         List<String> candidates = new ArrayList<>();
         for (String stem : ProductImageAssetStore.imageStemsFor(prodotto)) {
-            candidates.add("/Images/" + stem + ".png");
-            candidates.add("/Images/" + stem + ".jpg");
-            candidates.add("/Images/" + stem + ".jpeg");
+            candidates.add(IMAGE_RESOURCE_DIR + stem + ".png");
+            candidates.add(IMAGE_RESOURCE_DIR + stem + ".jpg");
+            candidates.add(IMAGE_RESOURCE_DIR + stem + ".jpeg");
         }
         return candidates;
     }

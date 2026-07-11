@@ -1,5 +1,7 @@
 package com.stocktrack.pattern.adapter;
 
+import com.stocktrack.config.AppConfig;
+import com.stocktrack.config.PersistenceMode;
 import com.stocktrack.entity.Fornitore;
 
 import java.io.IOException;
@@ -19,6 +21,7 @@ public class FornitoreApiAdaptee {
     private static final String HUAWEI_CODE = "HUAWEI-2026";
     private static final Path DATA_DIR = resolveDataDir();
     private static final Path SUPPLIER_PRODUCTS_FILE = DATA_DIR.resolve("fornitore_prodotti.csv");
+    private static final Object SUPPLIER_PRODUCTS_LOCK = new Object();
     private static final Map<String, Fornitore> SUPPLIER_CATALOG = Map.of(
             APPLE_CODE, new Fornitore(APPLE_CODE, "APPLE", "business@apple.example",
                     "simulated://fornitori/apple", true),
@@ -44,10 +47,14 @@ public class FornitoreApiAdaptee {
                     "HUA-FREEBUDS;Huawei FreeBuds Pro;Audio;45;139.00"
             )
     );
+    private static final Map<String, List<String>> DEMO_SUPPLIER_PRODUCTS =
+            copySupplierProducts(DEFAULT_SUPPLIER_PRODUCTS);
 
-    public synchronized List<String> fetchSupplierProducts(String endpoint, String supplierCode) {
+    public List<String> fetchSupplierProducts(String endpoint, String supplierCode) {
         checkEndpoint(endpoint);
-        return new ArrayList<>(loadSupplierProducts().getOrDefault(supplierCode, List.of()));
+        synchronized (SUPPLIER_PRODUCTS_LOCK) {
+            return new ArrayList<>(loadSupplierProductsForCurrentMode().getOrDefault(supplierCode, List.of()));
+        }
     }
 
     public boolean sendOrderNotification(String endpoint, String orderPayload) {
@@ -55,46 +62,49 @@ public class FornitoreApiAdaptee {
         return orderPayload != null && !orderPayload.isBlank() && !endpoint.contains("failnotify");
     }
 
-    public synchronized void saveSupplierProduct(String endpoint, String supplierCode, String rawProduct) {
+    public void saveSupplierProduct(String endpoint, String supplierCode, String rawProduct) {
         checkEndpoint(endpoint);
         String[] newColumns = rawProduct.split(";", -1);
-        Map<String, List<String>> supplierProducts = loadSupplierProducts();
-        List<String> products = supplierProducts.computeIfAbsent(supplierCode, key -> new ArrayList<>());
-        for (int index = 0; index < products.size(); index++) {
-            String[] currentColumns = products.get(index).split(";", -1);
-            if (currentColumns[0].equals(newColumns[0])) {
-                products.set(index, rawProduct);
-                saveSupplierProducts(supplierProducts);
-                return;
+        synchronized (SUPPLIER_PRODUCTS_LOCK) {
+            Map<String, List<String>> supplierProducts = loadSupplierProductsForCurrentMode();
+            List<String> products = supplierProducts.computeIfAbsent(supplierCode, key -> new ArrayList<>());
+            for (int index = 0; index < products.size(); index++) {
+                String[] currentColumns = products.get(index).split(";", -1);
+                if (currentColumns[0].equals(newColumns[0])) {
+                    products.set(index, rawProduct);
+                    saveSupplierProductsForCurrentMode(supplierProducts);
+                    return;
+                }
             }
+            products.add(rawProduct);
+            saveSupplierProductsForCurrentMode(supplierProducts);
         }
-        products.add(rawProduct);
-        saveSupplierProducts(supplierProducts);
     }
 
-    public synchronized void decreaseSupplierProductStock(String supplierCode, String productId, int quantity) {
-        Map<String, List<String>> supplierProducts = loadSupplierProducts();
-        List<String> products = supplierProducts.get(supplierCode);
-        if (products == null) {
-            throw new IllegalStateException("Fornitore non censito");
-        }
-
-        for (int index = 0; index < products.size(); index++) {
-            String[] columns = products.get(index).split(";", -1);
-            if (!columns[0].equals(productId)) {
-                continue;
+    public void decreaseSupplierProductStock(String supplierCode, String productId, int quantity) {
+        synchronized (SUPPLIER_PRODUCTS_LOCK) {
+            Map<String, List<String>> supplierProducts = loadSupplierProductsForCurrentMode();
+            List<String> products = supplierProducts.get(supplierCode);
+            if (products == null) {
+                throw new IllegalStateException("Fornitore non censito");
             }
-            int availableQuantity = Integer.parseInt(columns[3]);
-            if (availableQuantity < quantity) {
-                throw new IllegalStateException("Rimanenza fornitore insufficiente per " + columns[1]);
-            }
-            columns[3] = Integer.toString(availableQuantity - quantity);
-            products.set(index, String.join(";", columns));
-            saveSupplierProducts(supplierProducts);
-            return;
-        }
 
-        throw new IllegalStateException("Prodotto non trovato nell'inventario fornitore");
+            for (int index = 0; index < products.size(); index++) {
+                String[] columns = products.get(index).split(";", -1);
+                if (columns[0].equals(productId)) {
+                    int availableQuantity = Integer.parseInt(columns[3]);
+                    if (availableQuantity < quantity) {
+                        throw new IllegalStateException("Rimanenza fornitore insufficiente per " + columns[1]);
+                    }
+                    columns[3] = Integer.toString(availableQuantity - quantity);
+                    products.set(index, String.join(";", columns));
+                    saveSupplierProductsForCurrentMode(supplierProducts);
+                    return;
+                }
+            }
+
+            throw new IllegalStateException("Prodotto non trovato nell'inventario fornitore");
+        }
     }
 
     public Optional<Fornitore> findSupplierByCode(String supplierCode) {
@@ -109,15 +119,11 @@ public class FornitoreApiAdaptee {
         try {
             Map<String, List<String>> supplierProducts = new LinkedHashMap<>();
             for (String line : Files.readAllLines(SUPPLIER_PRODUCTS_FILE, StandardCharsets.UTF_8)) {
-                if (line.isBlank()) {
-                    continue;
-                }
                 String[] columns = line.split(";", -1);
-                if (columns.length < 6) {
-                    continue;
+                if (!line.isBlank() && columns.length >= 6) {
+                    supplierProducts.computeIfAbsent(columns[0], key -> new ArrayList<>())
+                            .add(String.join(";", columns[1], columns[2], columns[3], columns[4], columns[5]));
                 }
-                supplierProducts.computeIfAbsent(columns[0], key -> new ArrayList<>())
-                        .add(String.join(";", columns[1], columns[2], columns[3], columns[4], columns[5]));
             }
             return supplierProducts;
         } catch (IOException e) {
@@ -135,6 +141,32 @@ public class FornitoreApiAdaptee {
         } catch (IOException e) {
             throw new IllegalStateException("Errore scrittura inventario fornitori simulato", e);
         }
+    }
+
+    private static Map<String, List<String>> loadSupplierProductsForCurrentMode() {
+        if (isDemoMode()) {
+            return copySupplierProducts(DEMO_SUPPLIER_PRODUCTS);
+        }
+        return loadSupplierProducts();
+    }
+
+    private static void saveSupplierProductsForCurrentMode(Map<String, List<String>> supplierProducts) {
+        if (isDemoMode()) {
+            DEMO_SUPPLIER_PRODUCTS.clear();
+            DEMO_SUPPLIER_PRODUCTS.putAll(copySupplierProducts(supplierProducts));
+            return;
+        }
+        saveSupplierProducts(supplierProducts);
+    }
+
+    private static Map<String, List<String>> copySupplierProducts(Map<String, List<String>> source) {
+        Map<String, List<String>> copy = new LinkedHashMap<>();
+        source.forEach((supplierCode, products) -> copy.put(supplierCode, new ArrayList<>(products)));
+        return copy;
+    }
+
+    private static boolean isDemoMode() {
+        return PersistenceMode.DEMO.equals(new AppConfig().getPersistenceMode());
     }
 
     private static void ensureSeedData() {

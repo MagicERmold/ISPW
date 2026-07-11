@@ -17,20 +17,19 @@ import java.util.List;
 
 public class GestisciInventarioFornitoreController {
 
-    private final FornitoreApiAdapter fornitoreApiAdapter = new FornitoreApiAdapter();
-
     public FornitoreBean visualizzaProfiloFornitoreCorrente() throws InvalidInputException, PersistenceException {
         return toFornitoreBean(getFornitoreCorrente());
     }
 
     public List<ProdottoBean> visualizzaInventarioCorrente()
             throws InvalidInputException, PersistenceException, FornitoreConnectionException {
+        FornitoreApiAdapter fornitoreApiAdapter = new FornitoreApiAdapter();
         return fornitoreApiAdapter.recuperaProdotti(toFornitoreBean(getFornitoreCorrente()));
     }
 
     public EsitoOperazioneBean salvaProdotto(ProdottoBean prodottoBean)
             throws InvalidInputException, PersistenceException, FornitoreConnectionException {
-        prodottoBean.validate();
+        FornitoreApiAdapter fornitoreApiAdapter = new FornitoreApiAdapter();
         fornitoreApiAdapter.salvaProdotto(toFornitoreBean(getFornitoreCorrente()), prodottoBean);
         return new EsitoOperazioneBean(true, "Prodotto fornitore salvato");
     }

@@ -2,13 +2,17 @@ package com.stocktrack.view.fx.controller;
 
 import com.stocktrack.JavaFXApp;
 import com.stocktrack.bean.DisponibilitaProdottoBean;
+import com.stocktrack.bean.EsitoListaBean;
 import com.stocktrack.bean.EsitoOperazioneBean;
+import com.stocktrack.bean.ProdottoSelezionatoBean;
 import com.stocktrack.bean.ProdottoBean;
+import com.stocktrack.bean.QuantitaProdottoBean;
 import com.stocktrack.bean.RuoloUtente;
 import com.stocktrack.boundary.AnalizzaDisponibilitaInventarioBoundary;
 import com.stocktrack.boundary.AcquistaProdottiFornitoriBoundary;
 import com.stocktrack.boundary.GestisciProdottiBoundary;
 import com.stocktrack.common.AbstractProdottoData;
+import com.stocktrack.pattern.singleton.Session;
 import com.stocktrack.pattern.singleton.SessionManagerSingleton;
 import com.stocktrack.view.fx.component.ProductCardFactory;
 import javafx.fxml.FXML;
@@ -78,7 +82,8 @@ public class InventarioFXController {
     }
 
     private void loadInventory() {
-        List<DisponibilitaProdottoBean> prodotti = boundary.analizzaDisponibilita();
+        EsitoListaBean<DisponibilitaProdottoBean> esito = boundary.analizzaDisponibilitaConEsito();
+        List<DisponibilitaProdottoBean> prodotti = esito.getElementi();
         inventoryTilePane.getChildren().clear();
         boolean puoGestireProdotti = canManageProducts();
         for (DisponibilitaProdottoBean disponibilita : prodotti) {
@@ -91,13 +96,13 @@ public class InventarioFXController {
                 .filter(AbstractProdottoData::isSottoSoglia)
                 .count();
         summaryLabel.setText("Prodotti: " + prodotti.size() + " | Da riordinare: " + belowThreshold);
-        messageLabel.setText(prodotti.isEmpty() ? "Inventario vuoto" : "Inventario aggiornato");
+        messageLabel.setText(esito.getMessaggio());
     }
 
     private void configureRoleActions() {
         RuoloUtente ruolo = SessionManagerSingleton.getInstance()
                 .getCurrentSession()
-                .map(session -> session.getRuolo())
+                .map(Session::getRuolo)
                 .orElse(null);
         boolean titolare = RuoloUtente.TITOLARE.equals(ruolo);
         buyFromSuppliersButton.setVisible(titolare);
@@ -109,7 +114,7 @@ public class InventarioFXController {
     private boolean canManageProducts() {
         RuoloUtente ruolo = SessionManagerSingleton.getInstance()
                 .getCurrentSession()
-                .map(session -> session.getRuolo())
+                .map(Session::getRuolo)
                 .orElse(null);
         return RuoloUtente.TITOLARE.equals(ruolo) || RuoloUtente.COMMESSO.equals(ruolo);
     }
@@ -132,18 +137,18 @@ public class InventarioFXController {
 
         Button saveQuantityButton = new Button("Salva quantita");
         saveQuantityButton.setOnAction(event -> handleProductOperation(dialog, dialogMessageLabel,
-                () -> productManagementBoundary.modificaQuantitaProdotto(prodotto.getId(),
-                        parseInt(quantityField.getText())), true));
+                () -> productManagementBoundary.modificaQuantitaProdotto(new QuantitaProdottoBean(prodotto.getId(),
+                        parseInt(quantityField.getText()))), true));
 
         Button registerSaleButton = new Button("Vendita");
         registerSaleButton.setOnAction(event -> handleProductOperation(dialog, dialogMessageLabel,
-                () -> productManagementBoundary.registraVenditaManuale(prodotto.getId(),
-                        parseInt(movementQuantityField.getText())), true));
+                () -> productManagementBoundary.registraVenditaManuale(new QuantitaProdottoBean(prodotto.getId(),
+                        parseInt(movementQuantityField.getText()))), true));
 
         Button registerPurchaseButton = new Button("Acquisto");
         registerPurchaseButton.setOnAction(event -> handleProductOperation(dialog, dialogMessageLabel,
-                () -> productManagementBoundary.registraAcquistoEsterno(prodotto.getId(),
-                        parseInt(movementQuantityField.getText())), true));
+                () -> productManagementBoundary.registraAcquistoEsterno(new QuantitaProdottoBean(prodotto.getId(),
+                        parseInt(movementQuantityField.getText()))), true));
 
         Button deleteButton = new Button("Elimina prodotto");
         deleteButton.getStyleClass().add("danger-button");
@@ -190,7 +195,8 @@ public class InventarioFXController {
         alert.showAndWait()
                 .filter(ButtonType.OK::equals)
                 .ifPresent(buttonType -> handleProductOperation(dialog, dialogMessageLabel,
-                        () -> productManagementBoundary.rimuoviProdotto(prodotto), true));
+                        () -> productManagementBoundary.rimuoviProdotto(new ProdottoSelezionatoBean(prodotto.getId())),
+                        true));
     }
 
     private void handleProductOperation(Dialog<Void> dialog, Label dialogMessageLabel, ProductOperation operation,

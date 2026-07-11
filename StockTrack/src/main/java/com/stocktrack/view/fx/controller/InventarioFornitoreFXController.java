@@ -1,6 +1,7 @@
 package com.stocktrack.view.fx.controller;
 
 import com.stocktrack.JavaFXApp;
+import com.stocktrack.bean.EsitoListaBean;
 import com.stocktrack.bean.EsitoOperazioneBean;
 import com.stocktrack.bean.FornitoreBean;
 import com.stocktrack.bean.ProdottoBean;
@@ -67,7 +68,6 @@ public class InventarioFornitoreFXController {
     @FXML
     private void onRefresh() {
         loadInventory();
-        setMessage("Magazzino fornitore aggiornato");
     }
 
     @FXML
@@ -108,12 +108,14 @@ public class InventarioFornitoreFXController {
     }
 
     private void loadInventory() {
-        List<ProdottoBean> prodotti = boundary.visualizzaInventario();
+        EsitoListaBean<ProdottoBean> esito = boundary.visualizzaInventarioConEsito();
+        List<ProdottoBean> prodotti = esito.getElementi();
         supplierProductsListView.setItems(FXCollections.observableArrayList(prodotti));
         summaryLabel.setText("Prodotti fornitore: " + prodotti.size());
         if (!prodotti.isEmpty()) {
             supplierProductsListView.getSelectionModel().selectFirst();
         }
+        setMessage(esito.getMessaggio());
     }
 
     private void configureCells() {

@@ -1,6 +1,7 @@
 package com.stocktrack.boundary;
 
 import com.stocktrack.bean.DisponibilitaProdottoBean;
+import com.stocktrack.bean.EsitoListaBean;
 import com.stocktrack.bean.InventarioBean;
 import com.stocktrack.bean.LoginBean;
 import com.stocktrack.bean.ProfiloUtenteBean;
@@ -16,34 +17,60 @@ import java.util.List;
 public class AnalizzaDisponibilitaInventarioBoundary {
 
     public ProfiloUtenteBean login(LoginBean loginBean) {
+        LoginController controller = new LoginController();
         try {
-            return new LoginController().login(loginBean);
+            validateLogin(loginBean);
+            return controller.login(loginBean);
         } catch (AutenticazioneException | InvalidInputException | PersistenceException e) {
             return null;
         }
     }
 
     public InventarioBean visualizzaInventario() {
+        AnalizzaDisponibilitaInventarioController controller = new AnalizzaDisponibilitaInventarioController();
         try {
-            return new AnalizzaDisponibilitaInventarioController().visualizzaInventario();
+            return controller.visualizzaInventario();
         } catch (PersistenceException e) {
             return new InventarioBean();
         }
     }
 
     public List<DisponibilitaProdottoBean> analizzaDisponibilita() {
+        return analizzaDisponibilitaConEsito().getElementi();
+    }
+
+    public EsitoListaBean<DisponibilitaProdottoBean> analizzaDisponibilitaConEsito() {
+        AnalizzaDisponibilitaInventarioController controller = new AnalizzaDisponibilitaInventarioController();
         try {
-            return new AnalizzaDisponibilitaInventarioController().analizzaDisponibilita();
+            List<DisponibilitaProdottoBean> disponibilita = controller.analizzaDisponibilita();
+            String messaggio = disponibilita.isEmpty() ? "Inventario vuoto" : "Inventario aggiornato";
+            return EsitoListaBean.success(messaggio, disponibilita);
         } catch (PersistenceException e) {
-            return List.of();
+            return EsitoListaBean.failure("Errore caricamento inventario: " + e.getMessage());
         }
     }
 
     public DisponibilitaProdottoBean verificaDisponibilita(ProdottoBean prodottoBean) {
+        AnalizzaDisponibilitaInventarioController controller = new AnalizzaDisponibilitaInventarioController();
         try {
-            return new AnalizzaDisponibilitaInventarioController().verificaDisponibilita(prodottoBean);
+            validateProdotto(prodottoBean);
+            return controller.verificaDisponibilita(prodottoBean);
         } catch (InvalidInputException e) {
             return new DisponibilitaProdottoBean(prodottoBean, 0, false, e.getMessage());
         }
+    }
+
+    private void validateProdotto(ProdottoBean prodottoBean) throws InvalidInputException {
+        if (prodottoBean == null) {
+            throw new InvalidInputException("Prodotto obbligatorio");
+        }
+        prodottoBean.validate();
+    }
+
+    private void validateLogin(LoginBean loginBean) throws InvalidInputException {
+        if (loginBean == null) {
+            throw new InvalidInputException("Credenziali obbligatorie");
+        }
+        loginBean.validate();
     }
 }

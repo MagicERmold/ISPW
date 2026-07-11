@@ -10,6 +10,8 @@ public class CarrelloBean {
 
     private List<ProdottoBean> prodotti = new ArrayList<>();
     private BigDecimal totaleStimato = BigDecimal.ZERO;
+    private boolean successo = true;
+    private String messaggio = "";
 
     public CarrelloBean() {
     }
@@ -17,6 +19,13 @@ public class CarrelloBean {
     public CarrelloBean(List<ProdottoBean> prodotti, BigDecimal totaleStimato) {
         setProdotti(prodotti);
         this.totaleStimato = totaleStimato;
+        this.successo = true;
+        this.messaggio = "Carrello configurato";
+    }
+
+    public CarrelloBean(boolean successo, String messaggio) {
+        this.successo = successo;
+        this.messaggio = messaggio;
     }
 
     public void validate() throws InvalidInputException {
@@ -43,5 +52,21 @@ public class CarrelloBean {
 
     public void setTotaleStimato(BigDecimal totaleStimato) {
         this.totaleStimato = totaleStimato;
+    }
+
+    public boolean isSuccesso() {
+        return successo;
+    }
+
+    public void setSuccesso(boolean successo) {
+        this.successo = successo;
+    }
+
+    public String getMessaggio() {
+        return messaggio;
+    }
+
+    public void setMessaggio(String messaggio) {
+        this.messaggio = messaggio;
     }
 }

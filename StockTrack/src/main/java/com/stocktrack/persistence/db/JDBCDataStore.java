@@ -34,19 +34,46 @@ final class JDBCDataStore {
     private static final String PASSWORD = configuredSecret(DB_FILE_PASSWORD_PROPERTY, DB_FILE_PASSWORD_ENV)
             + " " + configuredSecret(DB_USER_PASSWORD_PROPERTY, DB_USER_PASSWORD_ENV);
     private static final String DEFAULT_LOGIN_PASSWORD = "password123";
+    private static final String ID_COLUMN = "id";
+    private static final String NAME_COLUMN = "nome";
+    private static final String SURNAME_COLUMN = "cognome";
     private static final String EMAIL_COLUMN = "email";
     private static final String PASSWORD_HASH_COLUMN = "password_hash";
-    private static final String USER_COLUMNS = "id, nome, cognome, " + EMAIL_COLUMN + ", " + PASSWORD_HASH_COLUMN;
-    private static final String SUPPLIER_COLUMNS = "id, nome, " + EMAIL_COLUMN
-            + ", api_endpoint, disponibile, " + PASSWORD_HASH_COLUMN;
-    private static final String PRODUCT_COLUMNS = "id, nome, categoria, quantita, soglia_minima, prezzo_unitario";
-    private static final String ORDER_COLUMNS = "id, totale, stato";
-    private static final String MOVEMENT_COLUMNS = "id, id_prodotto, nome_prodotto, tipo, quantita, "
-            + "valore_unitario, data_movimento, origine";
+    private static final String API_ENDPOINT_COLUMN = "api_endpoint";
+    private static final String AVAILABLE_COLUMN = "disponibile";
+    private static final String CATEGORY_COLUMN = "categoria";
+    private static final String QUANTITY_COLUMN = "quantita";
+    private static final String THRESHOLD_COLUMN = "soglia_minima";
+    private static final String UNIT_PRICE_COLUMN = "prezzo_unitario";
+    private static final String TOTAL_COLUMN = "totale";
+    private static final String STATUS_COLUMN = "stato";
+    private static final String MOVEMENT_PRODUCT_ID_COLUMN = "id_prodotto";
+    private static final String MOVEMENT_PRODUCT_NAME_COLUMN = "nome_prodotto";
+    private static final String MOVEMENT_TYPE_COLUMN = "tipo";
+    private static final String MOVEMENT_VALUE_COLUMN = "valore_unitario";
+    private static final String MOVEMENT_DATE_COLUMN = "data_movimento";
+    private static final String MOVEMENT_ORIGIN_COLUMN = "origine";
+    private static final String USER_COLUMNS = ID_COLUMN + ", " + NAME_COLUMN + ", " + SURNAME_COLUMN + ", "
+            + EMAIL_COLUMN + ", " + PASSWORD_HASH_COLUMN;
+    private static final String SUPPLIER_COLUMNS = ID_COLUMN + ", " + NAME_COLUMN + ", " + EMAIL_COLUMN
+            + ", " + API_ENDPOINT_COLUMN + ", " + AVAILABLE_COLUMN + ", " + PASSWORD_HASH_COLUMN;
+    private static final String PRODUCT_COLUMNS = ID_COLUMN + ", " + NAME_COLUMN + ", " + CATEGORY_COLUMN + ", "
+            + QUANTITY_COLUMN + ", " + THRESHOLD_COLUMN + ", " + UNIT_PRICE_COLUMN;
+    private static final String ORDER_COLUMNS = ID_COLUMN + ", " + TOTAL_COLUMN + ", " + STATUS_COLUMN;
+    private static final String MOVEMENT_COLUMNS = ID_COLUMN + ", " + MOVEMENT_PRODUCT_ID_COLUMN + ", "
+            + MOVEMENT_PRODUCT_NAME_COLUMN + ", " + MOVEMENT_TYPE_COLUMN + ", " + QUANTITY_COLUMN + ", "
+            + MOVEMENT_VALUE_COLUMN + ", " + MOVEMENT_DATE_COLUMN + ", " + MOVEMENT_ORIGIN_COLUMN;
     private static final String DUPLICATE_COLUMN_SQL_STATE = "42S21";
     private static final String SELECT = "select ";
     private static final String WHERE_ID = " where id = ?";
+    private static final String WHERE_LOWER_EMAIL = " where lower(" + EMAIL_COLUMN + ") = lower(?)";
+    private static final String TITOLARE_MERGE_SQL = "merge into titolari key(id) values (?, ?, ?, ?, ?)";
+    private static final String COMMESSO_MERGE_SQL = "merge into commessi key(id) values (?, ?, ?, ?, ?)";
+    private static final String SUPPLIER_MERGE_SQL = "merge into fornitori key(id) values (?, ?, ?, ?, ?, ?)";
     private static final String PRODUCT_MERGE_SQL = "merge into prodotti key(id) values (?, ?, ?, ?, ?, ?)";
+    private static final String ORDER_MERGE_SQL = "merge into ordini key(id) values (?, ?, ?)";
+    private static final String MOVEMENT_MERGE_SQL =
+            "merge into movimenti_inventario key(id) values (?, ?, ?, ?, ?, ?, ?, ?)";
     private static final String DELETE_PRODUCT_SQL = "delete from prodotti" + WHERE_ID;
     private static final String DELETE_SUPPLIER_SQL = "delete from fornitori" + WHERE_ID;
     private static final String SELECT_TITOLARI = SELECT + USER_COLUMNS + " from titolari";
@@ -64,7 +91,7 @@ final class JDBCDataStore {
     }
 
     static Optional<Titolare> findTitolareByEmail(String email) throws PersistenceException {
-        return queryTitolari(SELECT_TITOLARI + " where lower(" + EMAIL_COLUMN + ") = lower(?)", email)
+        return queryTitolari(SELECT_TITOLARI + WHERE_LOWER_EMAIL, email)
                 .stream()
                 .findFirst();
     }
@@ -74,7 +101,7 @@ final class JDBCDataStore {
     }
 
     static void saveTitolare(Titolare titolare) throws PersistenceException {
-        executeMerge("merge into titolari key(id) values (?, ?, ?, ?, ?)", titolare.getId(), titolare.getNome(),
+        executeMerge(TITOLARE_MERGE_SQL, titolare.getId(), titolare.getNome(),
                 titolare.getCognome(), titolare.getEmail(), titolare.getPasswordHash());
     }
 
@@ -83,7 +110,7 @@ final class JDBCDataStore {
     }
 
     static Optional<Commesso> findCommessoByEmail(String email) throws PersistenceException {
-        return queryCommessi(SELECT_COMMESSI + " where lower(" + EMAIL_COLUMN + ") = lower(?)", email)
+        return queryCommessi(SELECT_COMMESSI + WHERE_LOWER_EMAIL, email)
                 .stream()
                 .findFirst();
     }
@@ -93,7 +120,7 @@ final class JDBCDataStore {
     }
 
     static void saveCommesso(Commesso commesso) throws PersistenceException {
-        executeMerge("merge into commessi key(id) values (?, ?, ?, ?, ?)", commesso.getId(), commesso.getNome(),
+        executeMerge(COMMESSO_MERGE_SQL, commesso.getId(), commesso.getNome(),
                 commesso.getCognome(), commesso.getEmail(), commesso.getPasswordHash());
     }
 
@@ -106,13 +133,13 @@ final class JDBCDataStore {
     }
 
     static Optional<Fornitore> findFornitoreByEmail(String email) throws PersistenceException {
-        return queryFornitori(SELECT_FORNITORI + " where lower(" + EMAIL_COLUMN + ") = lower(?)", email)
+        return queryFornitori(SELECT_FORNITORI + WHERE_LOWER_EMAIL, email)
                 .stream()
                 .findFirst();
     }
 
     static void saveFornitore(Fornitore fornitore) throws PersistenceException {
-        executeMerge("merge into fornitori key(id) values (?, ?, ?, ?, ?, ?)", fornitore.getId(), fornitore.getNome(),
+        executeMerge(SUPPLIER_MERGE_SQL, fornitore.getId(), fornitore.getNome(),
                 fornitore.getEmail(), fornitore.getApiEndpoint(), fornitore.isDisponibile(),
                 fornitore.getPasswordHash());
     }
@@ -191,8 +218,7 @@ final class JDBCDataStore {
     }
 
     static void saveOrdine(Ordine ordine) throws PersistenceException {
-        executeMerge("merge into ordini key(id) values (?, ?, ?)", ordine.getId(), ordine.getTotale(),
-                ordine.getStato());
+        executeMerge(ORDER_MERGE_SQL, ordine.getId(), ordine.getTotale(), ordine.getStato());
     }
 
     static List<MovimentoInventario> loadMovimentiInventario() throws PersistenceException {
@@ -210,8 +236,7 @@ final class JDBCDataStore {
     }
 
     static void saveMovimentoInventario(MovimentoInventario movimento) throws PersistenceException {
-        executeMerge("merge into movimenti_inventario key(id) values (?, ?, ?, ?, ?, ?, ?, ?)",
-                movimento.getId(), movimento.getIdProdotto(), movimento.getNomeProdotto(),
+        executeMerge(MOVEMENT_MERGE_SQL, movimento.getId(), movimento.getIdProdotto(), movimento.getNomeProdotto(),
                 movimento.getTipo().name(), movimento.getQuantita(), movimento.getValoreUnitario(),
                 movimento.getDataMovimento(), movimento.getOrigine());
     }
@@ -223,8 +248,8 @@ final class JDBCDataStore {
             try (ResultSet resultSet = statement.executeQuery()) {
                 List<Titolare> titolari = new ArrayList<>();
                 while (resultSet.next()) {
-                    titolari.add(new Titolare(resultSet.getString("id"), resultSet.getString("nome"),
-                            resultSet.getString("cognome"), resultSet.getString(EMAIL_COLUMN),
+                    titolari.add(new Titolare(resultSet.getString(ID_COLUMN), resultSet.getString(NAME_COLUMN),
+                            resultSet.getString(SURNAME_COLUMN), resultSet.getString(EMAIL_COLUMN),
                             resultSet.getString(PASSWORD_HASH_COLUMN)));
                 }
                 return titolari;
@@ -241,8 +266,8 @@ final class JDBCDataStore {
             try (ResultSet resultSet = statement.executeQuery()) {
                 List<Commesso> commessi = new ArrayList<>();
                 while (resultSet.next()) {
-                    commessi.add(new Commesso(resultSet.getString("id"), resultSet.getString("nome"),
-                            resultSet.getString("cognome"), resultSet.getString(EMAIL_COLUMN),
+                    commessi.add(new Commesso(resultSet.getString(ID_COLUMN), resultSet.getString(NAME_COLUMN),
+                            resultSet.getString(SURNAME_COLUMN), resultSet.getString(EMAIL_COLUMN),
                             resultSet.getString(PASSWORD_HASH_COLUMN)));
                 }
                 return commessi;
@@ -259,9 +284,9 @@ final class JDBCDataStore {
             try (ResultSet resultSet = statement.executeQuery()) {
                 List<Fornitore> fornitori = new ArrayList<>();
                 while (resultSet.next()) {
-                    fornitori.add(new Fornitore(resultSet.getString("id"), resultSet.getString("nome"),
-                            resultSet.getString(EMAIL_COLUMN), resultSet.getString("api_endpoint"),
-                            resultSet.getBoolean("disponibile"), resultSet.getString(PASSWORD_HASH_COLUMN)));
+                    fornitori.add(new Fornitore(resultSet.getString(ID_COLUMN), resultSet.getString(NAME_COLUMN),
+                            resultSet.getString(EMAIL_COLUMN), resultSet.getString(API_ENDPOINT_COLUMN),
+                            resultSet.getBoolean(AVAILABLE_COLUMN), resultSet.getString(PASSWORD_HASH_COLUMN)));
                 }
                 return fornitori;
             }
@@ -277,9 +302,9 @@ final class JDBCDataStore {
             try (ResultSet resultSet = statement.executeQuery()) {
                 List<Prodotto> prodotti = new ArrayList<>();
                 while (resultSet.next()) {
-                    prodotti.add(new Prodotto(resultSet.getString("id"), resultSet.getString("nome"),
-                            resultSet.getString("categoria"), resultSet.getInt("quantita"),
-                            resultSet.getInt("soglia_minima"), resultSet.getBigDecimal("prezzo_unitario")));
+                    prodotti.add(new Prodotto(resultSet.getString(ID_COLUMN), resultSet.getString(NAME_COLUMN),
+                            resultSet.getString(CATEGORY_COLUMN), resultSet.getInt(QUANTITY_COLUMN),
+                            resultSet.getInt(THRESHOLD_COLUMN), resultSet.getBigDecimal(UNIT_PRICE_COLUMN)));
                 }
                 return prodotti;
             }
@@ -290,22 +315,22 @@ final class JDBCDataStore {
 
     private static Ordine toOrdine(ResultSet resultSet) throws SQLException {
         Ordine ordine = new Ordine();
-        ordine.setId(resultSet.getString("id"));
-        ordine.setTotale(resultSet.getBigDecimal("totale"));
-        ordine.setStato(resultSet.getString("stato"));
+        ordine.setId(resultSet.getString(ID_COLUMN));
+        ordine.setTotale(resultSet.getBigDecimal(TOTAL_COLUMN));
+        ordine.setStato(resultSet.getString(STATUS_COLUMN));
         return ordine;
     }
 
     private static MovimentoInventario toMovimentoInventario(ResultSet resultSet) throws SQLException {
         MovimentoInventario movimento = new MovimentoInventario();
-        movimento.setId(resultSet.getString("id"));
-        movimento.setIdProdotto(resultSet.getString("id_prodotto"));
-        movimento.setNomeProdotto(resultSet.getString("nome_prodotto"));
-        movimento.setTipo(TipoMovimentoInventario.valueOf(resultSet.getString("tipo")));
-        movimento.setQuantita(resultSet.getInt("quantita"));
-        movimento.setValoreUnitario(resultSet.getBigDecimal("valore_unitario"));
-        movimento.setDataMovimento(resultSet.getObject("data_movimento", LocalDateTime.class));
-        movimento.setOrigine(resultSet.getString("origine"));
+        movimento.setId(resultSet.getString(ID_COLUMN));
+        movimento.setIdProdotto(resultSet.getString(MOVEMENT_PRODUCT_ID_COLUMN));
+        movimento.setNomeProdotto(resultSet.getString(MOVEMENT_PRODUCT_NAME_COLUMN));
+        movimento.setTipo(TipoMovimentoInventario.valueOf(resultSet.getString(MOVEMENT_TYPE_COLUMN)));
+        movimento.setQuantita(resultSet.getInt(QUANTITY_COLUMN));
+        movimento.setValoreUnitario(resultSet.getBigDecimal(MOVEMENT_VALUE_COLUMN));
+        movimento.setDataMovimento(resultSet.getObject(MOVEMENT_DATE_COLUMN, LocalDateTime.class));
+        movimento.setOrigine(resultSet.getString(MOVEMENT_ORIGIN_COLUMN));
         return movimento;
     }
 
@@ -390,17 +415,17 @@ final class JDBCDataStore {
     }
 
     private static void seedDemoData(Connection connection) throws SQLException {
-        executeMerge(connection, "merge into titolari key(id) values (?, ?, ?, ?, ?)", "TIT-1", "Andrea",
+        executeMerge(connection, TITOLARE_MERGE_SQL, "TIT-1", "Andrea",
                 "Titolare", "titolare@stocktrack.local", PasswordHasher.hash(DEFAULT_LOGIN_PASSWORD));
-        executeMerge(connection, "merge into commessi key(id) values (?, ?, ?, ?, ?)", "COM-1", "Mario",
+        executeMerge(connection, COMMESSO_MERGE_SQL, "COM-1", "Mario",
                 "Commesso", "commesso@stocktrack.local", PasswordHasher.hash(DEFAULT_LOGIN_PASSWORD));
-        executeMerge(connection, "merge into fornitori key(id) values (?, ?, ?, ?, ?, ?)", "APPLE-2026", "APPLE",
+        executeMerge(connection, SUPPLIER_MERGE_SQL, "APPLE-2026", "APPLE",
                 "business@apple.example", "simulated://fornitori/apple", true,
                 PasswordHasher.hash(DEFAULT_LOGIN_PASSWORD));
-        executeMerge(connection, "merge into fornitori key(id) values (?, ?, ?, ?, ?, ?)", "SAMSUNG-2026", "SAMSUNG",
+        executeMerge(connection, SUPPLIER_MERGE_SQL, "SAMSUNG-2026", "SAMSUNG",
                 "business@samsung.example", "simulated://fornitori/samsung", true,
                 PasswordHasher.hash(DEFAULT_LOGIN_PASSWORD));
-        executeMerge(connection, "merge into fornitori key(id) values (?, ?, ?, ?, ?, ?)", "HUAWEI-2026", "HUAWEI",
+        executeMerge(connection, SUPPLIER_MERGE_SQL, "HUAWEI-2026", "HUAWEI",
                 "business@huawei.example", "simulated://fornitori/huawei", true,
                 PasswordHasher.hash(DEFAULT_LOGIN_PASSWORD));
         executeMerge(connection, PRODUCT_MERGE_SQL, "PROD-1", "Caffe",

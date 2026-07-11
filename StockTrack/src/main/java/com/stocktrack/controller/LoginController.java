@@ -25,8 +25,6 @@ public class LoginController {
 
     public ProfiloUtenteBean login(LoginBean loginBean)
             throws InvalidInputException, AutenticazioneException, PersistenceException {
-        loginBean.validate();
-
         DAOFactory daoFactory = DAOFactoryProvider.getFactory();
         Optional<Titolare> titolare = daoFactory.getTitolareDAO().findByEmail(loginBean.getUsername());
         if (titolare.isPresent()) {
@@ -51,8 +49,6 @@ public class LoginController {
 
     public ProfiloUtenteBean registra(RegistrazioneBean registrazioneBean)
             throws InvalidInputException, AutenticazioneException, PersistenceException {
-        registrazioneBean.validate();
-
         DAOFactory daoFactory = DAOFactoryProvider.getFactory();
         if (daoFactory.getTitolareDAO().findByEmail(registrazioneBean.getEmail()).isPresent()
                 || daoFactory.getCommessoDAO().findByEmail(registrazioneBean.getEmail()).isPresent()

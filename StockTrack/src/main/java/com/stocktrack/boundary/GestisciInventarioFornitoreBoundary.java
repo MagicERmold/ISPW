@@ -1,5 +1,6 @@
 package com.stocktrack.boundary;
 
+import com.stocktrack.bean.EsitoListaBean;
 import com.stocktrack.bean.EsitoOperazioneBean;
 import com.stocktrack.bean.FornitoreBean;
 import com.stocktrack.bean.ProdottoBean;
@@ -13,9 +14,8 @@ import java.util.List;
 
 public class GestisciInventarioFornitoreBoundary {
 
-    private final GestisciInventarioFornitoreController controller = new GestisciInventarioFornitoreController();
-
     public FornitoreBean visualizzaProfilo() {
+        GestisciInventarioFornitoreController controller = new GestisciInventarioFornitoreController();
         try {
             return controller.visualizzaProfiloFornitoreCorrente();
         } catch (InvalidInputException | PersistenceException e) {
@@ -24,15 +24,24 @@ public class GestisciInventarioFornitoreBoundary {
     }
 
     public List<ProdottoBean> visualizzaInventario() {
+        return visualizzaInventarioConEsito().getElementi();
+    }
+
+    public EsitoListaBean<ProdottoBean> visualizzaInventarioConEsito() {
+        GestisciInventarioFornitoreController controller = new GestisciInventarioFornitoreController();
         try {
-            return controller.visualizzaInventarioCorrente();
+            List<ProdottoBean> prodotti = controller.visualizzaInventarioCorrente();
+            String messaggio = prodotti.isEmpty() ? "Magazzino fornitore vuoto" : "Magazzino fornitore aggiornato";
+            return EsitoListaBean.success(messaggio, prodotti);
         } catch (InvalidInputException | PersistenceException | FornitoreConnectionException e) {
-            return List.of();
+            return EsitoListaBean.failure(e.getMessage());
         }
     }
 
     public EsitoOperazioneBean salvaProdotto(ProdottoBean prodottoBean) {
+        GestisciInventarioFornitoreController controller = new GestisciInventarioFornitoreController();
         try {
+            validateProdotto(prodottoBean);
             return controller.salvaProdotto(prodottoBean);
         } catch (InvalidInputException | PersistenceException | FornitoreConnectionException e) {
             return new EsitoOperazioneBean(false, e.getMessage());
@@ -40,6 +49,14 @@ public class GestisciInventarioFornitoreBoundary {
     }
 
     public EsitoOperazioneBean logout() {
-        return new LoginController().logout();
+        LoginController controller = new LoginController();
+        return controller.logout();
+    }
+
+    private void validateProdotto(ProdottoBean prodottoBean) throws InvalidInputException {
+        if (prodottoBean == null) {
+            throw new InvalidInputException("Prodotto obbligatorio");
+        }
+        prodottoBean.validate();
     }
 }

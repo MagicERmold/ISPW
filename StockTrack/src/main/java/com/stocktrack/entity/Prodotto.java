@@ -14,13 +14,13 @@ public class Prodotto extends AbstractProdottoData {
         super(id, nome, categoria, quantita, sogliaMinima, prezzoUnitario);
     }
 
-    public void aumentaQuantita(int quantitaDaAggiungere) {
+    public synchronized void aumentaQuantita(int quantitaDaAggiungere) {
         if (quantitaDaAggiungere > 0) {
             setQuantita(getQuantita() + quantitaDaAggiungere);
         }
     }
 
-    public void riduciQuantita(int quantitaDaRimuovere) {
+    public synchronized void riduciQuantita(int quantitaDaRimuovere) {
         if (quantitaDaRimuovere > 0 && quantitaDaRimuovere <= getQuantita()) {
             setQuantita(getQuantita() - quantitaDaRimuovere);
         }

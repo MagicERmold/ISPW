@@ -3,6 +3,9 @@ package com.stocktrack.pattern.adapter;
 import java.math.BigDecimal;
 import java.util.UUID;
 
+/**
+ * Componente esterno simulato con l'interfaccia specifica di PagamentoPaypal. È usato esclusivamente dal relativo adapter, così la BCE non dipende dal servizio concreto.
+ */
 public class PagamentoPaypalAdaptee {
 
     public String createPayment(BigDecimal amount, String currency, String accountEmail) {

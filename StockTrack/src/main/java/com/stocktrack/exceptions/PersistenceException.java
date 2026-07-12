@@ -1,5 +1,8 @@
 package com.stocktrack.exceptions;
 
+/**
+ * Uniforma gli errori dei diversi DAO affinche controller e boundary non dipendano dalla tecnologia di persistenza.
+ */
 public class PersistenceException extends Exception {
 
     public PersistenceException(String message) {

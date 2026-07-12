@@ -21,6 +21,9 @@ import com.stocktrack.exceptions.ProdottoNonDisponibileException;
 
 import java.util.List;
 
+/**
+ * Boundary BCE del caso d'uso AcquistaProdottiFornitori. Riceve bean dalla view, esegue la validazione sintattica, crea il controller applicativo per la richiesta e trasforma eccezioni e risultati in bean di risposta coerenti.
+ */
 public class AcquistaProdottiFornitoriBoundary {
 
     public ProfiloUtenteBean login(LoginBean loginBean) {

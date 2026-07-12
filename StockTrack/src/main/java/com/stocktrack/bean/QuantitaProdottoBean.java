@@ -2,6 +2,9 @@ package com.stocktrack.bean;
 
 import com.stocktrack.exceptions.InvalidInputException;
 
+/**
+ * Bean di input BCE che trasporta e valida prodotto e quantita per le operazioni di inventario.
+ */
 public class QuantitaProdottoBean {
 
     private String idProdotto;

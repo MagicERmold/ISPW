@@ -5,6 +5,9 @@ import com.stocktrack.bean.PagamentoBean;
 import com.stocktrack.exceptions.InvalidInputException;
 import com.stocktrack.exceptions.PagamentoFallitoException;
 
+/**
+ * Adapter che implementa il gateway applicativo traducendo i bean BCE nel formato richiesto da PagamentoVisa. Isola il controller dalle API esterne concrete.
+ */
 public class PagamentoVisaAdapter implements PagamentoGateway {
 
     private final PagamentoVisaAdaptee visaApi;

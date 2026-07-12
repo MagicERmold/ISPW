@@ -2,6 +2,9 @@ package com.stocktrack.bean;
 
 import com.stocktrack.exceptions.InvalidInputException;
 
+/**
+ * Bean di input BCE che trasporta e valida le credenziali dalla boundary al controller di autenticazione.
+ */
 public class LoginBean {
 
     private String username;

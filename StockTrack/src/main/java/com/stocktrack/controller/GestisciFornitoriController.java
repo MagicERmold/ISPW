@@ -15,6 +15,9 @@ import com.stocktrack.pattern.singleton.SessionManagerSingleton;
 
 import java.util.List;
 
+/**
+ * Controller applicativo BCE per consultare, aggiungere e rimuovere fornitori. Applica le autorizzazioni e coordina DAO e gateway, lasciando alla boundary la conversione degli errori per la view.
+ */
 public class GestisciFornitoriController {
 
     public List<FornitoreBean> visualizzaFornitori() throws PersistenceException {
@@ -31,7 +34,7 @@ public class GestisciFornitoriController {
 
     public EsitoOperazioneBean aggiungiFornitoreConCodice(CodiceFornitoreBean codiceFornitoreBean)
             throws InvalidInputException, PersistenceException {
-        if (isTitolare()) {
+        if (!isTitolare()) {
             return new EsitoOperazioneBean(false, "Solo il titolare puo aggiungere fornitori");
         }
 
@@ -48,7 +51,7 @@ public class GestisciFornitoriController {
 
     public EsitoOperazioneBean rimuoviFornitore(FornitoreBean fornitoreBean)
             throws PersistenceException {
-        if (isTitolare()) {
+        if (!isTitolare()) {
             return new EsitoOperazioneBean(false, "Solo il titolare puo rimuovere fornitori");
         }
         if (DAOFactoryProvider.getFactory().getFornitoreDAO().findById(fornitoreBean.getId()).isEmpty()) {

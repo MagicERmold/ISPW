@@ -1,5 +1,8 @@
 package com.stocktrack.bean;
 
+/**
+ * Bean di risposta BCE usato dal controller per comunicare alla boundary la disponibilita di un prodotto.
+ */
 public class DisponibilitaProdottoBean {
 
     private ProdottoBean prodotto;

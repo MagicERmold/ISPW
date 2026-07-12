@@ -3,6 +3,9 @@ package com.stocktrack.pattern.adapter;
 import java.math.BigDecimal;
 import java.util.UUID;
 
+/**
+ * Componente esterno simulato con l'interfaccia specifica di PagamentoVisa. È usato esclusivamente dal relativo adapter, così la BCE non dipende dal servizio concreto.
+ */
 public class PagamentoVisaAdaptee {
 
     public String authorizeCard(String cardNumber, String cvv, BigDecimal amount) {

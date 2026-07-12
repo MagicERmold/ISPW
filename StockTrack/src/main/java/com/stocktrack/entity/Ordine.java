@@ -4,6 +4,9 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Entity BCE che rappresenta un ordine confermato; viene costruita dal controller e conservata tramite il relativo DAO.
+ */
 public class Ordine {
 
     private String id;

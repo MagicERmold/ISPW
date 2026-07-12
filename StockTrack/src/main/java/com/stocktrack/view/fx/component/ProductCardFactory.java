@@ -28,6 +28,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Factory della sola View JavaFX che costruisce componenti grafici riutilizzabili per i prodotti. Evita duplicazione nei controller grafici e non partecipa alle regole di business BCE.
+ */
 public final class ProductCardFactory {
 
     private static final int CARD_IMAGE_WIDTH = 360;

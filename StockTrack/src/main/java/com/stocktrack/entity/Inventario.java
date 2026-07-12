@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Entity BCE che mantiene i prodotti del magazzino; viene caricata e salvata dai DAO su richiesta dei controller.
+ */
 public class Inventario {
 
     private String id;

@@ -9,6 +9,9 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.util.Objects;
 
+/**
+ * Bootstrap della view JavaFX: crea lo stage, carica gli FXML e gestisce il cambio di scena. Appartiene al livello View e non contiene regole di business, che restano nel flusso BCE.
+ */
 public class JavaFXApp extends Application {
 
     private static Scene scene;

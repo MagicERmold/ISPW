@@ -3,6 +3,9 @@ package com.stocktrack.bean;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Bean di risposta BCE che accompagna una lista con esito e messaggio, evitando risultati null o ambigui.
+ */
 public class EsitoListaBean<T> {
 
     private boolean successo;

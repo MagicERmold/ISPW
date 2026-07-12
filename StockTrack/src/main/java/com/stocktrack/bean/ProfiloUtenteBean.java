@@ -1,5 +1,8 @@
 package com.stocktrack.bean;
 
+/**
+ * Bean di risposta BCE restituito dopo l'autenticazione per mostrare alla view profilo e ruolo dell'utente.
+ */
 public class ProfiloUtenteBean {
 
     private String nome;

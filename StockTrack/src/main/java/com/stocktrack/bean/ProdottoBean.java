@@ -5,6 +5,9 @@ import com.stocktrack.exceptions.InvalidInputException;
 
 import java.math.BigDecimal;
 
+/**
+ * Bean BCE che trasporta e valida i dati di un prodotto tra boundary, controller e gateway senza esporre l'entity.
+ */
 public class ProdottoBean extends AbstractProdottoData {
 
     public ProdottoBean() {

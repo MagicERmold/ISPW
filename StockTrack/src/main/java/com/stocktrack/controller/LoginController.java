@@ -19,6 +19,9 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Controller applicativo BCE dell'autenticazione e registrazione. Riceve bean dalle boundary, applica le regole di accesso, usa i DAO per gli utenti e crea la sessione; è stateless per poter servire più richieste.
+ */
 public class LoginController {
 
     public ProfiloUtenteBean login(LoginBean loginBean)

@@ -6,6 +6,9 @@ import com.stocktrack.exceptions.PersistenceException;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Contratto DAO della BCE per l'accesso persistente a Fornitore. Viene usato dai controller tramite l'Abstract Factory, così la logica applicativa non dipende da memoria, file system o database.
+ */
 public interface FornitoreDAO {
 
     List<Fornitore> findAll() throws PersistenceException;

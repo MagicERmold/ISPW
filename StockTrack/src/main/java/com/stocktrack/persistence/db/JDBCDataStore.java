@@ -23,6 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Componente interno di persistenza che centralizza strutture e operazioni sulla database JDBC della modalità FULL. È usato dai DAO dello stesso package e resta nascosto a boundary, view e controller applicativi.
+ */
 final class JDBCDataStore {
 
     private static final String URL = "jdbc:h2:file:./StockTrack/data/stocktrack-db-secure;CIPHER=AES";

@@ -2,6 +2,9 @@ package com.stocktrack.entity;
 
 import com.stocktrack.common.AbstractAnagraficaData;
 
+/**
+ * Entity BCE che rappresenta un fornitore persistito; viene usata dai controller applicativi, DAO e adapter.
+ */
 public class Fornitore extends AbstractAnagraficaData {
 
     private String apiEndpoint;

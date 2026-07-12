@@ -2,6 +2,9 @@ package com.stocktrack.bean;
 
 import java.math.BigDecimal;
 
+/**
+ * Bean di risposta BCE con i dati statistici mensili calcolati dal controller e mostrati dalla view.
+ */
 public class StatisticaVenditaMensileBean {
 
     private String mese;

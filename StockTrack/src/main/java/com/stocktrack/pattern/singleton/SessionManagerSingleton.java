@@ -9,6 +9,9 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+/**
+ * Singleton che gestisce sessioni concorrenti indicizzate e lega la sessione corrente al thread. Viene consultato dai controller per autenticazione e autorizzazioni senza inserire stato utente nei controller.
+ */
 public class SessionManagerSingleton {
 
     private static final ZoneId APPLICATION_ZONE = ZoneId.systemDefault();
@@ -23,7 +26,7 @@ public class SessionManagerSingleton {
         return Holder.INSTANCE;
     }
 
-    public Session createSession(String idUtente, RuoloUtente ruolo) {
+    public void createSession(String idUtente, RuoloUtente ruolo) {
         if (idUtente == null || idUtente.isBlank()) {
             throw new IllegalArgumentException("Id utente obbligatorio");
         }
@@ -35,7 +38,6 @@ public class SessionManagerSingleton {
         Session session = new Session(sessionId, idUtente, ruolo, LocalDateTime.now(APPLICATION_ZONE));
         sessions.put(sessionId, session);
         currentSessionId.set(sessionId);
-        return session;
     }
 
     public Optional<Session> getCurrentSession() {

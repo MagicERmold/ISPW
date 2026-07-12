@@ -7,6 +7,9 @@ import com.stocktrack.persistence.dao.OrdineDAO;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Implementazione del DAO che persiste Ordine su file per la modalità FULL. Viene creata dalla factory e usata dai controller attraverso l'interfaccia DAO, preservando la separazione BCE.
+ */
 public class FileSystemOrdineDAO implements OrdineDAO {
 
     @Override

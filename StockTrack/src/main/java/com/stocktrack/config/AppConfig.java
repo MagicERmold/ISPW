@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+/**
+ * Legge la configurazione applicativa usata da avvio e factory per scegliere persistenza e interfaccia senza accoppiarle alla BCE.
+ */
 public class AppConfig {
 
     private static final String CONFIG_FILE = "config.properties";

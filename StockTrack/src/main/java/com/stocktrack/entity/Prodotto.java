@@ -4,6 +4,9 @@ import com.stocktrack.common.AbstractProdottoData;
 
 import java.math.BigDecimal;
 
+/**
+ * Entity BCE che rappresenta un prodotto e il suo stato di magazzino; viene usata dai controller e dai DAO.
+ */
 public class Prodotto extends AbstractProdottoData {
 
     public Prodotto() {

@@ -15,6 +15,9 @@ import com.stocktrack.persistence.db.JDBCOrdineDAO;
 import com.stocktrack.persistence.db.JDBCProdottoDAO;
 import com.stocktrack.persistence.db.JDBCTitolareDAO;
 
+/**
+ * Factory concreta che crea la famiglia di DAO JDBC. È selezionata dal provider e permette ai controller di usare la persistenza configurata senza cambiare il flusso BCE.
+ */
 public class JDBCDAOFactory extends DAOFactory {
 
     @Override

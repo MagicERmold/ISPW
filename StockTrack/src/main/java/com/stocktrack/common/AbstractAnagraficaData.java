@@ -1,5 +1,8 @@
 package com.stocktrack.common;
 
+/**
+ * Base comune per i dati anagrafici condivisi da bean ed entity, usata per evitare duplicazione senza mescolarne i ruoli BCE.
+ */
 public abstract class AbstractAnagraficaData {
 
     private String id;

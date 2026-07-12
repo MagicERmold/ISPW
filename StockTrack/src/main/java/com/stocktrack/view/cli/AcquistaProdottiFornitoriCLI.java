@@ -37,6 +37,9 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
 
+/**
+ * Boundary grafica testuale dell'applicazione: legge e mostra dati nella CLI, costruisce i bean e usa le boundary BCE. Permette di offrire lo stesso caso d'uso senza dipendere da JavaFX.
+ */
 public class AcquistaProdottiFornitoriCLI {
 
     private static final ConsoleOutput LOGGER = new ConsoleOutput();

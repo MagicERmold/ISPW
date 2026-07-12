@@ -6,6 +6,9 @@ import com.stocktrack.persistence.dao.MovimentoInventarioDAO;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Implementazione del DAO che persiste MovimentoInventario in memoria per la modalità DEMO. Viene creata dalla factory e usata dai controller attraverso l'interfaccia DAO, preservando la separazione BCE.
+ */
 public class InMemoryMovimentoInventarioDAO implements MovimentoInventarioDAO {
 
     @Override

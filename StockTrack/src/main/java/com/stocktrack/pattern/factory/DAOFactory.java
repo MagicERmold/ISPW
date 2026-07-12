@@ -8,6 +8,9 @@ import com.stocktrack.persistence.dao.OrdineDAO;
 import com.stocktrack.persistence.dao.ProdottoDAO;
 import com.stocktrack.persistence.dao.TitolareDAO;
 
+/**
+ * Abstract Factory che definisce la famiglia completa di DAO necessaria ai controller. Serve a cambiare tecnologia di persistenza mantenendo invariata la logica BCE.
+ */
 public abstract class DAOFactory {
 
     public abstract TitolareDAO getTitolareDAO();

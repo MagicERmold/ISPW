@@ -35,6 +35,9 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Controller applicativo del caso d'uso principale di acquisto. Coordina bean, entity, DAO e gateway di pagamento e fornitore, applicando autorizzazioni e regole di business senza dipendere dalla view.
+ */
 public class AcquistaProdottiFornitoriController {
 
     private static final Object INVENTORY_UPDATE_LOCK = new Object();

@@ -12,6 +12,9 @@ import com.stocktrack.exceptions.PersistenceException;
 
 import java.util.List;
 
+/**
+ * Boundary BCE del caso d'uso GestisciInventarioFornitore. Riceve bean dalla view, esegue la validazione sintattica, crea il controller applicativo per la richiesta e trasforma eccezioni e risultati in bean di risposta coerenti.
+ */
 public class GestisciInventarioFornitoreBoundary {
 
     public FornitoreBean visualizzaProfilo() {

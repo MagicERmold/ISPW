@@ -7,6 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Implementazione del DAO che persiste Titolare in memoria per la modalità DEMO. Viene creata dalla factory e usata dai controller attraverso l'interfaccia DAO, preservando la separazione BCE.
+ */
 public class InMemoryTitolareDAO implements TitolareDAO {
 
     @Override

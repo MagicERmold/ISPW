@@ -1,5 +1,8 @@
 package com.stocktrack.bean;
 
+/**
+ * Bean di risposta BCE che comunica alla boundary e alla view l'esito della conferma di un ordine.
+ */
 public class EsitoOrdineBean {
 
     private boolean successo;

@@ -14,6 +14,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * Simulazione dell'API proprietaria dei fornitori. Offre operazioni nel formato del sistema esterno ed è incapsulata dall'adapter per evitare che il controller BCE dipenda direttamente da tale formato.
+ */
 public class FornitoreApiAdaptee {
 
     private static final String APPLE_CODE = "APPLE-2026";

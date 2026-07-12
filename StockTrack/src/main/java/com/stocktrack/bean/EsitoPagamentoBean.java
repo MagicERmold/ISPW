@@ -1,5 +1,8 @@
 package com.stocktrack.bean;
 
+/**
+ * Bean di risposta BCE che comunica al controller chiamante l'esito dell'autorizzazione di pagamento.
+ */
 public class EsitoPagamentoBean {
 
     private boolean successo;

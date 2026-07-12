@@ -33,6 +33,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Controller grafico della View JavaFX per Inventario. Raccoglie gli eventi dell'interfaccia, costruisce bean e invoca le boundary; serve a mantenere FXML e dettagli grafici fuori dalla logica applicativa BCE.
+ */
 public class InventarioFXController {
 
     @FXML

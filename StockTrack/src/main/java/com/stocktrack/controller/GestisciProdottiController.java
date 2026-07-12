@@ -19,6 +19,9 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.UUID;
 
+/**
+ * Controller applicativo BCE per modifiche, vendite e acquisti di inventario. Valida permessi e regole di dominio, aggiorna entity e DAO e restituisce bean di esito alle boundary.
+ */
 public class GestisciProdottiController {
 
     private static final String PRODOTTO_NON_TROVATO = "Prodotto non trovato";

@@ -14,6 +14,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
+/**
+ * Componente interno di persistenza che centralizza strutture e operazioni sulla memoria della modalità DEMO. È usato dai DAO dello stesso package e resta nascosto a boundary, view e controller applicativi.
+ */
 final class InMemoryDataStore {
 
     static final Map<String, Titolare> TITOLARI = new ConcurrentHashMap<>();

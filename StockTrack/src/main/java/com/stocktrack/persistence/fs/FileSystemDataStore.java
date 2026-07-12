@@ -23,6 +23,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * Componente interno di persistenza che centralizza strutture e operazioni sulla file system della modalità FULL. È usato dai DAO dello stesso package e resta nascosto a boundary, view e controller applicativi.
+ */
 final class FileSystemDataStore {
 
     private static final Path DATA_DIR = resolveDataDir();

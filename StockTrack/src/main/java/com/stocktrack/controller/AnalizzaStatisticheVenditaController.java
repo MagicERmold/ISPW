@@ -18,6 +18,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Controller applicativo BCE che aggrega prodotti e movimenti persistiti per calcolare statistiche mensili restituite come bean, senza dipendere dalla view.
+ */
 public class AnalizzaStatisticheVenditaController {
 
     private static final int MONTHS_TO_SIMULATE = 6;

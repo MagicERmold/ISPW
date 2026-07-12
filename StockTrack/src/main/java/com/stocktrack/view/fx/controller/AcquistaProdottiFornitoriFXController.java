@@ -29,6 +29,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Controller grafico della View JavaFX per AcquistaProdottiFornitori. Raccoglie gli eventi dell'interfaccia, costruisce bean e invoca le boundary; serve a mantenere FXML e dettagli grafici fuori dalla logica applicativa BCE.
+ */
 public class AcquistaProdottiFornitoriFXController {
 
     @FXML

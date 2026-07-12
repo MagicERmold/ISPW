@@ -10,6 +10,9 @@ import com.stocktrack.pattern.factory.DAOFactoryProvider;
 
 import java.util.List;
 
+/**
+ * Controller applicativo BCE che legge l'inventario tramite DAO e produce bean di disponibilità per la boundary. Separa il calcolo dalla rappresentazione CLI o JavaFX.
+ */
 public class AnalizzaDisponibilitaInventarioController {
 
     public InventarioBean visualizzaInventario() throws PersistenceException {

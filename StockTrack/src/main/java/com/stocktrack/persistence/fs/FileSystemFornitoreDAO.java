@@ -7,6 +7,9 @@ import com.stocktrack.persistence.dao.FornitoreDAO;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Implementazione del DAO che persiste Fornitore su file per la modalità FULL. Viene creata dalla factory e usata dai controller attraverso l'interfaccia DAO, preservando la separazione BCE.
+ */
 public class FileSystemFornitoreDAO implements FornitoreDAO {
 
     @Override

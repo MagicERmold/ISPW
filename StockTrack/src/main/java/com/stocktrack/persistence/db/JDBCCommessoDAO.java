@@ -7,6 +7,9 @@ import com.stocktrack.persistence.dao.CommessoDAO;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Implementazione del DAO che persiste Commesso su database JDBC per la modalità FULL. Viene creata dalla factory e usata dai controller attraverso l'interfaccia DAO, preservando la separazione BCE.
+ */
 public class JDBCCommessoDAO implements CommessoDAO {
 
     @Override

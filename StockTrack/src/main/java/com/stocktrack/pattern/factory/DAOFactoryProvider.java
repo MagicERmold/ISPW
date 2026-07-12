@@ -3,6 +3,9 @@ package com.stocktrack.pattern.factory;
 import com.stocktrack.config.AppConfig;
 import com.stocktrack.config.PersistenceMode;
 
+/**
+ * Seleziona la factory DAO coerente con la configurazione DEMO o FULL. È usato dai controller per ottenere DAO astratti senza conoscere le implementazioni concrete.
+ */
 public class DAOFactoryProvider {
 
     private DAOFactoryProvider() {

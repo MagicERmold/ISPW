@@ -2,6 +2,9 @@ package com.stocktrack.bean;
 
 import com.stocktrack.exceptions.InvalidInputException;
 
+/**
+ * Bean di input BCE che identifica il prodotto selezionato dalla view per le operazioni del controller.
+ */
 public class ProdottoSelezionatoBean {
 
     private String idProdotto;

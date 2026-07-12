@@ -20,6 +20,9 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 
+/**
+ * Controller grafico della View JavaFX per InventarioFornitore. Raccoglie gli eventi dell'interfaccia, costruisce bean e invoca le boundary; serve a mantenere FXML e dettagli grafici fuori dalla logica applicativa BCE.
+ */
 public class InventarioFornitoreFXController {
 
     @FXML

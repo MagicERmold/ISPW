@@ -3,6 +3,9 @@ package com.stocktrack.entity;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Entity BCE che rappresenta il carrello nel dominio; viene usata dai controller applicativi per gestirne i prodotti.
+ */
 public class Carrello {
 
     private List<Prodotto> prodotti = new ArrayList<>();

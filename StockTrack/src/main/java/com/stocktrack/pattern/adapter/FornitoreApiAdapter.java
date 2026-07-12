@@ -11,6 +11,9 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Adapter che traduce i bean BCE nelle chiamate richieste dall'API simulata del fornitore e converte gli errori tecnici in eccezioni applicative. È usato dai controller tramite FornitoreGateway.
+ */
 public class FornitoreApiAdapter implements FornitoreGateway {
 
     private final FornitoreApiAdaptee fornitoreApi;

@@ -1,5 +1,8 @@
 package com.stocktrack.bean;
 
+/**
+ * Bean di risposta BCE usato dai controller e dalle boundary per comunicare successo e messaggio alla view.
+ */
 public class EsitoOperazioneBean {
 
     private boolean successo;

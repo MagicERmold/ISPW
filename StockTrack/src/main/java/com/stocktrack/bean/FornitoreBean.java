@@ -3,6 +3,9 @@ package com.stocktrack.bean;
 import com.stocktrack.common.AbstractAnagraficaData;
 import com.stocktrack.exceptions.InvalidInputException;
 
+/**
+ * Bean BCE che trasporta i dati di un fornitore tra view, boundary, controller e gateway senza esporre l'entity.
+ */
 public class FornitoreBean extends AbstractAnagraficaData {
 
     private String apiEndpoint;

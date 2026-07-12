@@ -3,6 +3,9 @@ package com.stocktrack.bean;
 import com.stocktrack.common.AbstractPersonaData;
 import com.stocktrack.exceptions.InvalidInputException;
 
+/**
+ * Bean di input BCE che trasporta e valida i dati raccolti dalla view durante la registrazione.
+ */
 public class RegistrazioneBean extends AbstractPersonaData {
 
     private String password;

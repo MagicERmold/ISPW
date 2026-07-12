@@ -15,6 +15,9 @@ import com.stocktrack.persistence.fs.FileSystemOrdineDAO;
 import com.stocktrack.persistence.fs.FileSystemProdottoDAO;
 import com.stocktrack.persistence.fs.FileSystemTitolareDAO;
 
+/**
+ * Factory concreta che crea la famiglia di DAO FileSystem. È selezionata dal provider e permette ai controller di usare la persistenza configurata senza cambiare il flusso BCE.
+ */
 public class FileSystemDAOFactory extends DAOFactory {
 
     @Override

@@ -6,6 +6,9 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Bean BCE che raccoglie i dati dell'ordine passati dalla boundary al controller e al gateway del fornitore.
+ */
 public class OrdineBean {
 
     private String idOrdine;

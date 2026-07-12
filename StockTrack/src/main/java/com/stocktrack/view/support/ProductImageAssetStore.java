@@ -11,6 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Supporto della View per salvare e individuare le immagini associate ai prodotti. È usato dai controller JavaFX e resta separato da entity, controller applicativi e DAO.
+ */
 public final class ProductImageAssetStore {
 
     private ProductImageAssetStore() {

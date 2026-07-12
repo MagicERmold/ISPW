@@ -15,6 +15,9 @@ import com.stocktrack.pattern.singleton.SessionManagerSingleton;
 
 import java.util.List;
 
+/**
+ * Controller applicativo BCE dedicato all'inventario del fornitore autenticato. Verifica la sessione e coordina DAO e gateway esterno senza conservare stato utente.
+ */
 public class GestisciInventarioFornitoreController {
 
     public FornitoreBean visualizzaProfiloFornitoreCorrente() throws InvalidInputException, PersistenceException {

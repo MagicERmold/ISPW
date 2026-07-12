@@ -6,6 +6,9 @@ import com.stocktrack.persistence.dao.MovimentoInventarioDAO;
 
 import java.util.List;
 
+/**
+ * Implementazione del DAO che persiste MovimentoInventario su database JDBC per la modalità FULL. Viene creata dalla factory e usata dai controller attraverso l'interfaccia DAO, preservando la separazione BCE.
+ */
 public class JDBCMovimentoInventarioDAO implements MovimentoInventarioDAO {
 
     @Override

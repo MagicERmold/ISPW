@@ -4,6 +4,9 @@ import com.stocktrack.exceptions.InvalidInputException;
 
 import java.math.BigDecimal;
 
+/**
+ * Bean di input BCE che trasporta e valida i dati di pagamento diretti al controller e agli adapter esterni.
+ */
 public class PagamentoBean {
 
     private String metodoPagamento;

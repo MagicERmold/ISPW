@@ -2,6 +2,9 @@ package com.stocktrack.common;
 
 import java.math.BigDecimal;
 
+/**
+ * Raccoglie i dati comuni alle rappresentazioni bean ed entity del prodotto, evitando duplicazione tra i livelli BCE.
+ */
 public abstract class AbstractProdottoData {
 
     private String id;

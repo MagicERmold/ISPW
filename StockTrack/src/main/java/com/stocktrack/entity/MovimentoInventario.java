@@ -4,6 +4,9 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
+/**
+ * Entity BCE che registra un acquisto o una vendita di magazzino; viene creata dai controller e salvata dai DAO.
+ */
 public class MovimentoInventario {
 
     private static final ZoneId APPLICATION_ZONE = ZoneId.systemDefault();

@@ -5,6 +5,9 @@ import com.stocktrack.bean.RuoloUtente;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
+/**
+ * Oggetto che rappresenta una singola sessione autenticata, con utente, ruolo e stato temporale. È creato e gestito dal SessionManagerSingleton e consultato dai controller applicativi.
+ */
 public class Session {
 
     private static final ZoneId APPLICATION_ZONE = ZoneId.systemDefault();

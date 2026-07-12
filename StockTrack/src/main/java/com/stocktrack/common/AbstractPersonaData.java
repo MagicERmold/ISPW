@@ -1,5 +1,8 @@
 package com.stocktrack.common;
 
+/**
+ * Specializza i dati anagrafici comuni alle persone rappresentate sia come bean sia come entity BCE.
+ */
 public abstract class AbstractPersonaData extends AbstractAnagraficaData {
 
     private String cognome;

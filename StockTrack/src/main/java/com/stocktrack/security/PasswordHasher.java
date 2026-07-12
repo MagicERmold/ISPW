@@ -4,6 +4,9 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+/**
+ * Servizio tecnico usato dal controller di login per trasformare e confrontare le password senza inserire dettagli crittografici nelle entity o nelle boundary.
+ */
 public final class PasswordHasher {
 
     private PasswordHasher() {

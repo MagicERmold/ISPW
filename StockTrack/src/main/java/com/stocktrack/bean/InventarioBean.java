@@ -3,6 +3,9 @@ package com.stocktrack.bean;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Bean BCE che rappresenta l'inventario restituito dai controller alle boundary senza esporre le entity persistenti.
+ */
 public class InventarioBean {
 
     private List<ProdottoBean> prodotti = new ArrayList<>();

@@ -15,6 +15,9 @@ import com.stocktrack.persistence.memory.InMemoryOrdineDAO;
 import com.stocktrack.persistence.memory.InMemoryProdottoDAO;
 import com.stocktrack.persistence.memory.InMemoryTitolareDAO;
 
+/**
+ * Factory concreta che crea la famiglia di DAO Memory. È selezionata dal provider e permette ai controller di usare la persistenza configurata senza cambiare il flusso BCE.
+ */
 public class MemoryDAOFactory extends DAOFactory {
 
     @Override

@@ -7,6 +7,9 @@ import com.stocktrack.persistence.dao.TitolareDAO;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Implementazione del DAO che persiste Titolare su file per la modalità FULL. Viene creata dalla factory e usata dai controller attraverso l'interfaccia DAO, preservando la separazione BCE.
+ */
 public class FileSystemTitolareDAO implements TitolareDAO {
 
     @Override

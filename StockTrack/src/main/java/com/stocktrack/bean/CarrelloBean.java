@@ -6,6 +6,9 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Bean BCE che trasporta i dati del carrello tra boundary e controller applicativo senza esporre l'entity.
+ */
 public class CarrelloBean {
 
     private List<ProdottoBean> prodotti = new ArrayList<>();

@@ -12,6 +12,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
+/**
+ * Punto di ingresso dell'applicazione. Legge la modalità di interfaccia configurata e avvia la CLI oppure JavaFX; serve a tenere la scelta della view separata dal flusso BCE.
+ */
 public class Main {
 
     private static final String GUI_VIEW = "GUI";

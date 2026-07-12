@@ -2,6 +2,9 @@ package com.stocktrack.bean;
 
 import com.stocktrack.exceptions.InvalidInputException;
 
+/**
+ * Bean BCE che trasporta e valida il codice fornitore inserito dalla view prima dell'uso nel controller.
+ */
 public class CodiceFornitoreBean {
 
     private String codiceFornitore;

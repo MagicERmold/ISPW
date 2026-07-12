@@ -53,6 +53,7 @@ final class JDBCDataStore {
     private static final String MOVEMENT_VALUE_COLUMN = "valore_unitario";
     private static final String MOVEMENT_DATE_COLUMN = "data_movimento";
     private static final String MOVEMENT_ORIGIN_COLUMN = "origine";
+    private static final String VARCHAR_TYPE = " varchar";
     private static final String VARCHAR_CLOSE = " varchar)";
     private static final String USER_COLUMNS = ID_COLUMN + ", " + NAME_COLUMN + ", " + SURNAME_COLUMN + ", "
             + EMAIL_COLUMN + ", " + PASSWORD_HASH_COLUMN;
@@ -388,7 +389,7 @@ final class JDBCDataStore {
 
     private static void addTitolarePasswordHashColumnIfMissing(Statement statement) throws SQLException {
         try {
-            statement.execute("alter table titolari add column " + PASSWORD_HASH_COLUMN + " varchar");
+            statement.execute("alter table titolari add column " + PASSWORD_HASH_COLUMN + VARCHAR_TYPE);
         } catch (SQLException e) {
             if (!DUPLICATE_COLUMN_SQL_STATE.equals(e.getSQLState())) {
                 throw e;
@@ -398,7 +399,7 @@ final class JDBCDataStore {
 
     private static void addCommessoPasswordHashColumnIfMissing(Statement statement) throws SQLException {
         try {
-            statement.execute("alter table commessi add column " + PASSWORD_HASH_COLUMN + " varchar");
+            statement.execute("alter table commessi add column " + PASSWORD_HASH_COLUMN + VARCHAR_TYPE);
         } catch (SQLException e) {
             if (!DUPLICATE_COLUMN_SQL_STATE.equals(e.getSQLState())) {
                 throw e;
@@ -408,7 +409,7 @@ final class JDBCDataStore {
 
     private static void addFornitorePasswordHashColumnIfMissing(Statement statement) throws SQLException {
         try {
-            statement.execute("alter table fornitori add column " + PASSWORD_HASH_COLUMN + " varchar");
+            statement.execute("alter table fornitori add column " + PASSWORD_HASH_COLUMN + VARCHAR_TYPE);
         } catch (SQLException e) {
             if (!DUPLICATE_COLUMN_SQL_STATE.equals(e.getSQLState())) {
                 throw e;

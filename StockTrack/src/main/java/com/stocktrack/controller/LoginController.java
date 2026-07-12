@@ -9,11 +9,9 @@ import com.stocktrack.entity.Commesso;
 import com.stocktrack.entity.Fornitore;
 import com.stocktrack.entity.Titolare;
 import com.stocktrack.exceptions.AutenticazioneException;
-import com.stocktrack.exceptions.InvalidInputException;
 import com.stocktrack.exceptions.PersistenceException;
 import com.stocktrack.pattern.factory.DAOFactory;
 import com.stocktrack.pattern.factory.DAOFactoryProvider;
-import com.stocktrack.pattern.singleton.Session;
 import com.stocktrack.pattern.singleton.SessionManagerSingleton;
 import com.stocktrack.security.PasswordHasher;
 
@@ -87,21 +85,18 @@ public class LoginController {
     }
 
     private ProfiloUtenteBean creaProfiloTitolare(Titolare titolare) {
-        Session session = SessionManagerSingleton.getInstance().createSession(titolare.getId(), RuoloUtente.TITOLARE);
-        return new ProfiloUtenteBean(titolare.getNome(), RuoloUtente.TITOLARE
-        );
+        SessionManagerSingleton.getInstance().createSession(titolare.getId(), RuoloUtente.TITOLARE);
+        return new ProfiloUtenteBean(titolare.getNome(), RuoloUtente.TITOLARE);
     }
 
     private ProfiloUtenteBean creaProfiloCommesso(Commesso commesso) {
-        Session session = SessionManagerSingleton.getInstance().createSession(commesso.getId(), RuoloUtente.COMMESSO);
-        return new ProfiloUtenteBean(commesso.getNome(), RuoloUtente.COMMESSO
-        );
+        SessionManagerSingleton.getInstance().createSession(commesso.getId(), RuoloUtente.COMMESSO);
+        return new ProfiloUtenteBean(commesso.getNome(), RuoloUtente.COMMESSO);
     }
 
     private ProfiloUtenteBean creaProfiloFornitore(Fornitore fornitore) {
-        Session session = SessionManagerSingleton.getInstance().createSession(fornitore.getId(), RuoloUtente.FORNITORE);
-        return new ProfiloUtenteBean(fornitore.getNome(), RuoloUtente.FORNITORE
-        );
+        SessionManagerSingleton.getInstance().createSession(fornitore.getId(), RuoloUtente.FORNITORE);
+        return new ProfiloUtenteBean(fornitore.getNome(), RuoloUtente.FORNITORE);
     }
 
     private void verificaPassword(String password, String expectedHash) throws AutenticazioneException {

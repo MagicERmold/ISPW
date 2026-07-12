@@ -5,9 +5,6 @@ import com.stocktrack.exceptions.InvalidInputException;
 
 public class TitolareBean extends AbstractPersonaData {
 
-    public TitolareBean() {
-    }
-
     public void validate() throws InvalidInputException {
         if (isBlank(getId())) {
             throw new InvalidInputException("Id titolare obbligatorio");

@@ -5,9 +5,6 @@ import com.stocktrack.exceptions.InvalidInputException;
 
 public class CommessoBean extends AbstractPersonaData {
 
-    public CommessoBean() {
-    }
-
     public void validate() throws InvalidInputException {
         if (isBlank(getId())) {
             throw new InvalidInputException("Id commesso obbligatorio");

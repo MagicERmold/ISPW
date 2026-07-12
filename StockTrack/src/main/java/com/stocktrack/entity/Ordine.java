@@ -1,14 +1,10 @@
 package com.stocktrack.entity;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Ordine {
-
-    private static final ZoneId APPLICATION_ZONE = ZoneId.systemDefault();
 
     private String id;
     private Fornitore fornitore;
@@ -24,7 +20,6 @@ public class Ordine {
         this.fornitore = fornitore;
         setProdotti(prodotti);
         this.totale = totale;
-        LocalDateTime.now(APPLICATION_ZONE);
         this.stato = "CREATO";
     }
 
